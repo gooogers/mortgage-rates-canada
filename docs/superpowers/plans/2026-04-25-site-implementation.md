@@ -1,5 +1,7 @@
 # Astro Site Implementation Plan (v1)
 
+> **Status:** Executed 2026-04-25. See "Execution Notes" below for what actually shipped.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the static Astro site that displays Canadian mortgage rates (the user-facing product), pairs each lender's posted rate with an estimated discounted rate, and includes a standard mortgage payment calculator. The site reads `rates.json` from the scraper as its single data input.
@@ -2559,3 +2561,71 @@ This plan ships a fully-working Astro site that consumes the scraper's `rates.js
 - **Email capture slot** (spec Section 9). "Notify me when rates drop" was reserved for v1.1.
 - **Sitemap.xml** generation. Add the `@astrojs/sitemap` integration when the domain is finalized.
 - **Open Graph / Twitter Card meta tags.** Worth adding before launch for better social sharing.
+
+---
+
+## Execution Notes (2026-04-25)
+
+**Outcome:** All 16 tasks shipped. 26 unit tests pass; `astro check` reports 0 errors / 0 warnings; build produces 18 static pages. Merged to master in commit `e099058`.
+
+**Corrections made during execution (followers of this plan should apply these directly):**
+
+1. **Vite path aliases (Task 6).** The plan only set up TS path aliases in `tsconfig.json`. Astro's Vite build also needs `resolve.alias` in `astro.config.mjs`:
+   ```javascript
+   import { defineConfig } from "astro/config";
+   import { fileURLToPath } from "node:url";
+
+   export default defineConfig({
+     site: "https://yourdomain.ca",
+     trailingSlash: "never",
+     build: { format: "file" },
+     vite: {
+       resolve: {
+         alias: {
+           "@lib": fileURLToPath(new URL("./src/lib", import.meta.url)),
+           "@components": fileURLToPath(new URL("./src/components", import.meta.url)),
+           "@layouts": fileURLToPath(new URL("./src/layouts", import.meta.url)),
+         },
+       },
+     },
+   });
+   ```
+
+2. **Calculator reference constants (Task 5).** The plan's reference values were off (off-by-rounding errors from a different compounding model). Correct values for `$400k @ 5% over 25yr` under Canadian semi-annual compounding:
+   - Monthly conventional: **$2,326.42** (plan said 2326.92)
+   - Monthly with $19k CMHC: **$2,873.13** (plan said 2873.95)
+   - Bi-weekly is computed from the bi-weekly periodic rate, not as `monthly × 12/26` (the approximation drifts by ~$1). For `$400k @ 5% over 25yr biweekly`: **$1,072.54**.
+
+3. **`fetch-rates.mjs` bootstrap fallback (Task 15).** `loadRatesData()` does a static dynamic import of `../data/rates.json` that Rollup tries to resolve at build time. The runtime `try/catch` fallback never gets a chance because the module resolution fails first. The prebuild script must ensure `rates.json` exists by copying `rates.sample.json` when no real data is available — the plan was updated to include this fallback case.
+
+4. **`pages/calculator.astro` import naming (post Task 11).** `import Calculator from ...` collides with Astro's internally-generated `Calculator` type for the page itself. Rename to `CalculatorWidget`:
+   ```astro
+   import CalculatorWidget from "@components/Calculator.astro";
+   ...
+   <CalculatorWidget />
+   ```
+
+5. **`site/.gitignore` (post Task 1).** Add `src/env.d.ts` (Astro auto-generates this on first build).
+
+**Final task structure (as actually executed):**
+
+| Task | Title | Commit | Status |
+|---|---|---|---|
+| 1 | Initialize Astro project | `645a8d9` | Done |
+| 2 | rates.sample.json | `bb990f0` | Done |
+| 3 | format.ts (TDD) | `3982546` | Done — 10 tests |
+| 4 | rates.ts (TDD) | `4087a60` | Done — 6 tests |
+| 5 | calculator.ts (TDD) | `62c7dd2` | Done — 10 tests (constants corrected) |
+| 6 | Base + Footer + Disclaimer | `d8eb8aa` | Done (Vite alias added to astro.config.mjs) |
+| 7 | RateTable + LenderRow | `6bc35f8` | Done |
+| 8 | HeroFeaturedRates | `dcac91b` | Done |
+| 9 | Calculator client island | `4b46035` | Done |
+| 10 | Homepage | `e14329a` | Done (revealed bootstrap issue, fixed in Task 15) |
+| 11 | Calculator page | `0ef7664` | Done (import renamed to fix later check error) |
+| 12 | /rates/[term] | `735ad4e` | Done — 8 pages |
+| 13 | /lenders/[slug] | `d2b13c3` | Done — 3 pages |
+| 14 | Legal pages | `26c86f5` | Done — 5 pages |
+| 15 | fetch-rates.mjs | `57b6ac4` | Done (with bootstrap fallback) |
+| 16 | Verification | (no commit) | Done — 26/26 tests, 0 errors / 0 warnings, 18 pages |
+| post | Naming-collision + dead-import fixes | `0c396e5` | Done |
+| merge | feature/site → master | `e099058` | Done |

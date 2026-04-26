@@ -2,6 +2,7 @@ node_modules/
 dist/
 .astro/
 src/data/rates.json
+src/env.d.ts
 .env
 .env.*
 !.env.example

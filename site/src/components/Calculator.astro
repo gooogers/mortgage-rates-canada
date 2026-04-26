@@ -1,0 +1,145 @@
+---
+import { bestRateForTerm, loadRatesData } from "@lib/rates";
+
+const data = await loadRatesData();
+const best = bestRateForTerm(data, "5yr_fixed");
+const defaultRate = best?.rate.discounted ?? 5.0;
+---
+
+<form class="calculator" data-default-rate={defaultRate}>
+  <h2 class="calculator__title">Mortgage payment calculator</h2>
+  <div class="calculator__grid">
+    <label class="calculator__field">
+      Home price
+      <input type="number" name="homePrice" min="0" step="1000" value="600000" required />
+    </label>
+
+    <label class="calculator__field">
+      Down payment %
+      <input type="number" name="downPct" min="5" max="90" step="0.5" value="20" required />
+    </label>
+
+    <label class="calculator__field">
+      Rate %
+      <input type="number" name="rate" min="0" max="20" step="0.01" value={defaultRate} required />
+    </label>
+
+    <label class="calculator__field">
+      Amortization (years)
+      <select name="amortization">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+        <option value="25" selected>25</option>
+        <option value="30">30</option>
+      </select>
+    </label>
+
+    <label class="calculator__field">
+      Frequency
+      <select name="frequency">
+        <option value="monthly" selected>Monthly</option>
+        <option value="biweekly">Bi-weekly</option>
+        <option value="accelerated_biweekly">Accelerated bi-weekly</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="calculator__results">
+    <div class="calculator__result">
+      <span class="calculator__result-label">Payment</span>
+      <span class="calculator__result-value" data-result="payment">$0</span>
+    </div>
+    <div class="calculator__result">
+      <span class="calculator__result-label">CMHC premium</span>
+      <span class="calculator__result-value" data-result="cmhc">$0</span>
+    </div>
+    <div class="calculator__result">
+      <span class="calculator__result-label">Total interest</span>
+      <span class="calculator__result-value" data-result="interest">$0</span>
+    </div>
+    <div class="calculator__result">
+      <span class="calculator__result-label">Total cost</span>
+      <span class="calculator__result-value" data-result="total">$0</span>
+    </div>
+  </div>
+</form>
+
+<script>
+  import { calculateMortgage, type Frequency } from "@lib/calculator";
+  import { formatCurrency } from "@lib/format";
+
+  const form = document.querySelector<HTMLFormElement>(".calculator");
+  if (!form) throw new Error("calculator form not found");
+
+  function read(name: string): number {
+    const el = form!.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement;
+    return parseFloat(el.value);
+  }
+
+  function readString(name: string): string {
+    const el = form!.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement;
+    return el.value;
+  }
+
+  function setText(selector: string, value: string) {
+    const el = form!.querySelector(selector);
+    if (el) el.textContent = value;
+  }
+
+  function recalc() {
+    try {
+      const result = calculateMortgage({
+        homePrice: read("homePrice"),
+        downPaymentPct: read("downPct") / 100,
+        annualRatePct: read("rate"),
+        amortizationYears: read("amortization"),
+        frequency: readString("frequency") as Frequency,
+      });
+      setText("[data-result='payment']", formatCurrency(result.payment, { cents: true }));
+      setText("[data-result='cmhc']", formatCurrency(result.cmhcPremium));
+      setText("[data-result='interest']", formatCurrency(result.totalInterest));
+      setText("[data-result='total']", formatCurrency(result.totalPaid));
+      updateUrl();
+    } catch (err) {
+      // Most likely: down payment < 5%. Show dashes rather than crashing.
+      setText("[data-result='payment']", "—");
+      setText("[data-result='cmhc']", "—");
+      setText("[data-result='interest']", "—");
+      setText("[data-result='total']", "—");
+    }
+  }
+
+  function updateUrl() {
+    const url = new URL(window.location.href);
+    url.searchParams.set("price", String(read("homePrice")));
+    url.searchParams.set("down", String(read("downPct")));
+    url.searchParams.set("rate", String(read("rate")));
+    url.searchParams.set("am", String(read("amortization")));
+    url.searchParams.set("freq", readString("frequency"));
+    window.history.replaceState({}, "", url);
+  }
+
+  function applyUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const map: Record<string, string> = {
+      price: "homePrice",
+      down: "downPct",
+      rate: "rate",
+      am: "amortization",
+      freq: "frequency",
+    };
+    for (const [param, name] of Object.entries(map)) {
+      const v = params.get(param);
+      if (v === null) continue;
+      const el = form!.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement;
+      if (el) el.value = v;
+    }
+  }
+
+  applyUrl();
+  recalc();
+  form.addEventListener("input", recalc);
+  form.addEventListener("change", recalc);
+</script>

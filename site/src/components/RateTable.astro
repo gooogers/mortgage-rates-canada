@@ -1,0 +1,31 @@
+---
+import LenderRow from "@components/LenderRow.astro";
+import { formatTermLabel } from "@lib/format";
+import type { RatesData, Term } from "@lib/rates";
+
+interface Props {
+  data: RatesData;
+  terms?: Term[];
+}
+
+const DEFAULT_TERMS: Term[] = ["3yr_fixed", "5yr_fixed", "variable"];
+const { data, terms = DEFAULT_TERMS } = Astro.props;
+---
+
+<div class="rate-table-wrap">
+  <table class="rate-table">
+    <thead>
+      <tr>
+        <th>Lender</th>
+        {terms.map((t) => <th>{formatTermLabel(t)}</th>)}
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {data.lenders.map((lender) => <LenderRow lender={lender} terms={terms} />)}
+    </tbody>
+  </table>
+  <p class="rate-table__legend">
+    <s>Posted</s> &nbsp; <strong>Estimated discounted</strong>
+  </p>
+</div>

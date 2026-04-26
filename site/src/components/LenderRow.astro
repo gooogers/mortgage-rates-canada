@@ -1,0 +1,54 @@
+---
+import { formatPercent } from "@lib/format";
+import type { Lender, Term } from "@lib/rates";
+
+interface Props {
+  lender: Lender;
+  terms: Term[];
+}
+
+const { lender, terms } = Astro.props;
+
+function rateFor(term: Term) {
+  return lender.rates.find((r) => r.term === term);
+}
+---
+
+<tr class="lender-row">
+  <td class="lender-row__name">
+    <a href={`/lenders/${lender.slug}`}>{lender.name}</a>
+  </td>
+  {
+    terms.map((term) => {
+      const rate = rateFor(term);
+      return (
+        <td class="lender-row__rate">
+          {rate ? (
+            <>
+              <s class="lender-row__posted">{formatPercent(rate.posted)}</s>
+              <br />
+              <strong class="lender-row__discounted">
+                {formatPercent(rate.discounted)}
+              </strong>
+            </>
+          ) : (
+            "—"
+          )}
+        </td>
+      );
+    })
+  }
+  <td class="lender-row__cta">
+    {
+      lender.affiliate_url ? (
+        <a class="cta" href={lender.affiliate_url} rel="sponsored noopener" target="_blank">
+          Apply →
+        </a>
+      ) : (
+        <a class="cta cta--secondary" href={lender.source_url} rel="noopener" target="_blank">
+          Visit lender →
+        </a>
+      )
+    }
+  </td>
+</tr>

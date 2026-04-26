@@ -1,0 +1,51 @@
+---
+import Base from "@layouts/Base.astro";
+import { loadRatesData } from "@lib/rates";
+import { formatUpdatedAt } from "@lib/format";
+
+const data = await loadRatesData();
+---
+
+<Base
+  title="Methodology"
+  description="How we collect and calculate the rates shown on Mortgage Rates Canada."
+  canonical="https://yourdomain.ca/methodology"
+>
+  <h1>Methodology</h1>
+  <p>Last updated {formatUpdatedAt(data.updated_at)}.</p>
+
+  <h2>Where the posted rates come from</h2>
+  <p>
+    For each lender we display, we automatically read the rates published on
+    that lender's public mortgage rates page. For lenders whose sites cannot
+    be read by an automated scraper, we maintain the rates manually based on
+    their published rate sheets. We always link to the source page on each
+    lender's profile so you can verify.
+  </p>
+
+  <h2>How we estimate the discounted rate</h2>
+  <p>
+    Posted rates are typically what lenders advertise. The actual rate you
+    qualify for through a mortgage broker is usually lower. We apply a fixed
+    haircut to each posted rate to estimate what's typically available:
+  </p>
+  <ul>
+    <li>Fixed terms: posted rate minus {data.discount_formula.fixed}%</li>
+    <li>Variable: posted rate minus {data.discount_formula.variable}%</li>
+    {data.discount_formula.heloc !== null && (
+      <li>HELOC: posted rate minus {data.discount_formula.heloc}%</li>
+    )}
+  </ul>
+  <p>
+    This is an estimate, not a guarantee. The actual rate you receive depends
+    on your credit score, down payment, property type, broker relationship,
+    and lender promotions in effect when you apply. Always confirm directly
+    with a lender or broker.
+  </p>
+
+  <h2>How often rates update</h2>
+  <p>
+    The site rebuilds daily. Each lender's profile shows when their rates were
+    last successfully scraped.
+  </p>
+</Base>

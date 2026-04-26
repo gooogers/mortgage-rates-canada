@@ -1,0 +1,50 @@
+---
+import Base from "@layouts/Base.astro";
+import Calculator from "@components/Calculator.astro";
+import Disclaimer from "@components/Disclaimer.astro";
+import HeroFeaturedRates from "@components/HeroFeaturedRates.astro";
+import RateTable from "@components/RateTable.astro";
+import { formatUpdatedAt } from "@lib/format";
+import { loadRatesData } from "@lib/rates";
+
+const data = await loadRatesData();
+---
+
+<Base
+  title="Mortgage Rates Canada — Compare today's posted and estimated discounted rates"
+  description="Compare current Canadian mortgage rates from major banks. Posted vs. estimated discounted broker-channel rates, updated daily."
+  canonical="https://yourdomain.ca/"
+>
+  <HeroFeaturedRates data={data} />
+
+  <section class="rates-section">
+    <h2>All lender rates</h2>
+    <p class="muted">
+      Updated {formatUpdatedAt(data.updated_at)}. Posted rates are what each
+      lender publishes; discounted rates are estimates of what's typically
+      available through a mortgage broker.
+    </p>
+    <Disclaimer variant="rate" />
+    <RateTable data={data} terms={["3yr_fixed", "5yr_fixed", "variable"]} />
+    <p>
+      <a href="/rates/5-year-fixed">See full 5-year fixed rankings →</a>
+    </p>
+  </section>
+
+  <section>
+    <Calculator />
+    <p>
+      <a href="/calculator">Open the full calculator →</a>
+    </p>
+  </section>
+</Base>
+
+<style>
+  .rates-section {
+    margin: 2rem 0;
+  }
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+</style>

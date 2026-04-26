@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://yourdomain.ca/sitemap.xml

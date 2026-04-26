@@ -1,0 +1,64 @@
+{
+  "updated_at": "2026-04-25T10:00:00Z",
+  "discount_formula": {
+    "fixed": 1.50,
+    "variable": 1.00,
+    "heloc": null
+  },
+  "lenders": [
+    {
+      "slug": "rbc",
+      "name": "RBC Royal Bank",
+      "type": "big6",
+      "source_url": "https://www.rbcroyalbank.com/mortgages/mortgage-rates.html",
+      "affiliate_url": null,
+      "scraped_at": "2026-04-25T10:00:00Z",
+      "rates": [
+        {"term": "1yr_fixed",  "posted": 5.49, "discounted": 3.99},
+        {"term": "2yr_fixed",  "posted": 5.09, "discounted": 3.59},
+        {"term": "3yr_fixed",  "posted": 6.05, "discounted": 4.55},
+        {"term": "4yr_fixed",  "posted": 5.99, "discounted": 4.49},
+        {"term": "5yr_fixed",  "posted": 6.09, "discounted": 4.59},
+        {"term": "7yr_fixed",  "posted": 6.40, "discounted": 4.90},
+        {"term": "10yr_fixed", "posted": 6.80, "discounted": 5.30},
+        {"term": "variable",   "posted": 4.45, "discounted": 3.45}
+      ]
+    },
+    {
+      "slug": "td",
+      "name": "TD Bank",
+      "type": "big6",
+      "source_url": "https://www.td.com/ca/en/personal-banking/products/mortgages/mortgage-rates",
+      "affiliate_url": null,
+      "scraped_at": "2026-04-25T10:00:00Z",
+      "rates": [
+        {"term": "1yr_fixed",  "posted": 5.49, "discounted": 3.99},
+        {"term": "2yr_fixed",  "posted": 4.89, "discounted": 3.39},
+        {"term": "3yr_fixed",  "posted": 6.05, "discounted": 4.55},
+        {"term": "4yr_fixed",  "posted": 5.99, "discounted": 4.49},
+        {"term": "5yr_fixed",  "posted": 6.09, "discounted": 4.59},
+        {"term": "7yr_fixed",  "posted": 6.40, "discounted": 4.90},
+        {"term": "10yr_fixed", "posted": 6.80, "discounted": 5.30},
+        {"term": "variable",   "posted": 4.60, "discounted": 3.60}
+      ]
+    },
+    {
+      "slug": "national",
+      "name": "National Bank of Canada",
+      "type": "big6",
+      "source_url": "https://www.nbc.ca/personal/mortgages.html",
+      "affiliate_url": null,
+      "scraped_at": "2026-04-25T10:00:00Z",
+      "rates": [
+        {"term": "1yr_fixed",  "posted": 5.49, "discounted": 3.99},
+        {"term": "2yr_fixed",  "posted": 5.14, "discounted": 3.64},
+        {"term": "3yr_fixed",  "posted": 6.05, "discounted": 4.55},
+        {"term": "4yr_fixed",  "posted": 5.99, "discounted": 4.49},
+        {"term": "5yr_fixed",  "posted": 6.09, "discounted": 4.59},
+        {"term": "7yr_fixed",  "posted": 6.40, "discounted": 4.90},
+        {"term": "10yr_fixed", "posted": 6.80, "discounted": 5.30},
+        {"term": "variable",   "posted": 4.45, "discounted": 3.45}
+      ]
+    }
+  ]
+}

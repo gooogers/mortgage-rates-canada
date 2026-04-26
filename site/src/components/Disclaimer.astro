@@ -1,0 +1,27 @@
+---
+interface Props {
+  variant?: "rate" | "footer";
+}
+const { variant = "rate" } = Astro.props;
+---
+
+{
+  variant === "rate" && (
+    <p class="disclaimer disclaimer--rate">
+      Rates shown are estimates updated daily and are not an offer of credit.
+      Actual rates require lender approval and may differ. Discounted rates are
+      illustrative estimates of typical broker-channel pricing — see our
+      <a href="/methodology">methodology</a>.
+    </p>
+  )
+}
+
+{
+  variant === "footer" && (
+    <p class="disclaimer disclaimer--footer">
+      The information on this site is for general purposes only and is not
+      financial advice. We may earn a commission when you apply through some
+      lender links — see our <a href="/disclosure">affiliate disclosure</a>.
+    </p>
+  )
+}

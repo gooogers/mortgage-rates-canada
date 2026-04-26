@@ -1,0 +1,30 @@
+---
+import Base from "@layouts/Base.astro";
+import CalculatorWidget from "@components/Calculator.astro";
+---
+
+<Base
+  title="Mortgage Payment Calculator Canada"
+  description="Calculate your Canadian mortgage payment with CMHC insurance, down payment, amortization, and payment frequency. Share scenarios via URL."
+  canonical="https://yourdomain.ca/calculator"
+>
+  <h1>Mortgage Payment Calculator</h1>
+  <p>
+    Estimate your monthly, bi-weekly, or accelerated bi-weekly mortgage
+    payment, including CMHC insurance for down payments under 20%.
+  </p>
+  <CalculatorWidget />
+  <h2>How this calculator works</h2>
+  <p>
+    Canadian mortgages are compounded semi-annually (not monthly), so the
+    effective per-payment rate is derived from the nominal annual rate as
+    <code>(1 + annual / 2)<sup>2</sup> − 1</code>. CMHC insurance is required
+    when the down payment is less than 20% and is added to the loan principal.
+  </p>
+  <ul>
+    <li>5.00–9.99% down: 4.00% CMHC premium</li>
+    <li>10.00–14.99% down: 3.10% CMHC premium</li>
+    <li>15.00–19.99% down: 2.80% CMHC premium</li>
+    <li>20%+ down: no CMHC required</li>
+  </ul>
+</Base>

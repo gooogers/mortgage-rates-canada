@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from core.models import Term
+from lenders.national import NationalScraper
 from lenders.rbc import RBCScraper
 from lenders.td import TDScraper
 
@@ -16,6 +17,7 @@ FIXTURES = Path(__file__).parent / "fixtures"
 LENDER_CASES = [
     pytest.param(RBCScraper, "rbc.html", id="rbc"),
     pytest.param(TDScraper, "td.html", id="td"),
+    pytest.param(NationalScraper, "national.html", id="national"),
 ]
 
 

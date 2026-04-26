@@ -1,5 +1,6 @@
 ---
 import Footer from "@components/Footer.astro";
+import { isStaging } from "@lib/staging";
 import "../styles/global.css";
 
 interface Props {
@@ -12,6 +13,7 @@ const { title, description, canonical } = Astro.props;
 const fullTitle = title.includes("Mortgage Rates Canada")
   ? title
   : `${title} — Mortgage Rates Canada`;
+const staging = isStaging();
 ---
 
 <!doctype html>
@@ -22,6 +24,7 @@ const fullTitle = title.includes("Mortgage Rates Canada")
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
     {canonical && <link rel="canonical" href={canonical} />}
+    {staging && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>

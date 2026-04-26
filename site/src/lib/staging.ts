@@ -1,3 +1,3 @@
 export function isStaging(): boolean {
-  return import.meta.env.STAGING === "true";
+  return process.env.STAGING === "true";
 }

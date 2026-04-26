@@ -1,0 +1,15 @@
+---
+import Disclaimer from "@components/Disclaimer.astro";
+---
+
+<footer class="site-footer">
+  <Disclaimer variant="footer" />
+  <nav class="site-footer__nav">
+    <a href="/about">About</a>
+    <a href="/methodology">Methodology</a>
+    <a href="/disclosure">Disclosure</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+  </nav>
+  <p class="site-footer__credit">© {new Date().getFullYear()} Mortgage Rates Canada</p>
+</footer>

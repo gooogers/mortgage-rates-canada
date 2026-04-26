@@ -104,10 +104,10 @@ The architecture is identical to parent spec §11 in production behavior. The on
   - **site** — Node 20 + `cd site && npm install && npm run build` (build implies `astro check` typecheck via existing config)
 - Catches drift in either component before it lands on `main` and breaks cron.
 
-### 4.5 `site/.env.production` (committed)
-- Single line: `DATA_BRANCH_URL=https://raw.githubusercontent.com/gooogers/mortgage-rates-canada/data/rates.json`
-- Read by Astro at build time on Cloudflare Pages so prebuild fetches real data.
-- Local dev continues to fall back to `rates.sample.json` when this env var is absent (existing behavior in `fetch-rates.mjs`).
+### 4.5 `DATA_BRANCH_URL` configuration
+- Set as a Cloudflare Pages dashboard environment variable (production scope), value `https://raw.githubusercontent.com/gooogers/mortgage-rates-canada/data/rates.json`.
+- `fetch-rates.mjs` is a raw Node script invoked by `npm run prebuild`, so it inherits `DATA_BRANCH_URL` from the build shell (CF Pages exposes dashboard env vars to the build process).
+- Local dev continues to fall back to `rates.sample.json` when the env var is absent (existing behavior in `fetch-rates.mjs`). No committed `.env` file — keeps a single source of truth for the URL (CF dashboard) and avoids the asymmetry of one env var in a file (`DATA_BRANCH_URL`) and one only in dashboard (`STAGING`).
 
 ### 4.6 Staging `noindex` (three layers)
 - **Layer 1 (HTML):** `Base.astro` includes `<meta name="robots" content="noindex, nofollow">` when `import.meta.env.STAGING === "true"`.
@@ -201,16 +201,18 @@ New files this plan creates:
     └── scrape.yml
 
 site/
-├── .env.production              # commits DATA_BRANCH_URL
+├── src/
+│   └── lib/
+│       ├── staging.ts           # isStaging() helper (testable)
+│       └── staging.test.ts
 └── public/
-    ├── _headers                 # Cloudflare Pages convention
-    └── robots.txt               # may already exist; set to Disallow: / for staging
+    └── _headers                 # Cloudflare Pages convention; X-Robots-Tag: noindex
 ```
 
 Files modified:
 ```
 site/src/layouts/Base.astro      # adds STAGING-gated noindex meta
-site/.gitignore                  # ensure .env.production is NOT ignored (commit-time env)
+site/public/robots.txt           # change to Disallow: / for staging (currently Allow: /)
 README.md                        # add deploy section pointing to this spec
 ```
 

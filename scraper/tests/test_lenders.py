@@ -8,12 +8,14 @@ import pytest
 
 from core.models import Term
 from lenders.rbc import RBCScraper
+from lenders.td import TDScraper
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
 LENDER_CASES = [
     pytest.param(RBCScraper, "rbc.html", id="rbc"),
+    pytest.param(TDScraper, "td.html", id="td"),
 ]
 
 

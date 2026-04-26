@@ -32,6 +32,13 @@ def main(argv: list[str] | None = None) -> int:
         help="CSS selector to wait for after navigation (e.g. 'table').",
     )
     parser.add_argument(
+        "--wait-until",
+        dest="wait_until",
+        default="domcontentloaded",
+        choices=["load", "domcontentloaded", "networkidle", "commit"],
+        help="Playwright goto() wait condition (default: domcontentloaded).",
+    )
+    parser.add_argument(
         "--timeout-ms",
         type=int,
         default=30_000,
@@ -43,6 +50,7 @@ def main(argv: list[str] | None = None) -> int:
     html = render_page(
         args.url,
         wait_for_selector=args.wait_for,
+        wait_until=args.wait_until,
         timeout_ms=args.timeout_ms,
     )
     args.output_path.parent.mkdir(parents=True, exist_ok=True)

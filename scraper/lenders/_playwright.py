@@ -16,25 +16,33 @@ USER_AGENT = (
 
 DEFAULT_TIMEOUT_MS = 30_000
 
+# Playwright's wait_until options. "networkidle" is the strictest but some bank
+# sites with persistent analytics beacons never go fully idle.
+WaitUntil = str  # one of: "load", "domcontentloaded", "networkidle", "commit"
+
 
 def render_page(
     url: str,
     *,
     wait_for_selector: str | None = None,
+    wait_until: WaitUntil = "domcontentloaded",
     timeout_ms: int = DEFAULT_TIMEOUT_MS,
 ) -> str:
     """Open `url` in headless Chromium, return the post-JS HTML.
 
-    If `wait_for_selector` is given, wait for that CSS selector to appear
+    `wait_until` controls when goto() returns. "domcontentloaded" is the safe
+    default for sites that ping analytics endlessly. Use "networkidle" only
+    when you know the site truly settles.
+
+    If `wait_for_selector` is given, also wait for that CSS selector to appear
     (rates are typically inside a specific container that mounts after JS runs).
-    Otherwise, wait for the network to be idle.
     """
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         try:
             context = browser.new_context(user_agent=USER_AGENT)
             page = context.new_page()
-            page.goto(url, timeout=timeout_ms, wait_until="networkidle")
+            page.goto(url, timeout=timeout_ms, wait_until=wait_until)
             if wait_for_selector:
                 page.wait_for_selector(wait_for_selector, timeout=timeout_ms)
             return page.content()

@@ -180,3 +180,59 @@ a {
   color: var(--color-muted);
   margin: 0.5rem 0 0;
 }
+
+/* Hero */
+.hero {
+  margin: 1.5rem 0;
+}
+
+.hero__title {
+  font-size: 1.75rem;
+  margin: 0 0 1rem;
+}
+
+.hero__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.hero-card {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  padding: 1.25rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.hero-card__label {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hero-card__rate {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.hero-card__lender {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.95rem;
+}
+
+.hero-card .cta {
+  background: var(--color-accent-fg);
+  color: var(--color-accent);
+  margin-top: 0.5rem;
+}
+
+.hero-card .cta--secondary {
+  background: transparent;
+  color: var(--color-accent-fg);
+  border-color: var(--color-accent-fg);
+}

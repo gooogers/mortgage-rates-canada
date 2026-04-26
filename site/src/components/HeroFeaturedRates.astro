@@ -1,0 +1,49 @@
+---
+import { formatPercent, formatTermLabel } from "@lib/format";
+import { bestRateForTerm, type RatesData, type Term } from "@lib/rates";
+
+interface Props {
+  data: RatesData;
+  /** Which terms to feature in the hero (default 5yr_fixed and variable). */
+  featured?: Term[];
+}
+
+const DEFAULT_FEATURED: Term[] = ["5yr_fixed", "variable"];
+const { data, featured = DEFAULT_FEATURED } = Astro.props;
+
+const cards = featured
+  .map((term) => ({ term, best: bestRateForTerm(data, term) }))
+  .filter((c) => c.best !== null);
+---
+
+<section class="hero">
+  <h1 class="hero__title">Today's Lowest Canadian Mortgage Rates</h1>
+  <div class="hero__cards">
+    {
+      cards.map(({ term, best }) => (
+        <article class="hero-card">
+          <p class="hero-card__label">Best {formatTermLabel(term)}</p>
+          <p class="hero-card__rate">{formatPercent(best!.rate.discounted)}</p>
+          <p class="hero-card__lender">{best!.lender.name}</p>
+          {best!.lender.affiliate_url ? (
+            <a
+              class="cta"
+              href={best!.lender.affiliate_url}
+              rel="sponsored noopener"
+              target="_blank"
+            >
+              Get this rate →
+            </a>
+          ) : (
+            <a
+              class="cta cta--secondary"
+              href={`/lenders/${best!.lender.slug}`}
+            >
+              View lender →
+            </a>
+          )}
+        </article>
+      ))
+    }
+  </div>
+</section>

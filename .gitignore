@@ -1,12 +1,12 @@
 .superpowers/
 .worktrees/
+.claude/
 node_modules/
 .venv/
 site/src/data/rates.json
 __pycache__/
 *.pyc
 .pytest_cache/
-.venv/
 
 # Scraper local output (lives on data branch in production)
 /data/

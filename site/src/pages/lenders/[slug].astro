@@ -1,0 +1,67 @@
+---
+import Base from "@layouts/Base.astro";
+import Disclaimer from "@components/Disclaimer.astro";
+import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
+import { loadRatesData } from "@lib/rates";
+
+export async function getStaticPaths() {
+  const data = await loadRatesData();
+  return data.lenders.map((lender) => ({
+    params: { slug: lender.slug },
+    props: { lender, updatedAt: data.updated_at },
+  }));
+}
+
+const { lender, updatedAt } = Astro.props as {
+  lender: import("@lib/rates").Lender;
+  updatedAt: string;
+};
+---
+
+<Base
+  title={`${lender.name} Mortgage Rates`}
+  description={`Current posted and estimated discounted mortgage rates for ${lender.name}, updated daily.`}
+  canonical={`https://yourdomain.ca/lenders/${lender.slug}`}
+>
+  <h1>{lender.name} Mortgage Rates</h1>
+  <p class="muted">
+    Source: <a href={lender.source_url} rel="noopener" target="_blank">{lender.source_url}</a>
+    <br />
+    Last updated {formatUpdatedAt(updatedAt)}.
+  </p>
+  <Disclaimer variant="rate" />
+
+  <table class="rate-table">
+    <thead>
+      <tr>
+        <th>Term</th>
+        <th>Posted</th>
+        <th>Estimated discounted</th>
+      </tr>
+    </thead>
+    <tbody>
+      {lender.rates.map((rate) => (
+        <tr class="lender-row">
+          <td class="lender-row__name">{formatTermLabel(rate.term)}</td>
+          <td><s class="lender-row__posted">{formatPercent(rate.posted)}</s></td>
+          <td><strong class="lender-row__discounted">{formatPercent(rate.discounted)}</strong></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  {lender.affiliate_url && (
+    <p>
+      <a class="cta" href={lender.affiliate_url} rel="sponsored noopener" target="_blank">
+        Apply with {lender.name} →
+      </a>
+    </p>
+  )}
+</Base>
+
+<style>
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+</style>

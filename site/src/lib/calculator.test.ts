@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  calculateMortgage,
-  cmhcPremiumRate,
-  type Frequency,
-} from "@lib/calculator";
+import { calculateMortgage, cmhcPremiumRate } from "@lib/calculator";
 
 describe("cmhcPremiumRate", () => {
   it("returns 0 when down payment is 20% or more", () => {

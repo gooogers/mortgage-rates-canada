@@ -1,0 +1,111 @@
+---
+import Base from "@layouts/Base.astro";
+import Disclaimer from "@components/Disclaimer.astro";
+import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
+import { loadRatesData, ratesByTerm, type Term } from "@lib/rates";
+
+// /rates/5-year-fixed maps to term "5yr_fixed".
+const TERM_SLUGS: Record<string, Term> = {
+  "1-year-fixed": "1yr_fixed",
+  "2-year-fixed": "2yr_fixed",
+  "3-year-fixed": "3yr_fixed",
+  "4-year-fixed": "4yr_fixed",
+  "5-year-fixed": "5yr_fixed",
+  "7-year-fixed": "7yr_fixed",
+  "10-year-fixed": "10yr_fixed",
+  variable: "variable",
+};
+
+export async function getStaticPaths() {
+  const slugs = [
+    "1-year-fixed",
+    "2-year-fixed",
+    "3-year-fixed",
+    "4-year-fixed",
+    "5-year-fixed",
+    "7-year-fixed",
+    "10-year-fixed",
+    "variable",
+  ];
+  return slugs.map((slug) => ({ params: { term: slug } }));
+}
+
+const { term: slug } = Astro.params;
+const term = TERM_SLUGS[slug as string];
+if (!term) {
+  return Astro.redirect("/404");
+}
+
+const data = await loadRatesData();
+const entries = ratesByTerm(data, term);
+const label = formatTermLabel(term);
+---
+
+<Base
+  title={`Best ${label} Mortgage Rates in Canada`}
+  description={`Compare ${label.toLowerCase()} mortgage rates across Canadian lenders. Posted vs. estimated discounted broker-channel rates, updated daily.`}
+  canonical={`https://yourdomain.ca/rates/${slug}`}
+>
+  <h1>Best {label} Mortgage Rates in Canada</h1>
+  <p class="muted">Updated {formatUpdatedAt(data.updated_at)}.</p>
+  <Disclaimer variant="rate" />
+
+  {
+    entries.length === 0 ? (
+      <p>No lenders currently offer this term.</p>
+    ) : (
+      <table class="rate-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Lender</th>
+            <th>Posted</th>
+            <th>Estimated discounted</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map(({ lender, rate }, i) => (
+            <tr class="lender-row">
+              <td>{i + 1}</td>
+              <td class="lender-row__name">
+                <a href={`/lenders/${lender.slug}`}>{lender.name}</a>
+              </td>
+              <td>
+                <s class="lender-row__posted">{formatPercent(rate.posted)}</s>
+              </td>
+              <td>
+                <strong class="lender-row__discounted">
+                  {formatPercent(rate.discounted)}
+                </strong>
+              </td>
+              <td>
+                {lender.affiliate_url ? (
+                  <a class="cta" href={lender.affiliate_url} rel="sponsored noopener" target="_blank">
+                    Apply →
+                  </a>
+                ) : (
+                  <a
+                    class="cta cta--secondary"
+                    href={lender.source_url}
+                    rel="noopener"
+                    target="_blank"
+                  >
+                    Visit lender →
+                  </a>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )
+  }
+</Base>
+
+<style>
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+</style>

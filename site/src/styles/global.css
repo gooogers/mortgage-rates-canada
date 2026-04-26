@@ -104,3 +104,79 @@ a {
   border-left: 3px solid var(--color-accent);
   padding: 0.75rem 1rem;
 }
+
+/* Rate table */
+.rate-table-wrap {
+  overflow-x: auto;
+}
+
+.rate-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.rate-table th,
+.rate-table td {
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.rate-table th {
+  background: var(--color-row-alt);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.rate-table tbody tr:hover {
+  background: var(--color-row-alt);
+}
+
+.lender-row__posted {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.lender-row__discounted {
+  color: var(--color-accent);
+  font-size: 1rem;
+}
+
+.lender-row__name a {
+  color: var(--color-fg);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.lender-row__name a:hover {
+  text-decoration: underline;
+}
+
+.cta {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.cta:hover {
+  filter: brightness(0.92);
+}
+
+.cta--secondary {
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.rate-table__legend {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin: 0.5rem 0 0;
+}

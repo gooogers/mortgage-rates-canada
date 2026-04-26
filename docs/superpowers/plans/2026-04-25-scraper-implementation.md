@@ -1,5 +1,7 @@
 # Scraper Implementation Plan (v1, Big 6 Banks)
 
+> **Status:** Executed 2026-04-25. See "Execution Notes" below for what actually shipped.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a Python scraper that fetches posted mortgage rates from the Big 6 Canadian banks (RBC, TD, Scotia, BMO, CIBC, National Bank), applies a configurable discount formula to estimate broker-channel rates, validates the results, and writes them to a single `rates.json` file matching the schema in the spec.
@@ -7,6 +9,61 @@
 **Architecture:** One Python module per lender implementing a `LenderScraper` ABC with `fetch()` and `parse()` methods. A runner orchestrates all lenders, applies discounts, validates, and assembles the final JSON. A separate publisher handles writing the file to disk and (in deploy plan) pushing to the `data` branch and triggering Cloudflare. Heavy use of HTML fixture files so scraper logic is fully testable without network. TDD throughout for pure logic; fixture-based tests for parsers.
 
 **Tech Stack:** Python 3.12, `uv` for dependency management, `httpx` for HTTP, `beautifulsoup4` + `lxml` for parsing, `pytest` for tests, `PyYAML` for config, `pydantic` for typed models.
+
+---
+
+## Execution Notes (2026-04-25)
+
+**Outcome:** v1 ships with **3 of 6 Big 6 banks fully working** (RBC, TD, National Bank). 48 tests pass. End-to-end live scrape produces a 24-rate `rates.json` (8 terms per lender × 3 lenders).
+
+**Key deviations from this plan:**
+
+1. **`httpx` → Playwright.** Every Big 6 site renders rates via JavaScript (React/Angular SPAs); plain HTTP returns no rate data. We added Playwright + `lenders/_playwright.py`'s `render_page()` helper as the fetch mechanism. BeautifulSoup still parses the rendered HTML. Inserted as **Task 5.5** between Tasks 5 and 6 (commits `5e91f19`, `bb1fb00`).
+
+2. **3 banks blocked by WAFs.** Even with Playwright, 3 banks block headless Chromium at the network layer:
+   - **Scotia:** returns a ~25 KB shell, JS never renders even after long waits
+   - **BMO:** navigation never commits — strong WAF block at TCP/TLS layer
+   - **CIBC:** HTTP/2 protocol error on Akamai
+   These are bot-management products (Akamai/Imperva-class) — not solvable by tweaking selectors.
+
+3. **Manual-source variant added.** Inserted as **Task 9** (commit `ffdb4aa`): a `ManualLenderScraper` ABC reading from `data/manual/<slug>.html`, plus `scripts/manual_capture.py` (a headed Playwright admin CLI) for the operator to manually capture pages from a visible browser. Scotia/BMO/CIBC scrapers are deferred to v1.1 once the operator captures fixtures.
+
+4. **Per-lender markup is bespoke.** Each bank uses different markup:
+   - RBC: `<span data-rate-code="0006340025">6.090</span>%` inside `div#posted-rates`
+   - TD: `<span data-source="tdct-resl" data-product-key="MTGF060C" data-value="PostedRate">` (Adobe Experience Manager)
+   - National: rates embedded in a JS `setProductMap(JSON.parse(...))` blob, not the rendered DOM
+   Each parser is bespoke. The original plan's "iterate `<tr>` rows" assumption did not hold for any lender.
+
+5. **uv install surprised the user.** A subagent installed `uv` via the official PowerShell installer when it was missing on Task 1. The user reasonably wanted to know what `uv` was first. Memory rule added: never run system installers from a subagent without explicit user confirmation.
+
+**Final task structure (as actually executed):**
+
+| Task | Title | Commit | Status |
+|---|---|---|---|
+| 1 | Initialize project | `0d26b8f` | Done |
+| 2 | Core models | `8f77300` | Done |
+| 3 | LenderScraper base | `f91ea54` | Done |
+| 4 | Discount formula | `00abf1d` | Done |
+| 5 | Validator | `efcf3da` | Done |
+| **5.5 (NEW)** | **Playwright setup + render helper** | `5e91f19`, `bb1fb00` | Done |
+| 6 | RBC scraper (Playwright) | `aeb5d1d` | Done — 8 terms |
+| 7 | TD scraper (Playwright) | `17f9060` | Done — 8 terms |
+| 8 | National Bank scraper (Playwright) | `f3cf9c7` | Done — 8 terms |
+| **9 (NEW)** | **Manual-source variant + admin CLI** | `ffdb4aa` | Done |
+| 10 | Scotia/BMO/CIBC parsers | — | **Deferred to v1.1** (needs operator-captured fixtures) |
+| 11 | (was admin CLI; merged into Task 9) | — | Folded into Task 9 |
+| 12 | Runner | `9107dce` | Done |
+| 13 | Publisher | `278402e` | Done |
+| 14 | CLI entry point | `62ec54d` | Done |
+
+**v1.1 follow-up work (separate plan recommended):**
+
+1. **Capture Scotia/BMO/CIBC manually** by running `uv run python scripts/manual_capture.py <slug> --url <URL>` from your normal Chrome environment for each.
+2. **Write parsers** for Scotia/BMO/CIBC subclassing `ManualLenderScraper` (only `parse()` needed — `fetch()` reads the manual fixture).
+3. **TD live-vs-fixture drift:** the live scrape returned 8 terms via the fixture-driven test, but during the smoke test the term *order* differed (special offers struck-through display first, posted second). Worth a small parser robustness pass.
+4. **Add monoline lenders** (MCAP, First National, Strive) — the spec's phased plan.
+
+---
 
 **Spec reference:** [docs/superpowers/specs/2026-04-25-canadian-mortgage-rates-site-design.md](../specs/2026-04-25-canadian-mortgage-rates-site-design.md) — Sections 6 (data model), 7 (scraper design), 12 (decisions).
 

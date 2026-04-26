@@ -1,0 +1,6 @@
+# Estimated broker-channel discount applied to posted rates, in percentage points.
+# A null value means "do not compute a discount" (site shows posted only).
+# These are domain-knowledge defaults; tune per market conditions.
+fixed: 1.50
+variable: 1.00
+heloc: null

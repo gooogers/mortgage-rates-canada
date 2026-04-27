@@ -73,19 +73,39 @@ class BMOScraper(ManualLenderScraper):
 
     def parse(self, html: str) -> list[Rate]:
         soup = BeautifulSoup(html, "lxml")
-        rates: list[Rate] = []
-        seen: set[str] = set()
 
+        # Pass 1: collect special-offer rates (rows whose label contains parens
+        # or "smart"). Map term → discounted rate.
+        specials: dict[str, float] = {}
         for row in soup.find_all("tr"):
             cells = row.find_all(["th", "td"])
             if len(cells) < 2:
                 continue
             label = _normalize(cells[0].get_text(" ", strip=True))
-            # Skip special-offer / promotional FIXED rows (parenthetical
-            # qualifiers like "(closed)", "(default insured)" and BMO-branded
-            # offers like "Smart Fixed"). Posted fixed rows have clean labels
-            # like "1 year", "5 year". For VARIABLE we accept the special-offer
-            # row because BMO's posted-rates table has no variable entry.
+            if "(" not in label and "smart" not in label:
+                continue
+            if "open" in label:
+                continue
+            for keyword, term in TERM_KEYWORD_MAP:
+                if keyword not in label:
+                    continue
+                rate = None
+                for cell in cells[1:]:
+                    rate = _extract_rate(cell.get_text(strip=True))
+                    if rate is not None:
+                        break
+                if rate is not None and term.value not in specials:
+                    specials[term.value] = rate
+                break
+
+        # Pass 2: emit posted rates with matching specials.
+        rates: list[Rate] = []
+        seen: set[str] = set()
+        for row in soup.find_all("tr"):
+            cells = row.find_all(["th", "td"])
+            if len(cells) < 2:
+                continue
+            label = _normalize(cells[0].get_text(" ", strip=True))
             if "open" in label:
                 continue
             if "variable" not in label and ("(" in label or "smart" in label):
@@ -95,15 +115,19 @@ class BMOScraper(ManualLenderScraper):
                     continue
                 if term.value in seen:
                     continue
-                # Posted rate is the first numeric cell after the label.
-                rate = None
+                posted = None
                 for cell in cells[1:]:
-                    rate = _extract_rate(cell.get_text(strip=True))
-                    if rate is not None:
+                    posted = _extract_rate(cell.get_text(strip=True))
+                    if posted is not None:
                         break
-                if rate is None:
+                if posted is None:
                     continue
-                rates.append(Rate(term=term, posted=rate))
+                discounted = specials.get(term.value)
+                # If this row IS the variable special-offer row (no separate posted),
+                # treat the same value as both.
+                if "variable" in label and "(" in label and discounted is None:
+                    discounted = posted
+                rates.append(Rate(term=term, posted=posted, discounted=discounted))
                 seen.add(term.value)
                 break
 

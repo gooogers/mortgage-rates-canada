@@ -43,6 +43,24 @@ PRIME_RATE_CODE = "0006470002"
 # The posted variable rate = Prime + this spread.
 VARIABLE_SPREAD_CODE = "0236440012"  # 5 Year Closed variable, posted rates col
 
+# ---------------------------------------------------------------------------
+# Special-offer rate codes (under 25yr amortization, "Special Rates" section).
+# Codes identified from tests/fixtures/rbc.html during Step 2 inspection.
+# The special-rates section has separate codes from the posted-rates section.
+# No 10yr special offer is published by RBC in this section.
+# ---------------------------------------------------------------------------
+SPECIAL_RATE_CODE_MAP: dict[str, Term] = {
+    "0386080056": Term.ONE_YEAR_FIXED,    # 1 Year Closed special offer
+    "0386080057": Term.TWO_YEAR_FIXED,    # 2 Year Closed special offer
+    "0386080058": Term.THREE_YEAR_FIXED,  # 3 Year Closed special offer
+    "0386080059": Term.FOUR_YEAR_FIXED,   # 4 Year Closed special offer
+    "0386080060": Term.FIVE_YEAR_FIXED,   # 5 Year Closed special offer
+    "0386080061": Term.SEVEN_YEAR_FIXED,  # 7 Year Closed special offer
+}
+
+# Variable special-offer spread code (Prime + spread = special variable rate).
+SPECIAL_VARIABLE_SPREAD_CODE = "0386080070"  # e.g. -0.500 (Prime minus 0.500)
+
 
 class RBCScraper(LenderScraper):
     slug = "rbc"
@@ -128,5 +146,44 @@ class RBCScraper(LenderScraper):
                 if term_value not in seen_terms:
                     rates.append(Rate(term=Term.VARIABLE, posted=variable_rate))
                     seen_terms.add(term_value)
+
+        # ------------------------------------------------------------------
+        # Step 4: Extract special-offer (discounted) rates from div#special-rates.
+        # The 25yr-or-less fixed table uses SPECIAL_RATE_CODE_MAP codes.
+        # The variable special rate = Prime + SPECIAL_VARIABLE_SPREAD_CODE spread.
+        # ------------------------------------------------------------------
+        special_div = soup.find("div", id="special-rates")
+        specials: dict[str, float] = {}
+        if isinstance(special_div, Tag):
+            for span in special_div.select("span[data-rate-code]"):
+                code = span.get("data-rate-code", "")
+                term = SPECIAL_RATE_CODE_MAP.get(code)
+                if term is None:
+                    continue
+                try:
+                    val = float(span.get_text(strip=True))
+                except ValueError:
+                    continue
+                if 1.0 <= val <= 15.0 and term.value not in specials:
+                    specials[term.value] = val
+
+            # Variable special: Prime + special variable spread
+            special_spread_spans = special_div.select(
+                f"span[data-rate-code='{SPECIAL_VARIABLE_SPREAD_CODE}']"
+            )
+            if special_spread_spans and prime is not None:
+                try:
+                    special_spread = float(special_spread_spans[0].get_text(strip=True))
+                    special_var = round(prime + special_spread, 4)
+                    if 1.0 <= special_var <= 15.0:
+                        specials[Term.VARIABLE.value] = special_var
+                except ValueError:
+                    pass
+
+        # Attach discounted values to already-collected rates by term match
+        for i, r in enumerate(rates):
+            term_key = r.term if isinstance(r.term, str) else r.term.value
+            if term_key in specials:
+                rates[i] = Rate(term=r.term, posted=r.posted, discounted=specials[term_key])
 
         return rates

@@ -28,13 +28,19 @@ function rateFor(term: Term) {
       return (
         <td class="lender-row__rate">
           {rate ? (
-            <>
-              <s class="lender-row__posted">{formatPercent(rate.posted)}</s>
-              <br />
+            rate.discounted !== null && rate.discounted !== undefined ? (
+              <>
+                <s class="lender-row__posted">{formatPercent(rate.posted)}</s>
+                <br />
+                <strong class="lender-row__discounted">
+                  {formatPercent(rate.discounted)}
+                </strong>
+              </>
+            ) : (
               <strong class="lender-row__discounted">
-                {formatPercent(rate.discounted)}
+                {formatPercent(rate.posted)}
               </strong>
-            </>
+            )
           ) : (
             "—"
           )}

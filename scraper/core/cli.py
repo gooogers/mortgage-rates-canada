@@ -11,8 +11,12 @@ from core.discount import load_discount_formula
 from core.publisher import load_previous_rates, write_rates_json
 from core.runner import build_rates_data
 from lenders.base import LenderScraper
+from lenders.bmo import BMOScraper
+from lenders.cibc import CIBCScraper
 from lenders.national import NationalScraper
 from lenders.rbc import RBCScraper
+from lenders.scotiabank import ScotiabankScraper
+from lenders.tangerine import TangerineScraper
 from lenders.td import TDScraper
 
 log = logging.getLogger("scraper")
@@ -30,8 +34,11 @@ def all_scrapers() -> list[LenderScraper]:
     return [
         RBCScraper(),
         TDScraper(),
+        BMOScraper(),
+        ScotiabankScraper(),
+        CIBCScraper(),
         NationalScraper(),
-        # Scotia/BMO/CIBC deferred to v1.1 — see scraper/README.md "Manual-source lenders"
+        TangerineScraper(),
     ]
 
 

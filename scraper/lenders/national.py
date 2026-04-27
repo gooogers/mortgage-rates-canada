@@ -62,6 +62,19 @@ FIXED_FIELD_MAP: dict[str, Term] = {
 # PH-TV product's field for the 5-year posted variable rate.
 VARIABLE_FIELD = "taux5ansO"
 
+# Field-name → Term mapping for promotional/special offer rates from tauxPromo* fields.
+PROMO_FIELD_MAP: dict[str, Term] = {
+    "tauxPromo1anF": Term.ONE_YEAR_FIXED,
+    "tauxPromo2ansF": Term.TWO_YEAR_FIXED,
+    "tauxPromo3ansF": Term.THREE_YEAR_FIXED,
+    "tauxPromo4ansF": Term.FOUR_YEAR_FIXED,
+    "tauxPromo5ansF": Term.FIVE_YEAR_FIXED,
+    "tauxPromo7ansF": Term.SEVEN_YEAR_FIXED,
+    "tauxPromo10ansF": Term.TEN_YEAR_FIXED,
+}
+
+PROMO_VARIABLE_FIELD = "tauxPromo5ansO"
+
 # conditionId values used to identify the right product objects.
 FIXED_CONDITION_ID = "PH-TF"
 VARIABLE_CONDITION_ID = "PH-TV"
@@ -148,12 +161,37 @@ class NationalScraper(LenderScraper):
             if cid:
                 by_condition[cid] = product
 
+        # ------------------------------------------------------------------
+        # Build term → promo rate lookup from the same product objects.
+        # ------------------------------------------------------------------
+        promos: dict[str, float] = {}
+        fixed_product = by_condition.get(FIXED_CONDITION_ID, {})
+        for field, term in PROMO_FIELD_MAP.items():
+            raw_value = fixed_product.get(field, "")
+            if not raw_value:
+                continue
+            try:
+                value = float(str(raw_value).replace(",", "."))
+            except ValueError:
+                continue
+            if 1.0 <= value <= 15.0:
+                promos[term.value] = value
+
+        variable_product = by_condition.get(VARIABLE_CONDITION_ID, {})
+        raw_promo_var = variable_product.get(PROMO_VARIABLE_FIELD, "")
+        if raw_promo_var:
+            try:
+                v = float(str(raw_promo_var).replace(",", "."))
+                if 1.0 <= v <= 15.0:
+                    promos[Term.VARIABLE.value] = v
+            except ValueError:
+                pass
+
         seen_terms: set[str] = set()
 
         # ------------------------------------------------------------------
         # Extract fixed posted rates from the PH-TF product.
         # ------------------------------------------------------------------
-        fixed_product = by_condition.get(FIXED_CONDITION_ID, {})
         for field, term in FIXED_FIELD_MAP.items():
             raw_value = fixed_product.get(field, "")
             if not raw_value:
@@ -167,13 +205,12 @@ class NationalScraper(LenderScraper):
             term_key = term.value
             if term_key in seen_terms:
                 continue
-            rates.append(Rate(term=term, posted=value))
+            rates.append(Rate(term=term, posted=value, discounted=promos.get(term.value)))
             seen_terms.add(term_key)
 
         # ------------------------------------------------------------------
         # Extract the variable posted rate from the PH-TV product.
         # ------------------------------------------------------------------
-        variable_product = by_condition.get(VARIABLE_CONDITION_ID, {})
         raw_var = variable_product.get(VARIABLE_FIELD, "")
         if raw_var:
             try:
@@ -184,7 +221,7 @@ class NationalScraper(LenderScraper):
             if var_value is not None and 1.0 <= var_value <= 15.0:
                 term_key = Term.VARIABLE.value
                 if term_key not in seen_terms:
-                    rates.append(Rate(term=Term.VARIABLE, posted=var_value))
+                    rates.append(Rate(term=Term.VARIABLE, posted=var_value, discounted=promos.get(Term.VARIABLE.value)))
                     seen_terms.add(term_key)
 
         return rates

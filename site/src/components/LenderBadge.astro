@@ -1,0 +1,30 @@
+---
+import { getLenderBrand } from "@lib/lenders";
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const brand = getLenderBrand(slug);
+---
+
+<span class="lender-badge" style={`background:${brand.bg}`}>{brand.abbr}</span>
+
+<style>
+  .lender-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: sans-serif;
+    flex-shrink: 0;
+    letter-spacing: -0.3px;
+    line-height: 1;
+  }
+</style>

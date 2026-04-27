@@ -8,6 +8,7 @@ import pytest
 
 from core.models import Term
 from lenders.bmo import BMOScraper
+from lenders.cibc import CIBCScraper
 from lenders.national import NationalScraper
 from lenders.rbc import RBCScraper
 from lenders.scotiabank import ScotiabankScraper
@@ -22,6 +23,7 @@ LENDER_CASES = [
     pytest.param(NationalScraper, "national.html", id="national"),
     pytest.param(BMOScraper, "bmo.html", id="bmo"),
     pytest.param(ScotiabankScraper, "scotiabank.html", id="scotiabank"),
+    pytest.param(CIBCScraper, "cibc.html", id="cibc"),
 ]
 
 

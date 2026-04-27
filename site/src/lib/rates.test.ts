@@ -22,8 +22,8 @@ describe("bestRateForTerm", () => {
     expect(best).not.toBeNull();
     expect(best!.lender.slug).toBeDefined();
     expect(best!.rate.term).toBe("5yr_fixed");
-    // Sample's lowest 5yr discounted = 4.59 across RBC/TD/National (all tied)
-    expect(best!.rate.discounted).toBe(4.59);
+    // Sample's lowest 5yr discounted = 3.94 (Tangerine)
+    expect(best!.rate.discounted).toBe(3.94);
   });
 
   it("returns null when no lender offers that term", async () => {

@@ -82,7 +82,7 @@
       "slug": "scotiabank",
       "name": "Scotiabank",
       "type": "big6",
-      "source_url": "https://www.scotiabank.com/ca/en/personal/mortgages/mortgage-rates.html",
+      "source_url": "https://www.scotiabank.com/ca/en/personal/mortgages.html",
       "affiliate_url": null,
       "scraped_at": "2026-04-25T10:00:00Z",
       "rates": [

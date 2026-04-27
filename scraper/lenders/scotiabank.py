@@ -5,7 +5,7 @@ the rendered HTML via:
 
     cd scraper
     uv run python scripts/manual_capture.py scotiabank \\
-        --url https://www.scotiabank.com/ca/en/personal/mortgages/mortgage-rates.html
+        --url https://www.scotiabank.com/ca/en/personal/mortgages.html
 
 The parse() method uses a keyword-scanning table walker. If the real Scotiabank
 HTML structure differs from the synthetic test fixture, update the selectors here
@@ -38,7 +38,7 @@ class ScotiabankScraper(ManualLenderScraper):
     slug = "scotiabank"
     name = "Scotiabank"
     type = LenderType.BIG6
-    source_url = "https://www.scotiabank.com/ca/en/personal/mortgages/mortgage-rates.html"
+    source_url = "https://www.scotiabank.com/ca/en/personal/mortgages.html"
     affiliate_url = None
 
     def parse(self, html: str) -> list[Rate]:

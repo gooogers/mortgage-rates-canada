@@ -1,4 +1,5 @@
 ---
+import LenderBadge from "@components/LenderBadge.astro";
 import { formatPercent } from "@lib/format";
 import type { Lender, Term } from "@lib/rates";
 
@@ -16,7 +17,10 @@ function rateFor(term: Term) {
 
 <tr class="lender-row">
   <td class="lender-row__name">
-    <a href={`/lenders/${lender.slug}`}>{lender.name}</a>
+    <div class="lender-row__name-inner">
+      <LenderBadge slug={lender.slug} />
+      <a href={`/lenders/${lender.slug}`}>{lender.name}</a>
+    </div>
   </td>
   {
     terms.map((term) => {
@@ -52,3 +56,11 @@ function rateFor(term: Term) {
     }
   </td>
 </tr>
+
+<style>
+  .lender-row__name-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+</style>

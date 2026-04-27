@@ -32,6 +32,12 @@ jobs:
         working-directory: scraper
         run: uv run playwright install --with-deps chromium
 
+      - name: Fetch previous rates so the runner can fall back per-lender
+        run: |
+          mkdir -p data
+          curl -fsSL https://raw.githubusercontent.com/gooogers/mortgage-rates-canada/data/rates.json -o data/rates.json \
+            || echo "[fetch-prev] no previous rates.json on data branch yet"
+
       - name: Run scraper
         working-directory: scraper
         run: |

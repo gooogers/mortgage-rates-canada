@@ -1,4 +1,5 @@
 ---
+import LenderBadge from "@components/LenderBadge.astro";
 import { formatPercent, formatTermLabel } from "@lib/format";
 import { bestRateForTerm, type RatesData, type Term } from "@lib/rates";
 
@@ -24,7 +25,10 @@ const cards = featured
         <article class="hero-card">
           <p class="hero-card__label">Best {formatTermLabel(term)}</p>
           <p class="hero-card__rate">{formatPercent(best!.rate.discounted)}</p>
-          <p class="hero-card__lender">{best!.lender.name}</p>
+          <p class="hero-card__lender">
+            <LenderBadge slug={best!.lender.slug} />
+            {best!.lender.name}
+          </p>
           {best!.lender.affiliate_url ? (
             <a
               class="cta"
@@ -47,3 +51,11 @@ const cards = featured
     }
   </div>
 </section>
+
+<style>
+  .hero-card__lender {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+</style>

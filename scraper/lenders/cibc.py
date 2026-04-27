@@ -77,14 +77,12 @@ class CIBCScraper(ManualLenderScraper):
                     continue
                 if term.value in seen:
                     continue
-                rate = None
-                for cell in cells[1:]:
-                    rate = _extract_rate(cell.get_text(strip=True))
-                    if rate is not None:
-                        break
-                if rate is None:
+                # cells[1] = Posted Rate, cells[2] = Special Offer (may be "N/A")
+                posted = _extract_rate(cells[1].get_text(strip=True)) if len(cells) > 1 else None
+                discounted = _extract_rate(cells[2].get_text(strip=True)) if len(cells) > 2 else None
+                if posted is None:
                     continue
-                rates.append(Rate(term=term, posted=rate))
+                rates.append(Rate(term=term, posted=posted, discounted=discounted))
                 seen.add(term.value)
                 break
 

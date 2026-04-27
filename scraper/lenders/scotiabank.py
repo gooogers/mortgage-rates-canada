@@ -66,17 +66,38 @@ class ScotiabankScraper(ManualLenderScraper):
 
     def parse(self, html: str) -> list[Rate]:
         soup = BeautifulSoup(html, "lxml")
-        rates: list[Rate] = []
-        seen: set[str] = set()
 
+        # Pass 1: special offers (rows containing "scotia" or "flex" except "open").
+        specials: dict[str, float] = {}
         for row in soup.find_all("tr"):
             cells = row.find_all(["th", "td"])
             if len(cells) < 2:
                 continue
             label = _normalize(cells[0].get_text(" ", strip=True))
-            # Skip open-term, short-term and brand-decorated FIXED rows.
-            # Variable is allowed because the only variable on the page is the
-            # "Scotia Ultimate Variable Rate Mortgage" in the Special Offers table.
+            if "open" in label or "month" in label:
+                continue
+            if "scotia" not in label and "flex" not in label:
+                continue
+            for keyword, term in TERM_KEYWORD_MAP:
+                if keyword not in label:
+                    continue
+                rate = None
+                for cell in cells[1:]:
+                    rate = _extract_rate(cell.get_text(strip=True))
+                    if rate is not None:
+                        break
+                if rate is not None and term.value not in specials:
+                    specials[term.value] = rate
+                break
+
+        # Pass 2: posted rates from clean rows.
+        rates: list[Rate] = []
+        seen: set[str] = set()
+        for row in soup.find_all("tr"):
+            cells = row.find_all(["th", "td"])
+            if len(cells) < 2:
+                continue
+            label = _normalize(cells[0].get_text(" ", strip=True))
             if "open" in label or "month" in label:
                 continue
             if "variable" not in label and ("flex" in label or "scotia" in label):
@@ -86,14 +107,17 @@ class ScotiabankScraper(ManualLenderScraper):
                     continue
                 if term.value in seen:
                     continue
-                rate = None
+                posted = None
                 for cell in cells[1:]:
-                    rate = _extract_rate(cell.get_text(strip=True))
-                    if rate is not None:
+                    posted = _extract_rate(cell.get_text(strip=True))
+                    if posted is not None:
                         break
-                if rate is None:
+                if posted is None:
                     continue
-                rates.append(Rate(term=term, posted=rate))
+                discounted = specials.get(term.value)
+                if "variable" in label and ("scotia" in label or "ultimate" in label) and discounted is None:
+                    discounted = posted
+                rates.append(Rate(term=term, posted=posted, discounted=discounted))
                 seen.add(term.value)
                 break
 

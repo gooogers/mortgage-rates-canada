@@ -1,7 +1,7 @@
 # Private Staging Deployment — Design Spec (Plan 3)
 
 **Date:** 2026-04-26
-**Status:** Approved (pending user review of this written spec)
+**Status:** Implemented (2026-04-27)
 **Parent spec:** [2026-04-25-canadian-mortgage-rates-site-design.md](2026-04-25-canadian-mortgage-rates-site-design.md) — §11 Branch & Deploy Wiring is the source of truth for steady-state production wiring; this addendum captures the staging phase decisions and concrete coordinates.
 
 ---

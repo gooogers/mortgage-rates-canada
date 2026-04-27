@@ -64,7 +64,7 @@
       "slug": "bmo",
       "name": "BMO Bank of Montreal",
       "type": "big6",
-      "source_url": "https://www.bmo.com/en-ca/main/personal/mortgages/mortgage-rates/",
+      "source_url": "https://www.bmo.com/main/personal/mortgages/mortgage-rates/",
       "affiliate_url": null,
       "scraped_at": "2026-04-25T10:00:00Z",
       "rates": [

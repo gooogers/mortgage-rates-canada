@@ -22,7 +22,7 @@ rate tables:
      is ignored.
 
 Rate selection rationale:
-  - PostedRate only (not SpecialRate / APR).
+  - PostedRate for the posted field; SpecialRate for the discounted field.
   - Closed term only (product keys ending in "C").
   - data-high-ratio="false" (conventional / uninsured tier).
   - No amortization tiers present on TD's page (unlike RBC); a single rate
@@ -119,5 +119,41 @@ class TDScraper(LenderScraper):
 
             rates.append(Rate(term=term, posted=value))
             seen_terms.add(term_value)
+
+        # Second pass: collect SpecialRate values as discounted rates.
+        # The product-key map is the same; only data-value differs.
+        specials: dict[str, float] = {}
+        special_selector = (
+            "span[data-source='tdct-resl']"
+            "[data-value='SpecialRate']"
+            "[data-high-ratio='false']"
+        )
+        seen_special: set[str] = set()
+        for span in soup.select(special_selector):
+            product_key = span.get("data-product-key", "")
+            term = PRODUCT_KEY_MAP.get(product_key)
+            if term is None:
+                continue
+
+            term_value = term.value
+            if term_value in seen_special:
+                continue
+
+            text = span.get_text(strip=True)
+            try:
+                value = float(text)
+            except ValueError:
+                continue
+            if value < 1.0 or value > 15.0:
+                continue
+
+            specials[term_value] = value
+            seen_special.add(term_value)
+
+        # Attach discounted values to the already-built rates list.
+        for i, r in enumerate(rates):
+            term_key = r.term if isinstance(r.term, str) else r.term.value
+            if term_key in specials:
+                rates[i] = Rate(term=r.term, posted=r.posted, discounted=specials[term_key])
 
         return rates

@@ -66,16 +66,21 @@ export interface BestRate {
   rate: Rate;
 }
 
-/** Return the lender + rate with the lowest `discounted` for the given term, or null. */
-export function bestRateForTerm(data: RatesData, term: Term): BestRate | null {
+/** Return the lender + rate with the lowest effective rate for the given term, or null.
+ *  Effective rate = discounted ?? posted (so we still rank when bank doesn't publish a special). */
+export function bestRateForTerm(
+  data: RatesData,
+  term: Term,
+): BestRate | null {
   let best: BestRate | null = null;
+  let bestRate = Infinity;
   for (const lender of data.lenders) {
-    for (const rate of lender.rates) {
-      if (rate.term !== term) continue;
-      if (rate.discounted === null || rate.discounted === undefined) continue;
-      if (best === null || rate.discounted < best.rate.discounted!) {
-        best = { lender, rate };
-      }
+    const rate = lender.rates.find((r) => r.term === term);
+    if (!rate) continue;
+    const effective = rate.discounted ?? rate.posted;
+    if (effective < bestRate) {
+      bestRate = effective;
+      best = { lender, rate };
     }
   }
   return best;

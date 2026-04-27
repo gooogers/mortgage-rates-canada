@@ -24,7 +24,7 @@ const cards = featured
       cards.map(({ term, best }) => (
         <article class="hero-card">
           <p class="hero-card__label">Best {formatTermLabel(term)}</p>
-          <p class="hero-card__rate">{formatPercent(best!.rate.discounted)}</p>
+          <p class="hero-card__rate">{formatPercent(best!.rate.discounted ?? best!.rate.posted)}</p>
           <p class="hero-card__lender">
             <LenderBadge slug={best!.lender.slug} />
             {best!.lender.name}

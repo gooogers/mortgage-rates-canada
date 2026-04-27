@@ -32,7 +32,7 @@ describe("bestRateForTerm", () => {
     expect(best).toBeNull();
   });
 
-  it("ignores lenders whose rate has discounted=null for that term", async () => {
+  it("falls back to posted when discounted=null, using effective rate", async () => {
     const data = {
       ...(await loadRatesData()),
       lenders: [
@@ -47,7 +47,10 @@ describe("bestRateForTerm", () => {
         },
       ],
     };
-    expect(bestRateForTerm(data, "heloc")).toBeNull();
+    const best = bestRateForTerm(data, "heloc");
+    expect(best).not.toBeNull();
+    expect(best!.rate.term).toBe("heloc");
+    expect(best!.rate.posted).toBe(7.2);
   });
 });
 

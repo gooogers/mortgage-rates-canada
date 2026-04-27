@@ -83,7 +83,7 @@ class TangerineScraper(ManualLenderScraper):
                         break
                 if rate is None:
                     continue
-                rates.append(Rate(term=term, posted=rate))
+                rates.append(Rate(term=term, posted=rate, discounted=rate))
                 seen.add(term.value)
                 break
 

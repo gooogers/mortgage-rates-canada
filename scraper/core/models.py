@@ -24,6 +24,7 @@ class LenderType(str, Enum):
     BIG6 = "big6"
     MONOLINE = "monoline"
     CREDIT_UNION = "credit_union"
+    OTHER = "other"
 
 
 # Posted rates are non-negative and reasonably bounded; validator enforces

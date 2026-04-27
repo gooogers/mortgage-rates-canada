@@ -10,6 +10,7 @@ from core.models import Term
 from lenders.bmo import BMOScraper
 from lenders.national import NationalScraper
 from lenders.rbc import RBCScraper
+from lenders.scotiabank import ScotiabankScraper
 from lenders.td import TDScraper
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -20,6 +21,7 @@ LENDER_CASES = [
     pytest.param(TDScraper, "td.html", id="td"),
     pytest.param(NationalScraper, "national.html", id="national"),
     pytest.param(BMOScraper, "bmo.html", id="bmo"),
+    pytest.param(ScotiabankScraper, "scotiabank.html", id="scotiabank"),
 ]
 
 

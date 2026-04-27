@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timezone
 
-from core.discount import DiscountFormula, apply_discount
+from core.discount import DiscountFormula
 from core.models import Lender, RatesData
 from core.validator import (
     RateValidationError,
@@ -71,5 +71,4 @@ def _run_one(
                 # Treat per-rate jump failure as scraper failure for this lender
                 raise RateValidationError(f"{scraper.slug}: {exc}") from exc
 
-    discounted = [apply_discount(r, formula) for r in raw_rates]
-    return scraper.to_lender(discounted)
+    return scraper.to_lender(raw_rates)

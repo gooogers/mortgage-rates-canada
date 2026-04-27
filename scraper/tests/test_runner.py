@@ -19,8 +19,8 @@ class StubLender(LenderScraper):
 
     def parse(self, html: str) -> list[Rate]:
         return [
-            Rate(term=Term.FIVE_YEAR_FIXED, posted=5.69),
-            Rate(term=Term.VARIABLE, posted=6.20),
+            Rate(term=Term.FIVE_YEAR_FIXED, posted=5.69, discounted=4.19),
+            Rate(term=Term.VARIABLE, posted=6.20, discounted=5.20),
         ]
 
 

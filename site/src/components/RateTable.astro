@@ -28,4 +28,18 @@ const { data, terms = DEFAULT_TERMS } = Astro.props;
   <p class="rate-table__legend">
     <s>Posted</s> &nbsp; <strong>Estimated discounted</strong>
   </p>
+  <p class="rate-table__disclaimer">
+    Discounted rates shown are bank-advertised special offers. Mortgage brokers may
+    offer further discounts. Posted rates are used by federal stress tests; actual
+    qualifying rates may differ.
+  </p>
 </div>
+
+<style>
+  .rate-table__disclaimer {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+    line-height: 1.4;
+  }
+</style>

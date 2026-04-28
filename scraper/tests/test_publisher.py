@@ -27,7 +27,6 @@ def _sample_data() -> RatesData:
     lender = FakeLender().to_lender(rates)
     return RatesData(
         updated_at=datetime(2026, 4, 25, 10, 0, tzinfo=timezone.utc),
-        discount_formula={"fixed": 1.50, "variable": 1.00, "heloc": None},
         lenders=[lender],
     )
 
@@ -38,7 +37,7 @@ def test_write_rates_json_creates_file_with_spec_shape(tmp_path: Path):
     assert output.exists()
     parsed = json.loads(output.read_text())
     assert parsed["updated_at"] == "2026-04-25T10:00:00Z"
-    assert parsed["discount_formula"] == {"fixed": 1.50, "variable": 1.00, "heloc": None}
+    assert "discount_formula" not in parsed
     assert parsed["lenders"][0]["slug"] == "fake"
     assert parsed["lenders"][0]["rates"][0]["posted"] == 5.69
 

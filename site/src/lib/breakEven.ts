@@ -1,10 +1,9 @@
 /**
  * Fixed vs variable break-even math. Pure functions.
  *
- * Models a variable-rate scenario where the rate is piecewise-constant: it
- * starts at `variableRate` and jumps by `rateChangePct` at month
- * `rateChangeMonth`. Outputs the total interest paid under each option over
- * the chosen horizon (typically the 5-year term length).
+ * Models a variable-rate path that moves linearly from `variableRate` to
+ * `variableRate + variableRateTargetChange` over `paceMonths`, then holds
+ * flat for the rest of the horizon. paceMonths = 0 means an immediate jump.
  *
  * Uses Canadian semi-annual compounding via the existing calculator math.
  */
@@ -14,8 +13,10 @@ export interface BreakEvenInput {
   amortizationYears: number;
   fixedRate: number; // %
   variableRate: number; // % at month 0
-  rateChangePct: number; // 0.5 = +0.5 percentage points
-  rateChangeMonth: number; // 0 = immediate, 12 = month 12
+  /** Total change in percentage points by the end of the pace window. -1.5 = drops 1.5pp. */
+  variableRateTargetChange: number;
+  /** Months over which the linear move happens. 0 = immediate jump. */
+  paceMonths: number;
   horizonMonths: number; // typically 60
 }
 
@@ -24,7 +25,7 @@ export interface BreakEvenResult {
   variableTotalInterest: number;
   fixedPayment: number;
   variableInitialPayment: number;
-  variablePostChangePayment: number;
+  variableEndingPayment: number;
   winner: "fixed" | "variable" | "tie";
   savingsAmount: number;
   /** Cumulative interest paid by month for each option. Length = horizonMonths + 1; index 0 is 0. */
@@ -47,10 +48,29 @@ function monthlyPayment(loan: number, annualRatePct: number, amortYears: number)
   return (loan * i) / (1 - Math.pow(1 + i, -n));
 }
 
+function buildVariableRatePath(
+  variableRate: number,
+  targetChange: number,
+  paceMonths: number,
+  horizonMonths: number,
+): number[] {
+  const path: number[] = [];
+  for (let m = 0; m < horizonMonths; m++) {
+    if (paceMonths <= 0) {
+      path.push(variableRate + targetChange);
+    } else if (m >= paceMonths) {
+      path.push(variableRate + targetChange);
+    } else {
+      path.push(variableRate + (targetChange * m) / paceMonths);
+    }
+  }
+  return path;
+}
+
 function simulate(
   loanAmount: number,
   amortYears: number,
-  ratePcts: number[], // length = horizonMonths; rate per month
+  ratePcts: number[],
 ): { totalInterest: number; payments: number[]; cumulativeInterest: number[] } {
   let balance = loanAmount;
   let totalInterest = 0;
@@ -80,7 +100,15 @@ function simulate(
 }
 
 export function compareBreakEven(input: BreakEvenInput): BreakEvenResult {
-  const { loanAmount, amortizationYears, fixedRate, variableRate, rateChangePct, rateChangeMonth, horizonMonths } = input;
+  const {
+    loanAmount,
+    amortizationYears,
+    fixedRate,
+    variableRate,
+    variableRateTargetChange,
+    paceMonths,
+    horizonMonths,
+  } = input;
 
   if (loanAmount === 0) {
     return {
@@ -88,7 +116,7 @@ export function compareBreakEven(input: BreakEvenInput): BreakEvenResult {
       variableTotalInterest: 0,
       fixedPayment: 0,
       variableInitialPayment: 0,
-      variablePostChangePayment: 0,
+      variableEndingPayment: 0,
       winner: "tie",
       savingsAmount: 0,
       fixedCumulativeInterest: Array(horizonMonths + 1).fill(0),
@@ -97,16 +125,18 @@ export function compareBreakEven(input: BreakEvenInput): BreakEvenResult {
   }
 
   const fixedRates = Array(horizonMonths).fill(fixedRate);
-  const variableRates = Array.from({ length: horizonMonths }, (_, m) =>
-    m < rateChangeMonth ? variableRate : variableRate + rateChangePct,
+  const variableRates = buildVariableRatePath(
+    variableRate,
+    variableRateTargetChange,
+    paceMonths,
+    horizonMonths,
   );
 
   const fixedSim = simulate(loanAmount, amortizationYears, fixedRates);
   const varSim = simulate(loanAmount, amortizationYears, variableRates);
 
   const variableInitialPayment = varSim.payments[0] ?? 0;
-  const variablePostChangePayment =
-    varSim.payments[Math.min(rateChangeMonth, varSim.payments.length - 1)] ?? variableInitialPayment;
+  const variableEndingPayment = varSim.payments[varSim.payments.length - 1] ?? variableInitialPayment;
 
   const diff = fixedSim.totalInterest - varSim.totalInterest;
   let winner: "fixed" | "variable" | "tie";
@@ -119,7 +149,7 @@ export function compareBreakEven(input: BreakEvenInput): BreakEvenResult {
     variableTotalInterest: varSim.totalInterest,
     fixedPayment: fixedSim.payments[0] ?? 0,
     variableInitialPayment,
-    variablePostChangePayment,
+    variableEndingPayment,
     winner,
     savingsAmount: Math.abs(diff),
     fixedCumulativeInterest: fixedSim.cumulativeInterest,
@@ -127,15 +157,24 @@ export function compareBreakEven(input: BreakEvenInput): BreakEvenResult {
   };
 }
 
-export function findBreakEvenRise(input: Omit<BreakEvenInput, "rateChangePct">): number {
+/**
+ * Find the immediate target rise (in % points) at which fixed begins to win.
+ * Useful as a sanity-check / commentary number; assumes paceMonths = 0.
+ */
+export function findBreakEvenRise(
+  input: Omit<BreakEvenInput, "variableRateTargetChange" | "paceMonths">,
+): number {
   if (input.fixedRate <= input.variableRate) return 0;
 
-  // Bisection over [0, 10] percentage-point rises.
   let lo = 0;
   let hi = 10;
   for (let iter = 0; iter < 60; iter++) {
     const mid = (lo + hi) / 2;
-    const r = compareBreakEven({ ...input, rateChangePct: mid });
+    const r = compareBreakEven({
+      ...input,
+      variableRateTargetChange: mid,
+      paceMonths: 0,
+    });
     if (r.winner === "fixed") {
       hi = mid;
     } else {

@@ -28,12 +28,25 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
       <label>Variable rate (%)
         <input type="number" name="variableRate" min="0" max="20" step="0.01" value={defaultVar} required />
       </label>
-      <label>Variable rate jumps (% pts)
-        <input type="number" name="rateChangePct" min="-5" max="5" step="0.25" value="0" required />
+      <fieldset class="be-presets">
+        <legend>Scenario</legend>
+        <div class="be-presets__row">
+          <button type="button" data-preset="hold">Hold steady</button>
+          <button type="button" data-preset="cuts">Gradual cuts</button>
+          <button type="button" data-preset="rise">Gradual rise</button>
+          <button type="button" data-preset="hike">Sharp hike</button>
+        </div>
+      </fieldset>
+      <label>Variable rate ends up <span class="be-help">(change in % points)</span>
+        <input type="number" name="variableRateTargetChange" min="-3" max="3" step="0.25" value="0" required />
       </label>
-      <label>...at month
-        <input type="number" name="rateChangeMonth" min="0" max="60" step="1" value="12" required />
-      </label>
+      <fieldset class="be-pace">
+        <legend>How quickly?</legend>
+        <label><input type="radio" name="paceMonths" value="0" checked /> Immediately</label>
+        <label><input type="radio" name="paceMonths" value="12" /> Over 1 year</label>
+        <label><input type="radio" name="paceMonths" value="24" /> Over 2 years</label>
+        <label><input type="radio" name="paceMonths" value="60" /> Over 5 years</label>
+      </fieldset>
       <button type="button" class="tool__use-rates" data-action="use-rates">Use today's rates</button>
     </form>
   </div>
@@ -53,7 +66,7 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
       <tbody>
         <tr><td>Fixed payment</td><td data-detail="fixed-payment">—</td></tr>
         <tr><td>Variable initial payment</td><td data-detail="var-init">—</td></tr>
-        <tr><td>Variable post-change payment</td><td data-detail="var-post">—</td></tr>
+        <tr><td>Variable ending payment</td><td data-detail="var-end">—</td></tr>
         <tr><td>Fixed total interest (5 yr)</td><td data-detail="fixed-int">—</td></tr>
         <tr><td>Variable total interest (5 yr)</td><td data-detail="var-int">—</td></tr>
       </tbody>
@@ -72,6 +85,17 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
   function num(name: string): number {
     return parseFloat((form!.elements.namedItem(name) as HTMLInputElement).value);
   }
+  function pickedPace(): number {
+    const checked = form!.querySelector<HTMLInputElement>('input[name="paceMonths"]:checked');
+    return checked ? parseInt(checked.value, 10) : 0;
+  }
+  function setPace(months: number) {
+    const radio = form!.querySelector<HTMLInputElement>(`input[name="paceMonths"][value="${months}"]`);
+    if (radio) radio.checked = true;
+  }
+  function setNum(name: string, value: number) {
+    (form!.elements.namedItem(name) as HTMLInputElement).value = String(value);
+  }
   function setText(sel: string, txt: string) {
     const el = root.querySelector(sel);
     if (el) el.textContent = txt;
@@ -83,8 +107,8 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
       amortizationYears: num("amortizationYears"),
       fixedRate: num("fixedRate"),
       variableRate: num("variableRate"),
-      rateChangePct: num("rateChangePct"),
-      rateChangeMonth: num("rateChangeMonth"),
+      variableRateTargetChange: num("variableRateTargetChange"),
+      paceMonths: pickedPace(),
       horizonMonths: 60,
     });
     const winner = r.winner === "tie" ? "tied" : r.winner;
@@ -97,10 +121,24 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
     );
     setText("[data-detail='fixed-payment']", formatCurrency(r.fixedPayment, { cents: true }));
     setText("[data-detail='var-init']", formatCurrency(r.variableInitialPayment, { cents: true }));
-    setText("[data-detail='var-post']", formatCurrency(r.variablePostChangePayment, { cents: true }));
+    setText("[data-detail='var-end']", formatCurrency(r.variableEndingPayment, { cents: true }));
     setText("[data-detail='fixed-int']", formatCurrency(r.fixedTotalInterest));
     setText("[data-detail='var-int']", formatCurrency(r.variableTotalInterest));
     drawChart(r.fixedCumulativeInterest, r.variableCumulativeInterest);
+  }
+
+  const PRESETS: Record<string, { target: number; pace: number }> = {
+    hold: { target: 0, pace: 0 },
+    cuts: { target: -1.5, pace: 24 },
+    rise: { target: 1.5, pace: 24 },
+    hike: { target: 2.0, pace: 0 },
+  };
+  function applyPreset(key: string) {
+    const p = PRESETS[key];
+    if (!p) return;
+    setNum("variableRateTargetChange", p.target);
+    setPace(p.pace);
+    recalc();
   }
 
   function drawChart(fixedSeries: number[], varSeries: number[]) {
@@ -159,6 +197,9 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
 
   form.addEventListener("input", recalc);
   form.querySelector('[data-action="use-rates"]')?.addEventListener("click", applyTodaysRates);
+  form.querySelectorAll<HTMLButtonElement>("[data-preset]").forEach((btn) => {
+    btn.addEventListener("click", () => applyPreset(btn.dataset.preset!));
+  });
   recalc();
 </script>
 
@@ -216,5 +257,57 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
   }
   .be-legend__item--variable::before {
     background: #d97706;
+  }
+  .be-presets {
+    border: none;
+    padding: 0;
+    margin: 0 0 0.5rem;
+  }
+  .be-presets legend {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    padding: 0;
+    margin-bottom: 0.3rem;
+  }
+  .be-presets__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .be-presets button {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--color-border, #ccc);
+    background: #fafafa;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .be-presets button:hover {
+    background: #f0f0f0;
+  }
+  .be-help {
+    font-weight: normal;
+    color: var(--color-muted);
+    font-size: 0.8rem;
+  }
+  .be-pace {
+    border: none;
+    padding: 0;
+    margin: 0.5rem 0;
+  }
+  .be-pace legend {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    padding: 0;
+    margin-bottom: 0.3rem;
+  }
+  .be-pace label {
+    display: block;
+    font-size: 0.9rem;
+    margin: 0.15rem 0;
+    font-weight: normal;
+  }
+  .be-pace input[type="radio"] {
+    margin-right: 0.4rem;
   }
 </style>

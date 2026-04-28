@@ -11,32 +11,43 @@ describe("compareBreakEven", () => {
   };
 
   it("variable wins when rates stay flat", () => {
-    const r = compareBreakEven({ ...base, rateChangePct: 0, rateChangeMonth: 0 });
+    const r = compareBreakEven({ ...base, variableRateTargetChange: 0, paceMonths: 0 });
     expect(r.winner).toBe("variable");
     expect(r.savingsAmount).toBeGreaterThan(0);
     expect(r.variableTotalInterest).toBeLessThan(r.fixedTotalInterest);
   });
 
-  it("fixed wins when variable rises sharply early", () => {
-    const r = compareBreakEven({ ...base, rateChangePct: 2.0, rateChangeMonth: 1 });
+  it("fixed wins when variable rises sharply and immediately", () => {
+    const r = compareBreakEven({ ...base, variableRateTargetChange: 2.0, paceMonths: 0 });
     expect(r.winner).toBe("fixed");
     expect(r.fixedTotalInterest).toBeLessThan(r.variableTotalInterest);
   });
 
-  it("rounds payment values consistently", () => {
-    const r = compareBreakEven({ ...base, rateChangePct: 0, rateChangeMonth: 0 });
-    expect(r.fixedPayment).toBeGreaterThan(0);
-    expect(r.variableInitialPayment).toBeGreaterThan(0);
-    expect(r.variablePostChangePayment).toEqual(r.variableInitialPayment);
+  it("ending payment reflects new rate after a rise", () => {
+    const r = compareBreakEven({ ...base, variableRateTargetChange: 1.0, paceMonths: 12 });
+    expect(r.variableEndingPayment).toBeGreaterThan(r.variableInitialPayment);
   });
 
-  it("post-change payment reflects new rate", () => {
-    const r = compareBreakEven({ ...base, rateChangePct: 1.0, rateChangeMonth: 12 });
-    expect(r.variablePostChangePayment).toBeGreaterThan(r.variableInitialPayment);
+  it("ending payment equals initial when target change is zero", () => {
+    const r = compareBreakEven({ ...base, variableRateTargetChange: 0, paceMonths: 0 });
+    expect(r.variableEndingPayment).toEqual(r.variableInitialPayment);
+  });
+
+  it("gradual rise costs less interest than the same rise applied immediately", () => {
+    const gradual = compareBreakEven({ ...base, variableRateTargetChange: 1.5, paceMonths: 24 });
+    const immediate = compareBreakEven({ ...base, variableRateTargetChange: 1.5, paceMonths: 0 });
+    expect(gradual.variableTotalInterest).toBeLessThan(immediate.variableTotalInterest);
+  });
+
+  it("gradual cuts save more than immediate cuts only at the start", () => {
+    const gradualCut = compareBreakEven({ ...base, variableRateTargetChange: -1.0, paceMonths: 24 });
+    const immediateCut = compareBreakEven({ ...base, variableRateTargetChange: -1.0, paceMonths: 0 });
+    // Immediate cut means variable is lower for longer — saves more interest overall.
+    expect(immediateCut.variableTotalInterest).toBeLessThan(gradualCut.variableTotalInterest);
   });
 
   it("zero loan returns zero interest", () => {
-    const r = compareBreakEven({ ...base, loanAmount: 0, rateChangePct: 0, rateChangeMonth: 0 });
+    const r = compareBreakEven({ ...base, loanAmount: 0, variableRateTargetChange: 0, paceMonths: 0 });
     expect(r.fixedTotalInterest).toBe(0);
     expect(r.variableTotalInterest).toBe(0);
   });
@@ -49,7 +60,6 @@ describe("findBreakEvenRise", () => {
     fixedRate: 4.79,
     variableRate: 4.20,
     horizonMonths: 60,
-    rateChangeMonth: 12,
   };
 
   it("finds a positive break-even when fixed > variable", () => {

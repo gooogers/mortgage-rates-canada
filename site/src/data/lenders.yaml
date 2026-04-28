@@ -67,7 +67,7 @@ lenders:
   cibc:
     full_name: Canadian Imperial Bank of Commerce
     short_name: CIBC
-    founded_year: 1867
+    founded_year: 1961
     regulator: OSFI
     channels:
       - branch

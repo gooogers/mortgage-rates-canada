@@ -28,6 +28,16 @@ const verifiedDate = new Date(facts.last_verified_at).toLocaleDateString("en-CA"
     <dd>
       {facts.prepayment.lump_sum_pct}% lump sum / {facts.prepayment.payment_increase_pct}% payment increase
     </dd>
+    {facts.notable_quirks.length > 0 && (
+      <>
+        <dt>Notes</dt>
+        <dd>
+          <ul class="lender-facts__notes">
+            {facts.notable_quirks.map((note) => <li>{note}</li>)}
+          </ul>
+        </dd>
+      </>
+    )}
   </dl>
   <p class="lender-facts__verified">Verified {verifiedDate}</p>
 </section>
@@ -47,6 +57,13 @@ const verifiedDate = new Date(facts.last_verified_at).toLocaleDateString("en-CA"
   }
   .lender-facts__grid dd {
     margin: 0;
+  }
+  .lender-facts__notes {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+  .lender-facts__notes li {
+    margin-bottom: 0.25rem;
   }
   .lender-facts__verified {
     margin-top: 0.75rem;

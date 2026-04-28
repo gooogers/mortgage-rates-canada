@@ -1,0 +1,33 @@
+---
+import { getEntry, render } from "astro:content";
+
+interface Props {
+  termSlug: string;
+}
+
+const { termSlug } = Astro.props;
+const entry = await getEntry("term-intros", termSlug);
+if (!entry) {
+  throw new Error(`Missing term intro for slug: ${termSlug}`);
+}
+const { Content } = await render(entry);
+---
+
+<section class="term-intro">
+  <h2 class="term-intro__headline">{entry.data.headline}</h2>
+  <Content />
+</section>
+
+<style>
+  .term-intro {
+    margin: 1.5rem 0 2rem;
+    line-height: 1.6;
+  }
+  .term-intro__headline {
+    font-size: 1.2rem;
+    margin: 0 0 0.75rem;
+  }
+  .term-intro :global(p) {
+    margin: 0 0 1rem;
+  }
+</style>

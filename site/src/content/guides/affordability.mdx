@@ -1,0 +1,142 @@
+---
+title: "How much mortgage can I afford in Canada?"
+description: "Affordability is bound by GDS/TDS ratios, the federal stress test, and your down payment. Here's how to back into your real number — not the bank's maximum."
+tool_id: "affordability"
+related_guides: ["fixed-vs-variable"]
+related_terms: ["5-year-fixed"]
+last_reviewed_at: "2026-04-28"
+---
+import AffordabilityTool from "@components/tools/AffordabilityTool.astro";
+
+When a lender decides how much to advance you, they are not asking what you are comfortable paying. They are running two debt-service ratios and a stress test against your documented income. The output is your **maximum approval** — a number that is often higher than what makes financial sense for your household. This guide explains exactly how those calculations work, what shrinks them, and how to figure out your real number, not just the maximum one.
+
+Understanding the formulas matters for a practical reason: if you know your GDS and TDS ratios before you apply, you can structure your offer, your down payment, and your debt payoff in ways that materially change what you qualify for.
+
+## What "affordability" actually means in Canada
+
+There are two affordability numbers, and they are not the same.
+
+The first is your **maximum approval** — the largest mortgage a federally regulated lender will write you under OSFI's qualification rules. This is what your bank or broker quotes when you ask for a pre-approval. It is bounded by three constraints: your **GDS ratio** (housing costs ÷ gross income, capped at 39%), your **TDS ratio** (all debts ÷ gross income, capped at 44%), and the **federal stress test** (you must qualify at your contract rate + 2%, or 5.25%, whichever is higher).
+
+The second is your **comfortable payment** — the mortgage that fits your household's actual cash flow without compressing retirement savings, childcare, or buffer for the unexpected. This is almost always lower than the maximum. The TDS limit of 44% of *gross* income translates to roughly 52–58% of take-home pay going to debt service, depending on your tax rate. That is the lender's risk threshold, not yours.
+
+This guide shows you both. The tool below outputs the lender's maximum. The sections after explain how to stress-test that number against your own life.
+
+## Try the affordability calculator
+
+The tool below encodes the math: GDS/TDS ratios, the stress test at max(contract+2%, 5.25%), and CMHC insurance tiers. Enter your income, debts, property costs, and down payment to see your maximum purchase price.
+
+<AffordabilityTool />
+
+The output is the lender's mathematical maximum, not a recommendation. A useful exercise: run it once at today's rate, then run it again at a rate **1.5–2% higher**. If the second number's monthly payment would force lifestyle compression you aren't prepared to make, you have probably found your real ceiling — somewhere below the maximum approval. The fuller [payment calculator](/calculator) is the better tool once you have a target purchase price and want to model the monthly cash flow in detail.
+
+## GDS, TDS, and the 39/44 ratios
+
+Every mortgage in Canada — whether through a bank, credit union, or monoline lender — must pass two debt-service tests at application.
+
+**Gross Debt Service (GDS)** measures your housing costs as a share of your gross (pre-tax) income. The cap is **39%** under OSFI guidelines and CMHC rules for insured mortgages. The numerator includes:
+
+- Principal and interest (P+I) on the mortgage
+- Monthly property tax (annual ÷ 12)
+- Monthly heating cost (lenders use a standard $150–$175/month if actual is unknown)
+- 50% of monthly condo fees, if applicable
+
+The denominator is total gross household income per month.
+
+**Total Debt Service (TDS)** adds all other monthly debt obligations — car loans, student loans, credit card minimum payments, lines of credit — to the GDS numerator. The cap is **44%**.
+
+**Worked example: a $120,000/year household.** Combined gross income $10,000/month. Property tax $400/month, heating $150/month, $450/month car payment.
+
+For a $600,000 mortgage at 5.20% on a 25-year amortization, monthly P+I is approximately $3,578.
+
+GDS = ($3,578 + $400 + $150) ÷ $10,000 = **41.3%** — over the 39% cap. This mortgage doesn't qualify.
+
+Working backward to find the maximum: 39% × $10,000 = $3,900/month for housing. Subtract tax and heat: $3,350 available for P+I. At 5.20% over 25 years, $3,350/month supports approximately **$560,000** in mortgage principal. TDS check: ($3,350 + $400 + $150 + $450) ÷ $10,000 = 43.5% — just under the 44% cap. This household passes both tests at roughly $560,000 — *before* the stress test.
+
+A few things to note. Lenders use the **stress-test rate** for the P+I calculation, not the contract rate (more on that next). Income counts only if it is verifiable: T4 employment income, NOA-confirmed self-employment income, or documented rental income. Promised bonuses or informal side income generally don't count at the A-lender level.
+
+## The federal stress test
+
+Canada's **stress test** (OSFI Guideline B-20, in its current form since 2018, updated 2021) requires that you qualify at the higher of:
+
+- Your contract rate plus 2.00 percentage points, or
+- 5.25% (the regulatory floor)
+
+So if your contract rate is 4.90%, you qualify at 6.90%. If your rate is 3.10%, you still qualify at 5.25%.
+
+The test was designed to insulate borrowers against rate shock at renewal. If you can carry payments at 6.90%, the reasoning goes, you can absorb a renewal 200 basis points above your original rate without defaulting. In practice, the test has also acted as a demand constraint on housing prices — which was part of the explicit policy intent.
+
+**Real-world impact:** the stress test typically reduces a household's maximum approval by **15–25%** compared to qualifying at the contract rate.
+
+Continuing the example: at a contract rate of 5.20%, the stress rate is 7.20%. Monthly P+I on a $560,000 mortgage at 7.20% over 25 years is approximately $3,993 — above the $3,350 available after tax and heat. The mortgage doesn't qualify under the stress test.
+
+Working backward at 7.20%: $3,350/month supports approximately $460,000. The stress test has reduced this household's maximum approval from $560,000 to roughly $460,000 — an **18% reduction**.
+
+This is why bank pre-approvals often surprise first-time buyers on the low side relative to the homes they have been viewing. The stress test is doing real work.
+
+The test applies to all federally regulated lenders (banks, federal trust companies). Some provincial credit unions are not federally regulated and may apply their own, sometimes looser, qualification standards — though most still run a similar test voluntarily.
+
+## Down payment and CMHC mechanics
+
+Your down payment determines whether your mortgage is **insured** or **conventional**, with several downstream effects.
+
+The rules, as of 2025:
+
+- **Under 5%**: Not permitted. Minimum is 5% of the first $500,000 plus 10% of the portion above $500,000.
+- **5–19.99% down**: Mortgage insurance is required, provided by **CMHC**, **Sagen**, or **Canada Guaranty**. Insured mortgages are capped at a $1.5 million purchase price (rule updated late 2024).
+- **20%+ down**: Insurance not required. This is a **conventional** mortgage.
+
+**CMHC premium tiers** (added to the mortgage principal, not paid up front):
+
+| Down payment | Premium rate |
+|---|---|
+| 5.00–9.99% | 4.00% of mortgage |
+| 10.00–14.99% | 3.10% of mortgage |
+| 15.00–19.99% | 2.80% of mortgage |
+| 20%+ | 0% |
+
+On a $700,000 purchase with 5% down ($35,000), the mortgage is $665,000. The CMHC premium is 4.00% × $665,000 = $26,600, rolled into the mortgage and bringing the total to $691,600. You pay interest on that premium for the life of the loan — at 5.20% over 25 years, the extra $26,600 costs roughly $21,400 in additional interest. The real cost of the insurance is closer to **$48,000**, not $26,600.
+
+**Down payment sources** must be verifiable. Lenders require a 90-day history of funds in a Canadian account (bank statement). Gifts from immediate family are accepted with a signed gift letter confirming the money is not a loan. **First Home Savings Account (FHSA)** balances and **Home Buyers' Plan (HBP)** RRSP withdrawals both count, subject to plan rules.
+
+## How banks differ from brokers in qualification
+
+If you go directly to your bank and don't qualify, that bank can't help you further — they only have their own products. A **mortgage broker** shops your application across A-lenders (major banks and federally regulated lenders), B-lenders (alternative lenders such as Home Trust or Equitable Bank), and sometimes credit unions.
+
+For most salaried borrowers with good credit and standard income, an A-lender rate and approval is accessible whether you go through a bank or broker. The broker adds value by **negotiating the rate**, not by unlocking access.
+
+For borderline cases, the difference is material:
+
+- **Self-employed borrowers** with limited NOA income can often qualify under stated-income programs at B-lenders or via portfolio insurance at some credit unions, where a bank would decline.
+- **Recent immigrants** without two years of Canadian credit history qualify at fewer A-lenders; brokers know which ones run more flexible programs.
+- **Low credit scores** (under ~650) generally disqualify you at A-lenders entirely. B-lenders will lend, but at rates typically **1–3 percentage points higher**.
+
+The B-lender route is not free. On a $500,000 mortgage, a 2% rate premium costs roughly $10,000 per year in additional interest. Use B-lenders as a bridge, not a destination — improve your credit or income documentation and refinance to an A-lender at renewal.
+
+For anyone comparing rate options once they know their qualification tier, the [fixed vs variable guide](/guides/fixed-vs-variable) walks through how to pick the product once you know how much you can borrow.
+
+## Common questions
+
+**What income counts toward GDS and TDS?**
+
+Employment income (T4/T4A) counts fully. Self-employment income counts if you can show two years of NOA (Notice of Assessment) confirming the income — most lenders average the two years. Rental income from an existing investment property usually counts at 50–80% of gross rent, depending on the lender. Child support and spousal support received count if there is a court order or signed agreement and the payments are demonstrably regular. Side income and tips are harder: you generally need two years of T1 history showing the income.
+
+**Can I include rental income from the property I'm buying?**
+
+Sometimes, under specific conditions. If the property has a legal secondary suite (a registered basement apartment, for example), some lenders count a portion of projected rental income — typically 50–80% of market rent — toward your qualifying income. This "rental offset" or "add-back" can meaningfully increase your approval. Not all lenders allow this, and the suite must be legal and habitable. Ask your broker specifically.
+
+**What if my partner has bad credit?**
+
+Two options: apply alone using only your income, or apply jointly and accept that the weaker credit profile may increase your rate or disqualify you from some lenders. A third option — having your partner as a non-borrowing co-habitant — is simpler but leaves your partner with no equity claim, which has separate legal implications.
+
+**Does a co-signer help?**
+
+Yes, in two ways: a co-signer adds their income to qualifying calculations (raising your maximum approval) and backstops the credit risk (which can unlock A-lender approval you would otherwise miss). However, the co-signer takes on full legal liability — if you default, they are responsible — and the mortgage appears on their credit report, counting against their own TDS for future borrowing. Co-signing is a significant commitment; both parties should understand the exposure before proceeding.
+
+**How does the [5-year fixed](/rates/5-year-fixed) stress test compare to a shorter term?**
+
+The stress rate is the same regardless of term: max(contract + 2%, 5.25%). A 2-year fixed at 4.60% stresses at 6.60%; a 5-year fixed at 5.20% stresses at 7.20%. The 2-year fixed stresses at a lower rate, meaning you could potentially qualify for a larger mortgage on a shorter term. Whether that is a good trade — taking renewal risk in two years to qualify for more today — is a cash-flow and rate-forecast question, not a simple yes/no.
+
+**What's the difference between pre-approval and pre-qualification?**
+
+A **pre-qualification** is a quick estimate based on your stated income and debts — no documents pulled, no credit check, often done online in minutes. It is directional only. A **pre-approval** involves a full credit pull, documented income verification, and a rate hold (typically 90–120 days). A pre-approval letter has weight with sellers; a pre-qualification does not. If you are house-hunting seriously, get a pre-approval.

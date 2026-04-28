@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://yourdomain.ca",
+  site: "https://canadianrates.ca",
   trailingSlash: "never",
   build: {
     format: "file",

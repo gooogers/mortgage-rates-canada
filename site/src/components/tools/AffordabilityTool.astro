@@ -1,0 +1,137 @@
+---
+import ToolFrame from "@components/ToolFrame.astro";
+import { bestRateForTerm, loadRatesData } from "@lib/rates";
+
+const data = await loadRatesData();
+const best = bestRateForTerm(data, "5yr_fixed");
+const defaultRate = best?.rate.discounted ?? 5.0;
+---
+
+<ToolFrame title="How much can I afford?" toolId="affordability">
+  <div slot="inputs">
+    <form class="aff-form" data-default-rate={defaultRate}>
+      <label>Gross annual income
+        <input type="number" name="grossAnnualIncome" min="0" step="1000" value="120000" required />
+      </label>
+      <label>Monthly debts (cars, cards, loans)
+        <input type="number" name="monthlyDebts" min="0" step="50" value="500" required />
+      </label>
+      <label>Monthly property tax
+        <input type="number" name="estimatedPropertyTax" min="0" step="25" value="400" required />
+      </label>
+      <label>Monthly heat
+        <input type="number" name="estimatedHeat" min="0" step="10" value="100" required />
+      </label>
+      <label>Monthly condo fees (0 if none)
+        <input type="number" name="estimatedCondoFees" min="0" step="50" value="0" required />
+      </label>
+      <label>Down payment
+        <input type="number" name="downPayment" min="0" step="1000" value="80000" required />
+      </label>
+      <label>Contract rate (%)
+        <input type="number" name="contractRate" min="0" max="20" step="0.01" value={defaultRate} required />
+      </label>
+      <label>Amortization (years)
+        <select name="amortizationYears">
+          <option value="25" selected>25</option>
+          <option value="30">30</option>
+        </select>
+      </label>
+      <button type="button" class="tool__use-rates" data-action="use-rates">Use today's rates</button>
+    </form>
+  </div>
+
+  <div slot="result">
+    <p class="aff-label">Maximum purchase price</p>
+    <p class="aff-headline" data-result="price">—</p>
+    <p class="aff-sub" data-result="sub"></p>
+  </div>
+
+  <div slot="details">
+    <table class="aff-detail">
+      <tbody>
+        <tr><td>Qualifying rate (stress test)</td><td data-detail="qualify">—</td></tr>
+        <tr><td>Max mortgage by GDS (39%)</td><td data-detail="gds">—</td></tr>
+        <tr><td>Max mortgage by TDS (44%)</td><td data-detail="tds">—</td></tr>
+        <tr><td>Max mortgage (binding)</td><td data-detail="max-mort">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</ToolFrame>
+
+<script>
+  import { calculateAffordability } from "@lib/affordability";
+  import { formatCurrency, formatPercent } from "@lib/format";
+
+  const form = document.querySelector<HTMLFormElement>(".aff-form");
+  if (!form) throw new Error("affordability form not found");
+  const root = form.closest('[data-tool-id="affordability"]') as HTMLElement;
+
+  function num(name: string): number {
+    return parseFloat((form!.elements.namedItem(name) as HTMLInputElement).value);
+  }
+  function setText(sel: string, txt: string) {
+    const el = root.querySelector(sel);
+    if (el) el.textContent = txt;
+  }
+
+  function recalc() {
+    const r = calculateAffordability({
+      grossAnnualIncome: num("grossAnnualIncome"),
+      monthlyDebts: num("monthlyDebts"),
+      estimatedPropertyTax: num("estimatedPropertyTax"),
+      estimatedHeat: num("estimatedHeat"),
+      estimatedCondoFees: num("estimatedCondoFees"),
+      downPayment: num("downPayment"),
+      contractRate: num("contractRate"),
+      amortizationYears: num("amortizationYears"),
+    });
+    setText("[data-result='price']", formatCurrency(r.maxPurchasePrice));
+    setText("[data-result='sub']",
+      `Bound by ${r.bindingConstraint.toUpperCase()}; max mortgage ${formatCurrency(r.maxMortgage)}.`);
+    setText("[data-detail='qualify']", formatPercent(r.qualifyingRate));
+    setText("[data-detail='gds']", formatCurrency(r.maxMortgageGds));
+    setText("[data-detail='tds']", formatCurrency(r.maxMortgageTds));
+    setText("[data-detail='max-mort']", formatCurrency(r.maxMortgage));
+  }
+
+  function applyTodaysRates() {
+    (form!.elements.namedItem("contractRate") as HTMLInputElement).value = form!.dataset.defaultRate!;
+    recalc();
+  }
+
+  form.addEventListener("input", recalc);
+  form.querySelector('[data-action="use-rates"]')?.addEventListener("click", applyTodaysRates);
+  recalc();
+</script>
+
+<style>
+  .aff-label {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin: 0;
+  }
+  .aff-headline {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0.2rem 0 0.4rem;
+  }
+  .aff-sub {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+  .aff-detail {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .aff-detail td {
+    padding: 0.3rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--color-border, #eee);
+  }
+  .aff-detail td:last-child {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

@@ -22,8 +22,13 @@ describe("bestRateForTerm", () => {
     expect(best).not.toBeNull();
     expect(best!.lender.slug).toBeDefined();
     expect(best!.rate.term).toBe("5yr_fixed");
-    // Sample's lowest 5yr discounted = 3.94 (Tangerine)
-    expect(best!.rate.discounted).toBe(3.94);
+    // The lowest effective rate across the data, computed fresh — keeps the
+    // assertion deterministic across sample-only and live-data environments.
+    const lowest = data.lenders
+      .flatMap((l) => l.rates.filter((r) => r.term === "5yr_fixed"))
+      .map((r) => r.discounted ?? r.posted)
+      .reduce((a, b) => Math.min(a, b), Infinity);
+    expect(best!.rate.discounted ?? best!.rate.posted).toBe(lowest);
   });
 
   it("returns null when no lender offers that term", async () => {

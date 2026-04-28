@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
+import { resolve } from "node:path";
 import yaml from "js-yaml";
 
 export interface LenderFacts {
@@ -21,9 +20,7 @@ interface LendersFile {
   lenders: Record<string, LenderFacts>;
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const yamlPath = resolve(__dirname, "../data/lenders.yaml");
+const yamlPath = resolve(process.cwd(), "src/data/lenders.yaml");
 
 let cache: LendersFile | null = null;
 

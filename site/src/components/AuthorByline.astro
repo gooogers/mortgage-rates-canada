@@ -1,0 +1,28 @@
+---
+import { EDITORIAL } from "../data/editorial";
+
+interface Props {
+  lastReviewedAt: string; // ISO date
+}
+
+const { lastReviewedAt } = Astro.props;
+const reviewedDate = new Date(lastReviewedAt).toLocaleDateString("en-CA", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<p class="byline">
+  <span>By {EDITORIAL.teamName}</span>
+  <span aria-hidden="true"> · </span>
+  <span>Last reviewed <time datetime={lastReviewedAt}>{reviewedDate}</time></span>
+</p>
+
+<style>
+  .byline {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    margin: 0.25rem 0 1rem;
+  }
+</style>

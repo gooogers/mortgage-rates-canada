@@ -10,9 +10,9 @@ interface Props {
 }
 
 const { title, description, canonical } = Astro.props;
-const fullTitle = title.includes("Mortgage Rates Canada")
+const fullTitle = title.includes("Canadian Rates")
   ? title
-  : `${title} — Mortgage Rates Canada`;
+  : `${title} — Canadian Rates`;
 const staging = isStaging();
 ---
 
@@ -29,11 +29,18 @@ const staging = isStaging();
   </head>
   <body>
     <header class="site-header">
-      <a href="/" class="site-header__brand">Mortgage Rates Canada</a>
+      <a href="/" class="site-header__brand">Canadian Rates</a>
       <nav class="site-header__nav">
         <a href="/">Rates</a>
         <a href="/guides">Guides</a>
-        <a href="/calculator">Calculator</a>
+        <div class="nav-dropdown">
+          <a href="/calculator" class="nav-dropdown__trigger" aria-haspopup="true">Calculators ▾</a>
+          <ul class="nav-dropdown__menu" role="menu">
+            <li role="none"><a role="menuitem" href="/calculator">Payment calculator</a></li>
+            <li role="none"><a role="menuitem" href="/guides/affordability">Affordability calculator</a></li>
+            <li role="none"><a role="menuitem" href="/guides/fixed-vs-variable">Fixed vs variable calculator</a></li>
+          </ul>
+        </div>
       </nav>
     </header>
     <main>

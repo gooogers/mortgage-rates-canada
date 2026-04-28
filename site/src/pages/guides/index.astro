@@ -1,0 +1,40 @@
+---
+import Base from "@layouts/Base.astro";
+import GuideCard from "@components/GuideCard.astro";
+import { getAllGuides } from "@lib/guides";
+
+const guides = await getAllGuides();
+guides.sort((a, b) => a.data.title.localeCompare(b.data.title));
+---
+
+<Base
+  title="Mortgage Guides"
+  description="Plain-English explainers on Canadian mortgages — fixed vs variable, affordability, the stress test, and more."
+  canonical="https://canadianrates.ca/guides"
+>
+  <h1>Mortgage Guides</h1>
+  <p class="muted">Researched and written by the Mortgage Rates Canada editorial team.</p>
+
+  <div class="guides-grid">
+    {guides.map((g) => (
+      <GuideCard
+        href={`/guides/${g.slug}`}
+        title={g.data.title}
+        description={g.data.description}
+      />
+    ))}
+  </div>
+</Base>
+
+<style>
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+  .guides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+</style>

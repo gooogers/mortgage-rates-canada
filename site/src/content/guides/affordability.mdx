@@ -8,9 +8,13 @@ last_reviewed_at: "2026-04-28"
 ---
 import AffordabilityTool from "@components/tools/AffordabilityTool.astro";
 
-When a lender decides how much to advance you, they are not asking what you are comfortable paying. They are running two debt-service ratios and a stress test against your documented income. The output is your **maximum approval** — a number that is often higher than what makes financial sense for your household. This guide explains exactly how those calculations work, what shrinks them, and how to figure out your real number, not just the maximum one.
+The tool below encodes the math Canadian lenders use to size your maximum mortgage: GDS/TDS ratios, the federal stress test at max(contract+2%, 5.25%), and CMHC insurance tiers. Enter your income, debts, property costs, and down payment to see your maximum purchase price.
 
-Understanding the formulas matters for a practical reason: if you know your GDS and TDS ratios before you apply, you can structure your offer, your down payment, and your debt payoff in ways that materially change what you qualify for.
+<AffordabilityTool />
+
+The output is the lender's mathematical maximum, not a recommendation. A useful exercise: run it once at today's rate, then run it again at a rate **1.5–2% higher**. If the second number's monthly payment would force lifestyle compression you aren't prepared to make, you have probably found your real ceiling — somewhere below the maximum approval. The fuller [payment calculator](/calculator) is the better tool once you have a target purchase price.
+
+The rest of this guide explains how each piece of the calculation works — and the gap between the lender's maximum and what your household can actually afford.
 
 ## What "affordability" actually means in Canada
 
@@ -19,16 +23,6 @@ There are two affordability numbers, and they are not the same.
 The first is your **maximum approval** — the largest mortgage a federally regulated lender will write you under OSFI's qualification rules. This is what your bank or broker quotes when you ask for a pre-approval. It is bounded by three constraints: your **GDS ratio** (housing costs ÷ gross income, capped at 39%), your **TDS ratio** (all debts ÷ gross income, capped at 44%), and the **federal stress test** (you must qualify at your contract rate + 2%, or 5.25%, whichever is higher).
 
 The second is your **comfortable payment** — the mortgage that fits your household's actual cash flow without compressing retirement savings, childcare, or buffer for the unexpected. This is almost always lower than the maximum. The TDS limit of 44% of *gross* income translates to roughly 52–58% of take-home pay going to debt service, depending on your tax rate. That is the lender's risk threshold, not yours.
-
-This guide shows you both. The tool below outputs the lender's maximum. The sections after explain how to stress-test that number against your own life.
-
-## Try the affordability calculator
-
-The tool below encodes the math: GDS/TDS ratios, the stress test at max(contract+2%, 5.25%), and CMHC insurance tiers. Enter your income, debts, property costs, and down payment to see your maximum purchase price.
-
-<AffordabilityTool />
-
-The output is the lender's mathematical maximum, not a recommendation. A useful exercise: run it once at today's rate, then run it again at a rate **1.5–2% higher**. If the second number's monthly payment would force lifestyle compression you aren't prepared to make, you have probably found your real ceiling — somewhere below the maximum approval. The fuller [payment calculator](/calculator) is the better tool once you have a target purchase price and want to model the monthly cash flow in detail.
 
 ## GDS, TDS, and the 39/44 ratios
 

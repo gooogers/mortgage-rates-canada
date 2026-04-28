@@ -25,7 +25,7 @@ const intro = facts ? renderLenderIntro(facts) : null;
 
 <Base
   title={`${lender.name} Mortgage Rates`}
-  description={`Current posted and estimated discounted mortgage rates for ${lender.name}, updated daily.`}
+  description={`Current posted and discounted mortgage rates for ${lender.name}, updated daily.`}
   canonical={`https://canadianrates.ca/lenders/${lender.slug}`}
 >
   <h1>{lender.name} Mortgage Rates</h1>
@@ -44,7 +44,7 @@ const intro = facts ? renderLenderIntro(facts) : null;
       <tr>
         <th>Term</th>
         <th>Posted</th>
-        <th>Estimated discounted</th>
+        <th>Discounted</th>
       </tr>
     </thead>
     <tbody>

@@ -10,7 +10,6 @@ describe("loadRatesData", () => {
   it("loads and parses the sample rates file", async () => {
     const data = await loadRatesData();
     expect(data.lenders.length).toBeGreaterThan(0);
-    expect(data.discount_formula.fixed).toBe(1.5);
     expect(data.lenders[0].slug).toBe("rbc");
   });
 });

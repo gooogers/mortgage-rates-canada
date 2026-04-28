@@ -36,15 +36,8 @@ export interface Lender {
   rates: Rate[];
 }
 
-export interface DiscountFormula {
-  fixed: number | null;
-  variable: number | null;
-  heloc: number | null;
-}
-
 export interface RatesData {
   updated_at: string;
-  discount_formula: DiscountFormula;
   lenders: Lender[];
 }
 

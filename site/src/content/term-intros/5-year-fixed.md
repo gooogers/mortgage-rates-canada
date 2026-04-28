@@ -14,4 +14,4 @@ The 5-year fixed is the most common choice in Canada. Most Canadian homeowners p
 
 **When to consider alternatives.** If you expect to break the mortgage early (sale, refinance, divorce), the 5-year fixed has the steepest interest rate differential (IRD) penalty. If you believe the Bank of Canada will continue cutting rates, variable can save real money over the term.
 
-**How to read the table.** "Posted" is the rate the lender publishes on their public rates page. "Estimated discounted" is what's typically available through a mortgage broker — usually 0.50–1.00% below posted on the 5-year fixed for well-qualified borrowers. Your actual rate depends on credit, down payment, property type, and broker relationship.
+**How to read the table.** "Posted" is the rate the lender publishes on their public rates page. "Discounted" is the bank's own special-offer rate, also published on the same page — usually 0.50–1.00% below posted on the 5-year fixed. A mortgage broker can typically secure a rate below the bank's published discounted rate; your actual rate depends on credit, down payment, property type, and broker relationship.

@@ -16,4 +16,4 @@ A variable mortgage's interest rate moves with the lender's prime rate, which it
 
 **When to consider alternatives.** When you have no payment cushion. When the variable discount is small and prime rates are already low (limiting upside). When you simply value certainty more than expected savings.
 
-**How to read the table.** Posted is the rate the lender publishes today; discounted is what a broker typically delivers. Both move whenever the BoC moves. The "discount from prime" is what to compare across lenders, since prime itself is uniform.
+**How to read the table.** Posted is the rate the lender publishes today; discounted is the bank's own published special-offer rate, captured from the same page. Both move whenever the BoC moves. A mortgage broker can typically secure a rate below the bank's published discounted rate. The "discount from prime" is what to compare across lenders, since prime itself is uniform.

@@ -1,5 +1,5 @@
 export const EDITORIAL = {
-  teamName: "Mortgage Rates Canada editorial team",
+  teamName: "Canadian Rates editorial team",
   affiliateDisclosure:
     "We earn a commission when you apply through some links — see our affiliate disclosure.",
   methodologySummary:

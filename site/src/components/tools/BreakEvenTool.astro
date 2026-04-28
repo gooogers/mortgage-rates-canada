@@ -1,0 +1,139 @@
+---
+import ToolFrame from "@components/ToolFrame.astro";
+import { bestRateForTerm, loadRatesData } from "@lib/rates";
+
+const data = await loadRatesData();
+const bestFixed = bestRateForTerm(data, "5yr_fixed");
+const bestVar = bestRateForTerm(data, "variable");
+const defaultFixed = bestFixed?.rate.discounted ?? 4.79;
+const defaultVar = bestVar?.rate.discounted ?? 4.20;
+---
+
+<ToolFrame title="Fixed vs variable break-even" toolId="break-even">
+  <div slot="inputs">
+    <form class="be-form" data-default-fixed={defaultFixed} data-default-var={defaultVar}>
+      <label>Loan amount
+        <input type="number" name="loanAmount" min="0" step="1000" value="500000" required />
+      </label>
+      <label>Amortization (years)
+        <select name="amortizationYears">
+          <option value="20">20</option>
+          <option value="25" selected>25</option>
+          <option value="30">30</option>
+        </select>
+      </label>
+      <label>Fixed rate (%)
+        <input type="number" name="fixedRate" min="0" max="20" step="0.01" value={defaultFixed} required />
+      </label>
+      <label>Variable rate (%)
+        <input type="number" name="variableRate" min="0" max="20" step="0.01" value={defaultVar} required />
+      </label>
+      <label>Variable rate jumps (% pts)
+        <input type="number" name="rateChangePct" min="-5" max="5" step="0.25" value="0" required />
+      </label>
+      <label>...at month
+        <input type="number" name="rateChangeMonth" min="0" max="60" step="1" value="12" required />
+      </label>
+      <button type="button" class="tool__use-rates" data-action="use-rates">Use today's rates</button>
+    </form>
+  </div>
+
+  <div slot="result">
+    <p class="be-headline" data-result="headline">—</p>
+    <p class="be-sub" data-result="sub"></p>
+  </div>
+
+  <div slot="details">
+    <table class="be-detail">
+      <tbody>
+        <tr><td>Fixed payment</td><td data-detail="fixed-payment">—</td></tr>
+        <tr><td>Variable initial payment</td><td data-detail="var-init">—</td></tr>
+        <tr><td>Variable post-change payment</td><td data-detail="var-post">—</td></tr>
+        <tr><td>Fixed total interest (5 yr)</td><td data-detail="fixed-int">—</td></tr>
+        <tr><td>Variable total interest (5 yr)</td><td data-detail="var-int">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</ToolFrame>
+
+<script>
+  import { compareBreakEven } from "@lib/breakEven";
+  import { formatCurrency } from "@lib/format";
+
+  const form = document.querySelector<HTMLFormElement>(".be-form");
+  if (!form) throw new Error("break-even form not found");
+  const root = form.closest('[data-tool-id="break-even"]') as HTMLElement;
+
+  function num(name: string): number {
+    return parseFloat((form!.elements.namedItem(name) as HTMLInputElement).value);
+  }
+  function setText(sel: string, txt: string) {
+    const el = root.querySelector(sel);
+    if (el) el.textContent = txt;
+  }
+
+  function recalc() {
+    const r = compareBreakEven({
+      loanAmount: num("loanAmount"),
+      amortizationYears: num("amortizationYears"),
+      fixedRate: num("fixedRate"),
+      variableRate: num("variableRate"),
+      rateChangePct: num("rateChangePct"),
+      rateChangeMonth: num("rateChangeMonth"),
+      horizonMonths: 60,
+    });
+    const winner = r.winner === "tie" ? "tied" : r.winner;
+    setText("[data-result='headline']", `${winner === "tied" ? "It's a tie" : capitalize(winner) + " wins"}`);
+    setText(
+      "[data-result='sub']",
+      r.winner === "tie"
+        ? "Total interest over 5 years is essentially equal."
+        : `Saves ${formatCurrency(r.savingsAmount)} in interest over 5 years vs the other option.`,
+    );
+    setText("[data-detail='fixed-payment']", formatCurrency(r.fixedPayment, { cents: true }));
+    setText("[data-detail='var-init']", formatCurrency(r.variableInitialPayment, { cents: true }));
+    setText("[data-detail='var-post']", formatCurrency(r.variablePostChangePayment, { cents: true }));
+    setText("[data-detail='fixed-int']", formatCurrency(r.fixedTotalInterest));
+    setText("[data-detail='var-int']", formatCurrency(r.variableTotalInterest));
+  }
+
+  function capitalize(s: string) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  function applyTodaysRates() {
+    (form!.elements.namedItem("fixedRate") as HTMLInputElement).value = form!.dataset.defaultFixed!;
+    (form!.elements.namedItem("variableRate") as HTMLInputElement).value = form!.dataset.defaultVar!;
+    recalc();
+  }
+
+  form.addEventListener("input", recalc);
+  form.querySelector('[data-action="use-rates"]')?.addEventListener("click", applyTodaysRates);
+  recalc();
+</script>
+
+<style>
+  .be-headline {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+  }
+  .be-sub {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+  .be-detail {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .be-detail td {
+    padding: 0.3rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--color-border, #eee);
+  }
+  .be-detail td:last-child {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

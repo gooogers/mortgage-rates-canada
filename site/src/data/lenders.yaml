@@ -1,5 +1,6 @@
 # Structured facts per lender. Rendered into prose by the lender page template.
-# Add a `last_verified_at` (YYYY-MM-DD) every time you fact-check an entry.
+# Set `last_verified_at` (YYYY-MM-DD) ONLY after fact-checking against primary sources.
+# Entries with last_verified_at: "" are AI-drafted from public knowledge and need verification.
 lenders:
   rbc:
     full_name: Royal Bank of Canada
@@ -15,3 +16,95 @@ lenders:
       payment_increase_pct: 10
     notable_quirks: []
     last_verified_at: "2026-04-28"
+
+  td:
+    full_name: TD Canada Trust
+    short_name: TD
+    founded_year: 1855
+    regulator: OSFI
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 15
+      payment_increase_pct: 100
+    notable_quirks:
+      - "TD's collateral charge mortgage can complicate switching to another lender at renewal."
+    last_verified_at: ""
+
+  bmo:
+    full_name: Bank of Montreal
+    short_name: BMO
+    founded_year: 1817
+    regulator: OSFI
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 20
+      payment_increase_pct: 20
+    notable_quirks: []
+    last_verified_at: ""
+
+  scotiabank:
+    full_name: The Bank of Nova Scotia
+    short_name: Scotiabank
+    founded_year: 1832
+    regulator: OSFI
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 15
+      payment_increase_pct: 15
+    notable_quirks:
+      - "Scotia STEP (collateral charge) is the default for new mortgages and is registered for up to 125% of property value."
+    last_verified_at: ""
+
+  cibc:
+    full_name: Canadian Imperial Bank of Commerce
+    short_name: CIBC
+    founded_year: 1867
+    regulator: OSFI
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 10
+      payment_increase_pct: 100
+    notable_quirks: []
+    last_verified_at: ""
+
+  national:
+    full_name: National Bank of Canada
+    short_name: National Bank
+    founded_year: 1859
+    regulator: OSFI
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 10
+      payment_increase_pct: 100
+    notable_quirks: []
+    last_verified_at: ""
+
+  tangerine:
+    full_name: Tangerine Bank
+    short_name: Tangerine
+    founded_year: 1997
+    regulator: OSFI
+    channels:
+      - online
+      - broker
+    prepayment:
+      lump_sum_pct: 25
+      payment_increase_pct: 25
+    notable_quirks:
+      - "Owned by Scotiabank since 2012. Operates as an online-only bank with no physical branches."
+    last_verified_at: ""

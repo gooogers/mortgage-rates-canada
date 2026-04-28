@@ -1,0 +1,17 @@
+# Structured facts per lender. Rendered into prose by the lender page template.
+# Add a `last_verified_at` (YYYY-MM-DD) every time you fact-check an entry.
+lenders:
+  rbc:
+    full_name: Royal Bank of Canada
+    short_name: RBC
+    founded_year: 1864
+    regulator: OSFI
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 10
+      payment_increase_pct: 10
+    notable_quirks: []
+    last_verified_at: "2026-04-28"

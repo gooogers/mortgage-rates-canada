@@ -12,6 +12,7 @@ const channelList = facts.channels
 const verifiedDate = new Date(facts.last_verified_at).toLocaleDateString("en-CA", {
   year: "numeric",
   month: "short",
+  timeZone: "UTC",
 });
 ---
 

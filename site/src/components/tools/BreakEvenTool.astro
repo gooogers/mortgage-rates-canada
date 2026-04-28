@@ -41,6 +41,11 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
   <div slot="result">
     <p class="be-headline" data-result="headline">—</p>
     <p class="be-sub" data-result="sub"></p>
+    <svg class="be-chart" data-result="chart" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cumulative interest over 5 years for fixed vs variable mortgage."></svg>
+    <div class="be-legend">
+      <span class="be-legend__item be-legend__item--fixed">Fixed</span>
+      <span class="be-legend__item be-legend__item--variable">Variable</span>
+    </div>
   </div>
 
   <div slot="details">
@@ -95,6 +100,51 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
     setText("[data-detail='var-post']", formatCurrency(r.variablePostChangePayment, { cents: true }));
     setText("[data-detail='fixed-int']", formatCurrency(r.fixedTotalInterest));
     setText("[data-detail='var-int']", formatCurrency(r.variableTotalInterest));
+    drawChart(r.fixedCumulativeInterest, r.variableCumulativeInterest);
+  }
+
+  function drawChart(fixedSeries: number[], varSeries: number[]) {
+    const svg = root.querySelector<SVGSVGElement>("[data-result='chart']");
+    if (!svg) return;
+    const W = 320, H = 200;
+    const PAD_L = 44, PAD_R = 8, PAD_T = 12, PAD_B = 28;
+    const innerW = W - PAD_L - PAD_R;
+    const innerH = H - PAD_T - PAD_B;
+    const n = Math.max(fixedSeries.length, varSeries.length);
+    const maxY = Math.max(
+      fixedSeries[fixedSeries.length - 1] ?? 0,
+      varSeries[varSeries.length - 1] ?? 0,
+      1,
+    );
+    const x = (i: number) => PAD_L + (i / (n - 1)) * innerW;
+    const y = (v: number) => PAD_T + innerH - (v / maxY) * innerH;
+    const toPath = (series: number[]) =>
+      series.map((v, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+
+    const yTicks = 4;
+    const yTickValues = Array.from({ length: yTicks + 1 }, (_, i) => (maxY * i) / yTicks);
+    const fmtTick = (v: number) =>
+      v >= 1000 ? `$${Math.round(v / 1000)}k` : `$${Math.round(v)}`;
+
+    const xTicks = [0, 12, 24, 36, 48, 60].filter((m) => m < n);
+
+    const gridLines = yTickValues
+      .map((v) => `<line x1="${PAD_L}" x2="${W - PAD_R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="#eee" stroke-width="1" />`)
+      .join("");
+    const yLabels = yTickValues
+      .map((v) => `<text x="${PAD_L - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="#666">${fmtTick(v)}</text>`)
+      .join("");
+    const xLabels = xTicks
+      .map((m) => `<text x="${x(m).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#666">${m === 0 ? "Now" : `${m / 12}y`}</text>`)
+      .join("");
+
+    svg.innerHTML = `
+      ${gridLines}
+      ${yLabels}
+      ${xLabels}
+      <path d="${toPath(fixedSeries)}" fill="none" stroke="#1f6feb" stroke-width="2" />
+      <path d="${toPath(varSeries)}" fill="none" stroke="#d97706" stroke-width="2" />
+    `;
   }
 
   function capitalize(s: string) {
@@ -135,5 +185,36 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
   .be-detail td:last-child {
     text-align: right;
     font-variant-numeric: tabular-nums;
+  }
+  .be-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 0.75rem;
+    max-width: 360px;
+  }
+  .be-legend {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    color: var(--color-muted);
+  }
+  .be-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .be-legend__item::before {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 2px;
+  }
+  .be-legend__item--fixed::before {
+    background: #1f6feb;
+  }
+  .be-legend__item--variable::before {
+    background: #d97706;
   }
 </style>

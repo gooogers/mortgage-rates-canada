@@ -27,6 +27,9 @@ export interface BreakEvenResult {
   variablePostChangePayment: number;
   winner: "fixed" | "variable" | "tie";
   savingsAmount: number;
+  /** Cumulative interest paid by month for each option. Length = horizonMonths + 1; index 0 is 0. */
+  fixedCumulativeInterest: number[];
+  variableCumulativeInterest: number[];
 }
 
 function periodicRateMonthly(annualRatePct: number): number {
@@ -48,17 +51,17 @@ function simulate(
   loanAmount: number,
   amortYears: number,
   ratePcts: number[], // length = horizonMonths; rate per month
-): { totalInterest: number; payments: number[] } {
+): { totalInterest: number; payments: number[]; cumulativeInterest: number[] } {
   let balance = loanAmount;
   let totalInterest = 0;
   const payments: number[] = [];
+  const cumulativeInterest: number[] = [0];
   let currentRate = NaN;
   let currentPayment = 0;
 
   for (let m = 0; m < ratePcts.length; m++) {
     const r = ratePcts[m];
     if (r !== currentRate) {
-      // Re-amortize remaining balance over remaining amortization months.
       const remainingMonths = amortYears * 12 - m;
       currentPayment = monthlyPayment(balance, r, remainingMonths / 12);
       currentRate = r;
@@ -69,10 +72,11 @@ function simulate(
     balance = Math.max(0, balance - principal);
     totalInterest += interest;
     payments.push(currentPayment);
+    cumulativeInterest.push(totalInterest);
     if (balance === 0) break;
   }
 
-  return { totalInterest, payments };
+  return { totalInterest, payments, cumulativeInterest };
 }
 
 export function compareBreakEven(input: BreakEvenInput): BreakEvenResult {
@@ -87,6 +91,8 @@ export function compareBreakEven(input: BreakEvenInput): BreakEvenResult {
       variablePostChangePayment: 0,
       winner: "tie",
       savingsAmount: 0,
+      fixedCumulativeInterest: Array(horizonMonths + 1).fill(0),
+      variableCumulativeInterest: Array(horizonMonths + 1).fill(0),
     };
   }
 
@@ -116,6 +122,8 @@ export function compareBreakEven(input: BreakEvenInput): BreakEvenResult {
     variablePostChangePayment,
     winner,
     savingsAmount: Math.abs(diff),
+    fixedCumulativeInterest: fixedSim.cumulativeInterest,
+    variableCumulativeInterest: varSim.cumulativeInterest,
   };
 }
 

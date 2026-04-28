@@ -48,4 +48,19 @@ const data = await loadRatesData();
     The site rebuilds daily. Each lender's profile shows when their rates were
     last successfully scraped.
   </p>
+
+  <h2>How we write our guides</h2>
+  <p>
+    Each guide is researched against primary sources — the Bank of Canada, OSFI,
+    CMHC, lender rate sheets, and federal mortgage regulations — then drafted,
+    edited for clarity, and reviewed before publication. The math behind every
+    interactive tool is implemented as pure functions with unit tests, so the
+    same calculation runs in the browser and in our test suite.
+  </p>
+  <p>
+    We commit to reviewing each guide every quarter and updating it whenever
+    underlying rules change (for example, a CMHC premium tier change or a
+    federal stress-test rule update). Every guide has a "Last reviewed" date
+    visible at the top of the page.
+  </p>
 </Base>

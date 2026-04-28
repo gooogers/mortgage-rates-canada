@@ -23,24 +23,27 @@ const data = await loadRatesData();
     lender's profile so you can verify.
   </p>
 
-  <h2>How we estimate the discounted rate</h2>
+  <h2>Where the discounted rates come from</h2>
   <p>
-    Posted rates are typically what lenders advertise. The actual rate you
-    qualify for through a mortgage broker is usually lower. We apply a fixed
-    haircut to each posted rate to estimate what's typically available:
+    Most major Canadian banks publish two rates on their public mortgage
+    pages: a "posted" rate and a special-offer rate (sometimes labelled
+    "special rate," "limited-time offer," or "promotional rate"). The
+    discounted rate shown on this site is the bank's own published
+    special-offer rate, captured directly from the same source page as the
+    posted rate. We do not estimate, derive, or apply a haircut.
   </p>
-  <ul>
-    <li>Fixed terms: posted rate minus {data.discount_formula.fixed}%</li>
-    <li>Variable: posted rate minus {data.discount_formula.variable}%</li>
-    {data.discount_formula.heloc !== null && (
-      <li>HELOC: posted rate minus {data.discount_formula.heloc}%</li>
-    )}
-  </ul>
   <p>
-    This is an estimate, not a guarantee. The actual rate you receive depends
-    on your credit score, down payment, property type, broker relationship,
-    and lender promotions in effect when you apply. Always confirm directly
-    with a lender or broker.
+    When a lender publishes only one rate (for example, Tangerine), the
+    posted and discounted columns show the same value. When a lender does
+    not publish a special-offer rate for a given term, that row shows the
+    posted rate only.
+  </p>
+  <p>
+    A mortgage broker can typically secure a rate below the bank's
+    published special-offer rate. The actual rate you qualify for depends
+    on your credit score, down payment, property type, and the broker's
+    relationship with the lender. Always confirm directly with a lender or
+    broker.
   </p>
 
   <h2>How often rates update</h2>

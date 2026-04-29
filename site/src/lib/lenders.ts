@@ -12,7 +12,7 @@ export const LENDER_BRANDS: Record<string, LenderBrand> = {
   scotiabank: { bg: "#EC111A", abbr: "BNS"  },
   cibc:       { bg: "#AC145A", abbr: "CIBC", logo: "/logos/cibc.svg" },
   national:   { bg: "#E31837", abbr: "NBC"  },
-  tangerine:  { bg: "#F26520", abbr: "TAN"  },
+  tangerine:  { bg: "#F26520", abbr: "TAN",  logo: "/logos/tangerine.svg" },
 };
 
 export function getLenderBrand(slug: string): LenderBrand {

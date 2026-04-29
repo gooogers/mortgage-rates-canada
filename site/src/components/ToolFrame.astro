@@ -8,7 +8,7 @@ const { title, toolId } = Astro.props;
 ---
 
 <section class="tool" data-tool-id={toolId}>
-  <h3 class="tool__title">{title}</h3>
+  <h2 class="tool__title">{title}</h2>
   <div class="tool__body">
     <div class="tool__inputs">
       <slot name="inputs" />

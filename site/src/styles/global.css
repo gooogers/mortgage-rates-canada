@@ -247,42 +247,45 @@ a {
 
 .hero__cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 320px));
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 .hero-card {
   background: var(--color-accent);
   color: var(--color-accent-fg);
-  padding: 1.25rem;
+  padding: 0.75rem 1rem;
   border-radius: 8px;
   text-align: center;
 }
 
 .hero-card__label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   opacity: 0.9;
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.15rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .hero-card__rate {
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
   margin: 0;
   line-height: 1.1;
 }
 
 .hero-card__lender {
-  margin: 0.25rem 0 0.75rem;
-  font-size: 0.95rem;
+  margin: 0.15rem 0 0.4rem;
+  font-size: 0.85rem;
 }
 
 .hero-card .cta {
   background: var(--color-accent-fg);
   color: var(--color-accent);
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.9rem;
 }
 
 .hero-card .cta--secondary {

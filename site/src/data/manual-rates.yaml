@@ -1,0 +1,109 @@
+# Manually-maintained rate entries for lenders without an automated scraper.
+#
+# These get merged into the live rates dataset at build time, so they appear
+# alongside the scraper output on the site. Refresh by visiting each source_url
+# below, copying the current posted/discounted rates, and updating
+# `last_verified` to today's date.
+#
+# When/if a real scraper is built for one of these lenders, remove its entry
+# from this file — the scraper output will take over.
+
+lenders:
+  meridian:
+    name: Meridian Credit Union
+    type: credit_union
+    source_url: https://www.meridiancu.ca/personal/borrowing/mortgages/mortgage-rates
+    affiliate_url: null
+    provinces: [ON]
+    last_verified: "2026-04-29"
+    rates:
+      - { term: 1yr_fixed,  posted: 6.59, discounted: null }
+      - { term: 2yr_fixed,  posted: 6.39, discounted: null }
+      - { term: 3yr_fixed,  posted: 5.79, discounted: 4.69 }
+      - { term: 4yr_fixed,  posted: 5.99, discounted: null }
+      - { term: 5yr_fixed,  posted: 5.99, discounted: 4.79 }
+      - { term: variable,   posted: 5.45, discounted: 4.65 }
+
+  alterna:
+    name: Alterna Savings
+    type: credit_union
+    source_url: https://www.alterna.ca/en/personal/products/mortgages/rates
+    affiliate_url: null
+    provinces: [ON]
+    last_verified: "2026-04-29"
+    rates:
+      - { term: 1yr_fixed,  posted: 6.49, discounted: null }
+      - { term: 3yr_fixed,  posted: 5.49, discounted: 4.49 }
+      - { term: 5yr_fixed,  posted: 5.84, discounted: 4.74 }
+      - { term: variable,   posted: 5.20, discounted: null }
+
+  desjardins:
+    name: Desjardins
+    type: credit_union
+    source_url: https://www.desjardins.com/ca/personal/loans-credit/mortgages/posted-rates/index.jsp
+    affiliate_url: null
+    provinces: [QC]
+    last_verified: "2026-04-29"
+    rates:
+      - { term: 1yr_fixed,  posted: 6.74, discounted: null }
+      - { term: 2yr_fixed,  posted: 6.44, discounted: null }
+      - { term: 3yr_fixed,  posted: 5.79, discounted: 4.79 }
+      - { term: 4yr_fixed,  posted: 5.94, discounted: null }
+      - { term: 5yr_fixed,  posted: 5.99, discounted: 4.99 }
+      - { term: 7yr_fixed,  posted: 6.29, discounted: null }
+      - { term: 10yr_fixed, posted: 6.84, discounted: null }
+      - { term: variable,   posted: 5.35, discounted: 4.85 }
+
+  vancity:
+    name: Vancity
+    type: credit_union
+    source_url: https://www.vancity.com/Mortgages/Rates/
+    affiliate_url: null
+    provinces: [BC]
+    last_verified: "2026-04-29"
+    rates:
+      - { term: 1yr_fixed,  posted: 6.49, discounted: null }
+      - { term: 3yr_fixed,  posted: 5.59, discounted: 4.59 }
+      - { term: 5yr_fixed,  posted: 5.84, discounted: 4.74 }
+      - { term: variable,   posted: 5.20, discounted: 4.70 }
+
+  coast-capital:
+    name: Coast Capital Savings
+    type: credit_union
+    source_url: https://www.coastcapitalsavings.com/personal/mortgages/rates
+    affiliate_url: null
+    provinces: [BC]
+    last_verified: "2026-04-29"
+    rates:
+      - { term: 1yr_fixed,  posted: 6.49, discounted: null }
+      - { term: 3yr_fixed,  posted: 5.49, discounted: 4.49 }
+      - { term: 5yr_fixed,  posted: 5.79, discounted: 4.69 }
+      - { term: variable,   posted: 5.20, discounted: 4.65 }
+
+  servus:
+    name: Servus Credit Union
+    type: credit_union
+    source_url: https://www.servus.ca/Personal/Borrowing/Mortgages/Rates
+    affiliate_url: null
+    provinces: [AB]
+    last_verified: "2026-04-29"
+    rates:
+      - { term: 1yr_fixed,  posted: 6.49, discounted: null }
+      - { term: 3yr_fixed,  posted: 5.59, discounted: 4.69 }
+      - { term: 5yr_fixed,  posted: 5.84, discounted: 4.79 }
+      - { term: variable,   posted: 5.20, discounted: 4.85 }
+
+  atb:
+    name: ATB Financial
+    type: credit_union
+    source_url: https://www.atb.com/personal/borrowing/mortgages/posted-rates/
+    affiliate_url: null
+    provinces: [AB]
+    last_verified: "2026-04-29"
+    rates:
+      - { term: 1yr_fixed,  posted: 6.59, discounted: null }
+      - { term: 2yr_fixed,  posted: 6.34, discounted: null }
+      - { term: 3yr_fixed,  posted: 5.69, discounted: 4.69 }
+      - { term: 4yr_fixed,  posted: 5.84, discounted: null }
+      - { term: 5yr_fixed,  posted: 5.99, discounted: 4.94 }
+      - { term: variable,   posted: 5.45, discounted: 4.85 }

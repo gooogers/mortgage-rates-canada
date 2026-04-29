@@ -4,7 +4,14 @@
  * At build time we read either:
  *   - src/data/rates.json (populated by scripts/fetch-rates.mjs in production)
  *   - src/data/rates.sample.json (fallback for local dev when no rates.json exists)
+ *
+ * Manually-maintained lender entries from src/data/manual-rates.yaml are
+ * merged in after the scraped data, for lenders that don't yet have an
+ * automated scraper (currently: provincial credit unions).
  */
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import yaml from "js-yaml";
 import sample from "../data/rates.sample.json";
 
 export type Term =
@@ -20,6 +27,22 @@ export type Term =
 
 export type LenderType = "big6" | "monoline" | "credit_union";
 
+/** ISO 3166-2 subdivision code (e.g. "ON", "QC"). */
+export type Province =
+  | "AB"
+  | "BC"
+  | "MB"
+  | "NB"
+  | "NL"
+  | "NS"
+  | "NT"
+  | "NU"
+  | "ON"
+  | "PE"
+  | "QC"
+  | "SK"
+  | "YT";
+
 export interface Rate {
   term: Term;
   posted: number;
@@ -34,6 +57,11 @@ export interface Lender {
   affiliate_url: string | null;
   scraped_at: string;
   rates: Rate[];
+  /**
+   * Provinces where this lender operates. Omit (or empty array) for national
+   * lenders that should appear regardless of selected province.
+   */
+  provinces?: Province[];
 }
 
 export interface RatesData {
@@ -41,17 +69,66 @@ export interface RatesData {
   lenders: Lender[];
 }
 
+interface ManualLenderEntry {
+  name: string;
+  type: LenderType;
+  source_url: string;
+  affiliate_url: string | null;
+  provinces?: Province[];
+  last_verified: string;
+  rates: Rate[];
+}
+
+interface ManualRatesFile {
+  lenders: Record<string, ManualLenderEntry>;
+}
+
+let manualCache: Lender[] | null = null;
+
+function loadManualLenders(): Lender[] {
+  if (manualCache) return manualCache;
+  try {
+    const path = resolve(process.cwd(), "src/data/manual-rates.yaml");
+    const raw = readFileSync(path, "utf8");
+    const parsed = yaml.load(raw) as ManualRatesFile;
+    manualCache = Object.entries(parsed.lenders ?? {}).map(([slug, entry]) => ({
+      slug,
+      name: entry.name,
+      type: entry.type,
+      source_url: entry.source_url,
+      affiliate_url: entry.affiliate_url,
+      scraped_at: entry.last_verified,
+      rates: entry.rates,
+      provinces: entry.provinces,
+    }));
+  } catch {
+    manualCache = [];
+  }
+  return manualCache;
+}
+
 /**
  * Load rates data. Tries src/data/rates.json first; falls back to the sample.
+ * Manual entries from manual-rates.yaml are appended in either path.
  * Async to leave room for future build-time fetches without changing the API.
  */
 export async function loadRatesData(): Promise<RatesData> {
+  let base: RatesData;
   try {
     const real = await import("../data/rates.json");
-    return real.default as RatesData;
+    base = real.default as RatesData;
   } catch {
-    return sample as RatesData;
+    base = sample as RatesData;
   }
+  const manual = loadManualLenders();
+  if (manual.length === 0) return base;
+  // De-duplicate: scraper output wins if a slug exists in both.
+  const scrapedSlugs = new Set(base.lenders.map((l) => l.slug));
+  const merged = [
+    ...base.lenders,
+    ...manual.filter((l) => !scrapedSlugs.has(l.slug)),
+  ];
+  return { ...base, lenders: merged };
 }
 
 export interface BestRate {

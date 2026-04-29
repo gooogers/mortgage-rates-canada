@@ -8,14 +8,44 @@ interface Props {
   terms?: Term[];
   /** Term to sort by ascending on initial load. Defaults to first rate column. */
   defaultSort?: Term;
+  /** Render the province dropdown above the table. */
+  provinceFilter?: boolean;
 }
 
 const DEFAULT_TERMS: Term[] = ["3yr_fixed", "5yr_fixed", "variable"];
-const { data, terms = DEFAULT_TERMS, defaultSort } = Astro.props;
+const { data, terms = DEFAULT_TERMS, defaultSort, provinceFilter = false } = Astro.props;
 const initialSortKey = defaultSort && terms.includes(defaultSort) ? defaultSort : terms[0];
+
+const PROVINCES: { code: string; name: string }[] = [
+  { code: "AB", name: "Alberta" },
+  { code: "BC", name: "British Columbia" },
+  { code: "MB", name: "Manitoba" },
+  { code: "NB", name: "New Brunswick" },
+  { code: "NL", name: "Newfoundland and Labrador" },
+  { code: "NS", name: "Nova Scotia" },
+  { code: "NT", name: "Northwest Territories" },
+  { code: "NU", name: "Nunavut" },
+  { code: "ON", name: "Ontario" },
+  { code: "PE", name: "Prince Edward Island" },
+  { code: "QC", name: "Quebec" },
+  { code: "SK", name: "Saskatchewan" },
+  { code: "YT", name: "Yukon" },
+];
 ---
 
 <div class="rate-table-wrap">
+  {provinceFilter && (
+    <div class="rate-table__filter">
+      <label for="province-select">Province</label>
+      <select id="province-select" data-province-select>
+        <option value="">All Canada</option>
+        {PROVINCES.map((p) => (
+          <option value={p.code}>{p.name}</option>
+        ))}
+      </select>
+      <span class="rate-table__filter-hint" data-province-hint></span>
+    </div>
+  )}
   <table class="rate-table" data-sortable data-default-sort={initialSortKey}>
     <thead>
       <tr>
@@ -84,6 +114,27 @@ const initialSortKey = defaultSort && terms.includes(defaultSort) ? defaultSort 
     content: "▼";
     color: var(--color-fg);
   }
+  .rate-table__filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.75rem;
+    font-size: 0.95rem;
+  }
+  .rate-table__filter label {
+    font-weight: 600;
+  }
+  .rate-table__filter select {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font: inherit;
+    background: var(--color-bg);
+  }
+  .rate-table__filter-hint {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
 </style>
 
 <script>
@@ -138,9 +189,78 @@ const initialSortKey = defaultSort && terms.includes(defaultSort) ? defaultSort 
     });
   }
 
+  function applyProvinceFilter(province: string) {
+    const tbodies = document.querySelectorAll<HTMLTableSectionElement>(
+      "table[data-sortable] tbody",
+    );
+    tbodies.forEach((tbody) => {
+      const rows = tbody.querySelectorAll<HTMLTableRowElement>("tr.lender-row");
+      rows.forEach((row) => {
+        const provs = (row.dataset.provinces ?? "").split(",").filter(Boolean);
+        // National lenders (no provinces listed) always visible.
+        // Provincial lenders: visible only when their province is selected.
+        const isNational = provs.length === 0;
+        const visible = isNational || (province !== "" && provs.includes(province));
+        row.style.display = visible ? "" : "none";
+      });
+    });
+  }
+
+  function initProvinceFilter() {
+    const select = document.querySelector<HTMLSelectElement>("[data-province-select]");
+    if (!select) return;
+    const hint = document.querySelector<HTMLSpanElement>("[data-province-hint]");
+
+    const updateHint = (province: string) => {
+      if (!hint) return;
+      hint.textContent = province
+        ? "Showing national lenders plus credit unions in this province."
+        : "Showing national lenders only.";
+    };
+
+    const setProvince = (province: string, persist = true) => {
+      select.value = province;
+      applyProvinceFilter(province);
+      updateHint(province);
+      if (persist) {
+        try {
+          if (province) localStorage.setItem("province", province);
+          else localStorage.removeItem("province");
+        } catch {}
+      }
+    };
+
+    select.addEventListener("change", () => setProvince(select.value));
+
+    // Initial load: stored preference > IP-detected region > "All Canada".
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem("province");
+    } catch {}
+    if (stored) {
+      setProvince(stored, false);
+      return;
+    }
+    setProvince("", false);
+    fetch("/api/region")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const region = data?.region as string | undefined;
+        if (region && [...select.options].some((o) => o.value === region)) {
+          // Auto-set without persisting — user hasn't explicitly chosen yet.
+          setProvince(region, false);
+        }
+      })
+      .catch(() => {});
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initSortableTables);
+    document.addEventListener("DOMContentLoaded", () => {
+      initSortableTables();
+      initProvinceFilter();
+    });
   } else {
     initSortableTables();
+    initProvinceFilter();
   }
 </script>

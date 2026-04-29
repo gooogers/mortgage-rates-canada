@@ -108,3 +108,115 @@ lenders:
     notable_quirks:
       - "Owned by Scotiabank since 2012. Operates as an online-only bank with no physical branches."
     last_verified_at: ""
+
+  meridian:
+    full_name: Meridian Credit Union
+    short_name: Meridian
+    founded_year: 2005
+    regulator: FSRA (Ontario)
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 20
+      payment_increase_pct: 20
+    notable_quirks:
+      - "Largest credit union in Ontario. Open to anyone living, working, or studying in Ontario."
+    last_verified_at: ""
+
+  alterna:
+    full_name: Alterna Savings
+    short_name: Alterna
+    founded_year: 1908
+    regulator: FSRA (Ontario)
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 20
+      payment_increase_pct: 20
+    notable_quirks:
+      - "Federally-incorporated cousin Alterna Bank operates online-only across Canada; the credit union itself serves Ontario."
+    last_verified_at: ""
+
+  desjardins:
+    full_name: Desjardins
+    short_name: Desjardins
+    founded_year: 1900
+    regulator: AMF (Quebec)
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 15
+      payment_increase_pct: 100
+    notable_quirks:
+      - "Largest financial cooperative in North America. Dominant in Quebec; serves all of Canada through Caisse populaires and Zag Bank."
+    last_verified_at: ""
+
+  vancity:
+    full_name: Vancouver City Savings Credit Union
+    short_name: Vancity
+    founded_year: 1946
+    regulator: BCFSA (British Columbia)
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 20
+      payment_increase_pct: 20
+    notable_quirks:
+      - "Largest English-language credit union in Canada. Strong sustainability and community-investment focus."
+    last_verified_at: ""
+
+  coast-capital:
+    full_name: Coast Capital Savings
+    short_name: Coast Capital
+    founded_year: 1940
+    regulator: BCFSA (British Columbia)
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 20
+      payment_increase_pct: 20
+    notable_quirks:
+      - "Federally-continued credit union as of 2018, but still primarily serves BC members."
+    last_verified_at: ""
+
+  servus:
+    full_name: Servus Credit Union
+    short_name: Servus
+    founded_year: 1938
+    regulator: Credit Union Deposit Guarantee Corporation (Alberta)
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 20
+      payment_increase_pct: 20
+    notable_quirks:
+      - "Largest credit union in Alberta. Merged with Connect First in 2024 to expand reach."
+    last_verified_at: ""
+
+  atb:
+    full_name: ATB Financial
+    short_name: ATB
+    founded_year: 1938
+    regulator: Government of Alberta (Crown corporation)
+    channels:
+      - branch
+      - broker
+      - online
+    prepayment:
+      lump_sum_pct: 20
+      payment_increase_pct: 20
+    notable_quirks:
+      - "Provincially-owned Crown corporation, not technically a credit union but operates as Alberta's main provincial lender alongside the Big 6."
+    last_verified_at: ""

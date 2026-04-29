@@ -331,14 +331,18 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
   .be-pace label {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
     font-size: 0.9rem;
-    margin: 0.1rem 0;
+    margin: 0;
+    padding: 0.35rem 0;
+    min-height: 2rem;
     font-weight: normal;
     line-height: 1.3;
+    cursor: pointer;
   }
   .be-pace input[type="radio"] {
-    width: auto;
+    width: 18px;
+    height: 18px;
     margin: 0;
     padding: 0;
     flex: 0 0 auto;

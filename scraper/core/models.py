@@ -58,7 +58,6 @@ class Lender(BaseModel):
 
 class RatesData(BaseModel):
     updated_at: datetime
-    discount_formula: dict[str, float | None]
     lenders: list[Lender]
 
     @field_serializer("updated_at")

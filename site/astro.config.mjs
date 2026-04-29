@@ -1,12 +1,15 @@
 import { defineConfig } from "astro/config";
 import { fileURLToPath } from "url";
 import path from "path";
+import mdx from "@astrojs/mdx";
+import sitemap from "@astrojs/sitemap";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://yourdomain.ca",
+  integrations: [mdx(), sitemap()],
+  site: "https://canadianrates.ca",
   trailingSlash: "never",
   build: {
     format: "file",

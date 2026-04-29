@@ -1,0 +1,88 @@
+---
+interface Props {
+  title: string;
+  toolId: string;
+}
+
+const { title, toolId } = Astro.props;
+---
+
+<section class="tool" data-tool-id={toolId}>
+  <h2 class="tool__title">{title}</h2>
+  <div class="tool__body">
+    <div class="tool__inputs">
+      <slot name="inputs" />
+    </div>
+    <div class="tool__result">
+      <slot name="result" />
+    </div>
+  </div>
+  <details class="tool__details">
+    <summary>Show the math</summary>
+    <slot name="details" />
+  </details>
+</section>
+
+<style>
+  .tool {
+    border: 1px solid var(--color-border, #e0e4e8);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 2rem 0;
+    background: var(--color-surface, #fafbfc);
+  }
+  .tool__title {
+    margin: 0 0 1rem;
+    font-size: 1.15rem;
+  }
+  .tool__body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  @media (max-width: 600px) {
+    .tool__body {
+      grid-template-columns: 1fr;
+    }
+  }
+  .tool__inputs {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .tool__result {
+    background: var(--color-bg, #fff);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+  }
+  .tool__details {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+  .tool__details summary {
+    cursor: pointer;
+    color: var(--color-accent, #0066cc);
+  }
+  .tool :global(label) {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+  .tool :global(input),
+  .tool :global(select) {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid var(--color-border, #ccc);
+    border-radius: 4px;
+    font-size: 0.95rem;
+  }
+  .tool :global(.tool__use-rates) {
+    margin-top: 0.5rem;
+    background: none;
+    border: 1px solid var(--color-accent, #0066cc);
+    color: var(--color-accent, #0066cc);
+    padding: 0.35rem 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+</style>

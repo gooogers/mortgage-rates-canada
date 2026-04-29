@@ -1,8 +1,11 @@
 ---
 import Base from "@layouts/Base.astro";
 import Disclaimer from "@components/Disclaimer.astro";
+import LenderFacts from "@components/LenderFacts.astro";
+import RelatedGuides from "@components/RelatedGuides.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
 import { loadRatesData } from "@lib/rates";
+import { getLenderFacts, renderLenderIntro } from "@lib/lenderFacts";
 
 export async function getStaticPaths() {
   const data = await loadRatesData();
@@ -16,12 +19,14 @@ const { lender, updatedAt } = Astro.props as {
   lender: import("@lib/rates").Lender;
   updatedAt: string;
 };
+const facts = getLenderFacts(lender.slug);
+const intro = facts ? renderLenderIntro(facts) : null;
 ---
 
 <Base
   title={`${lender.name} Mortgage Rates`}
-  description={`Current posted and estimated discounted mortgage rates for ${lender.name}, updated daily.`}
-  canonical={`https://yourdomain.ca/lenders/${lender.slug}`}
+  description={`Current posted and discounted mortgage rates for ${lender.name}, updated daily.`}
+  canonical={`https://canadianrates.ca/lenders/${lender.slug}`}
 >
   <h1>{lender.name} Mortgage Rates</h1>
   <p class="muted">
@@ -29,6 +34,9 @@ const { lender, updatedAt } = Astro.props as {
     <br />
     Last updated {formatUpdatedAt(updatedAt)}.
   </p>
+
+  {intro && <p class="lender-intro">{intro}</p>}
+
   <Disclaimer variant="rate" />
 
   <table class="rate-table">
@@ -36,7 +44,7 @@ const { lender, updatedAt } = Astro.props as {
       <tr>
         <th>Term</th>
         <th>Posted</th>
-        <th>Estimated discounted</th>
+        <th>Discounted</th>
       </tr>
     </thead>
     <tbody>
@@ -50,6 +58,8 @@ const { lender, updatedAt } = Astro.props as {
     </tbody>
   </table>
 
+  {facts && <LenderFacts facts={facts} />}
+
   {lender.affiliate_url && (
     <p>
       <a class="cta" href={lender.affiliate_url} rel="sponsored noopener" target="_blank">
@@ -57,11 +67,18 @@ const { lender, updatedAt } = Astro.props as {
       </a>
     </p>
   )}
+
+  <RelatedGuides slugs={["affordability"]} />
 </Base>
 
 <style>
   .muted {
     color: var(--color-muted);
     font-size: 0.95rem;
+  }
+  .lender-intro {
+    font-size: 1rem;
+    line-height: 1.55;
+    margin: 1rem 0 1.25rem;
   }
 </style>

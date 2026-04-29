@@ -2,32 +2,54 @@
 import Base from "@layouts/Base.astro";
 import Calculator from "@components/Calculator.astro";
 import Disclaimer from "@components/Disclaimer.astro";
+import GuideCard from "@components/GuideCard.astro";
 import HeroFeaturedRates from "@components/HeroFeaturedRates.astro";
 import RateTable from "@components/RateTable.astro";
 import { formatUpdatedAt } from "@lib/format";
+import { getAllGuides } from "@lib/guides";
 import { loadRatesData } from "@lib/rates";
 
 const data = await loadRatesData();
+const guides = await getAllGuides();
+guides.sort((a, b) => a.data.title.localeCompare(b.data.title));
 ---
 
 <Base
-  title="Mortgage Rates Canada — Compare today's posted and estimated discounted rates"
-  description="Compare current Canadian mortgage rates from major banks. Posted vs. estimated discounted broker-channel rates, updated daily."
-  canonical="https://yourdomain.ca/"
+  title="Canadian Rates | Compare today's posted and discounted rates"
+  description="Compare current Canadian mortgage rates from major banks. Posted rates and the bank's own published discounted rates, updated daily."
+  canonical="https://canadianrates.ca/"
 >
   <HeroFeaturedRates data={data} />
 
   <section class="rates-section">
     <h2>All lender rates</h2>
     <p class="muted">
-      Updated {formatUpdatedAt(data.updated_at)}. Posted rates are what each
-      lender publishes; discounted rates are estimates of what's typically
-      available through a mortgage broker.
+      Updated {formatUpdatedAt(data.updated_at)}. Posted rates are the public
+      rates each lender advertises; discounted rates are the bank's own
+      special-offer rates published alongside posted. Both come directly from
+      the lender. See our <a href="/methodology">methodology</a>.
     </p>
     <Disclaimer variant="rate" />
-    <RateTable data={data} terms={["3yr_fixed", "5yr_fixed", "variable"]} />
+    <RateTable data={data} terms={["3yr_fixed", "5yr_fixed", "variable"]} defaultSort="5yr_fixed" />
     <p>
       <a href="/rates/5-year-fixed">See full 5-year fixed rankings →</a>
+    </p>
+  </section>
+
+  <section class="learn-section">
+    <h2>Learn before you choose</h2>
+    <p class="muted">Plain-English guides covering the decisions every Canadian homeowner faces.</p>
+    <div class="learn-grid">
+      {guides.map((g) => (
+        <GuideCard
+          href={`/guides/${g.slug}`}
+          title={g.data.title}
+          description={g.data.description}
+        />
+      ))}
+    </div>
+    <p>
+      <a href="/guides">All guides →</a>
     </p>
   </section>
 
@@ -42,6 +64,15 @@ const data = await loadRatesData();
 <style>
   .rates-section {
     margin: 2rem 0;
+  }
+  .learn-section {
+    margin: 2rem 0;
+  }
+  .learn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
   }
   .muted {
     color: var(--color-muted);

@@ -10,9 +10,9 @@ interface Props {
 }
 
 const { title, description, canonical } = Astro.props;
-const fullTitle = title.includes("Mortgage Rates Canada")
+const fullTitle = title.includes("Canadian Rates")
   ? title
-  : `${title} — Mortgage Rates Canada`;
+  : `${title} — Canadian Rates`;
 const staging = isStaging();
 ---
 
@@ -29,10 +29,38 @@ const staging = isStaging();
   </head>
   <body>
     <header class="site-header">
-      <a href="/" class="site-header__brand">Mortgage Rates Canada</a>
+      <a href="/" class="site-header__brand" aria-label="Canadian Rates — home">
+        <svg viewBox="0 0 50 34" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 24 L24 4 L46 24" stroke="currentColor" stroke-width="3.5"/>
+            <path d="M2 32 L46 32" stroke="#C8102E" stroke-width="2.5"/>
+          </g>
+        </svg>
+        <span>Canadian Rates</span>
+      </a>
       <nav class="site-header__nav">
-        <a href="/">Rates</a>
-        <a href="/calculator">Calculator</a>
+        <div class="nav-dropdown">
+          <a href="/" class="nav-dropdown__trigger" aria-haspopup="true">Rates ▾</a>
+          <ul class="nav-dropdown__menu" role="menu">
+            <li role="none"><a role="menuitem" href="/rates/5-year-fixed">5-year fixed</a></li>
+            <li role="none"><a role="menuitem" href="/rates/3-year-fixed">3-year fixed</a></li>
+            <li role="none"><a role="menuitem" href="/rates/variable">Variable</a></li>
+            <li role="none"><a role="menuitem" href="/rates/1-year-fixed">1-year fixed</a></li>
+            <li role="none"><a role="menuitem" href="/rates/2-year-fixed">2-year fixed</a></li>
+            <li role="none"><a role="menuitem" href="/rates/4-year-fixed">4-year fixed</a></li>
+            <li role="none"><a role="menuitem" href="/rates/7-year-fixed">7-year fixed</a></li>
+            <li role="none"><a role="menuitem" href="/rates/10-year-fixed">10-year fixed</a></li>
+          </ul>
+        </div>
+        <a href="/guides">Guides</a>
+        <div class="nav-dropdown">
+          <a href="/calculator" class="nav-dropdown__trigger" aria-haspopup="true">Calculators ▾</a>
+          <ul class="nav-dropdown__menu" role="menu">
+            <li role="none"><a role="menuitem" href="/calculator">Payment</a></li>
+            <li role="none"><a role="menuitem" href="/guides/affordability">Affordability</a></li>
+            <li role="none"><a role="menuitem" href="/guides/fixed-vs-variable">Fixed vs Variable</a></li>
+          </ul>
+        </div>
       </nav>
     </header>
     <main>

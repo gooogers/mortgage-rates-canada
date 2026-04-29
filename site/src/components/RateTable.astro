@@ -6,18 +6,31 @@ import type { RatesData, Term } from "@lib/rates";
 interface Props {
   data: RatesData;
   terms?: Term[];
+  /** Term to sort by ascending on initial load. Defaults to first rate column. */
+  defaultSort?: Term;
 }
 
 const DEFAULT_TERMS: Term[] = ["3yr_fixed", "5yr_fixed", "variable"];
-const { data, terms = DEFAULT_TERMS } = Astro.props;
+const { data, terms = DEFAULT_TERMS, defaultSort } = Astro.props;
+const initialSortKey = defaultSort && terms.includes(defaultSort) ? defaultSort : terms[0];
 ---
 
 <div class="rate-table-wrap">
-  <table class="rate-table">
+  <table class="rate-table" data-sortable data-default-sort={initialSortKey}>
     <thead>
       <tr>
-        <th>Lender</th>
-        {terms.map((t) => <th>{formatTermLabel(t)}</th>)}
+        <th>
+          <button type="button" class="rate-table__sort" data-sort-key="name" data-sort-type="text">
+            Lender <span class="rate-table__sort-indicator" aria-hidden="true"></span>
+          </button>
+        </th>
+        {terms.map((t) => (
+          <th>
+            <button type="button" class="rate-table__sort" data-sort-key={t} data-sort-type="num">
+              {formatTermLabel(t)} <span class="rate-table__sort-indicator" aria-hidden="true"></span>
+            </button>
+          </th>
+        ))}
         <th></th>
       </tr>
     </thead>
@@ -26,7 +39,7 @@ const { data, terms = DEFAULT_TERMS } = Astro.props;
     </tbody>
   </table>
   <p class="rate-table__legend">
-    <s>Posted</s> &nbsp; <strong>Estimated discounted</strong>
+    <s>Posted</s> &nbsp; <strong>Discounted</strong>
   </p>
   <p class="rate-table__disclaimer">
     Discounted rates shown are bank-advertised special offers. Mortgage brokers may
@@ -42,4 +55,92 @@ const { data, terms = DEFAULT_TERMS } = Astro.props;
     color: #6c757d;
     line-height: 1.4;
   }
+  .rate-table__sort {
+    background: none;
+    border: 0;
+    padding: 0.5rem 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    min-height: 2.75rem;
+  }
+  .rate-table__sort:hover {
+    text-decoration: underline;
+  }
+  .rate-table__sort-indicator {
+    display: inline-block;
+    width: 0.7em;
+    color: var(--color-muted);
+    font-size: 0.85em;
+  }
+  .rate-table__sort[data-active="asc"] .rate-table__sort-indicator::before {
+    content: "▲";
+    color: var(--color-fg);
+  }
+  .rate-table__sort[data-active="desc"] .rate-table__sort-indicator::before {
+    content: "▼";
+    color: var(--color-fg);
+  }
 </style>
+
+<script>
+  function initSortableTables() {
+    const tables = document.querySelectorAll<HTMLTableElement>("table[data-sortable]");
+    tables.forEach((table) => {
+      const tbody = table.tBodies[0];
+      if (!tbody) return;
+      const buttons = table.querySelectorAll<HTMLButtonElement>(".rate-table__sort");
+
+      const sortBy = (key: string, type: string, dir: "asc" | "desc") => {
+        const attr = `data-sort-${key}`;
+        const rows = Array.from(tbody.rows);
+        rows.sort((a, b) => {
+          const av = a.getAttribute(attr) ?? "";
+          const bv = b.getAttribute(attr) ?? "";
+          if (type === "num") {
+            const aEmpty = av === "";
+            const bEmpty = bv === "";
+            if (aEmpty && bEmpty) return 0;
+            if (aEmpty) return 1;
+            if (bEmpty) return -1;
+            const an = Number(av);
+            const bn = Number(bv);
+            return dir === "asc" ? an - bn : bn - an;
+          }
+          const cmp = av.localeCompare(bv);
+          return dir === "asc" ? cmp : -cmp;
+        });
+        rows.forEach((r) => tbody.appendChild(r));
+        buttons.forEach((b) => b.removeAttribute("data-active"));
+        const activeBtn = table.querySelector<HTMLButtonElement>(
+          `.rate-table__sort[data-sort-key="${key}"]`,
+        );
+        if (activeBtn) activeBtn.dataset.active = dir;
+      };
+
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const key = btn.dataset.sortKey ?? "";
+          const type = btn.dataset.sortType ?? "text";
+          const current = btn.dataset.active;
+          const next: "asc" | "desc" = current === "asc" ? "desc" : "asc";
+          sortBy(key, type, next);
+        });
+      });
+
+      const defaultKey = table.dataset.defaultSort;
+      if (defaultKey) {
+        sortBy(defaultKey, "num", "asc");
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSortableTables);
+  } else {
+    initSortableTables();
+  }
+</script>

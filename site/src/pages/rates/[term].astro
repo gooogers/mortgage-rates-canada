@@ -1,10 +1,12 @@
 ---
 import Base from "@layouts/Base.astro";
 import Disclaimer from "@components/Disclaimer.astro";
+import TermIntro from "@components/TermIntro.astro";
+import TermFaq from "@components/TermFaq.astro";
+import RelatedGuides from "@components/RelatedGuides.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
 import { loadRatesData, ratesByTerm, type Term } from "@lib/rates";
 
-// /rates/5-year-fixed maps to term "5yr_fixed".
 const TERM_SLUGS: Record<string, Term> = {
   "1-year-fixed": "1yr_fixed",
   "2-year-fixed": "2yr_fixed",
@@ -14,6 +16,114 @@ const TERM_SLUGS: Record<string, Term> = {
   "7-year-fixed": "7yr_fixed",
   "10-year-fixed": "10yr_fixed",
   variable: "variable",
+};
+
+// Per-term FAQ map. Drafted by AI, requires user review and rewriting for voice.
+const FAQS: Record<string, { q: string; a: string }[]> = {
+  "1-year-fixed": [
+    {
+      q: "Who actually picks a 1-year fixed?",
+      a: "It's a small minority, typically borrowers in transitional life situations (selling, divorcing, relocating within the year) or those who have specific evidence rates will be materially lower in 12 months and want to renew into them.",
+    },
+    {
+      q: "Why is the 1-year fixed often more expensive than longer terms?",
+      a: "Short-end bond yields are usually higher than long-end yields when the yield curve is normal. In an inverted yield curve (like recent years), the 1-year fixed can actually be cheaper than the 5-year, uncommon historically but increasingly normal.",
+    },
+    {
+      q: "Is variable a better alternative?",
+      a: "Often yes. Variable mortgages can typically be broken with just three months' interest as penalty, giving you similar flexibility at usually a lower rate.",
+    },
+  ],
+  "2-year-fixed": [
+    {
+      q: "When does a 2-year fixed beat a 3-year?",
+      a: "When pricing puts the 2-year materially below the 3-year (sometimes happens in inverted yield curves) and your plans align with a 24-month horizon. Otherwise, the 3-year is usually the better short-fixed pick.",
+    },
+    {
+      q: "Why don't all lenders offer a 2-year fixed?",
+      a: "Lower demand. Most Canadian banks build pricing and promotion around 5-year (and increasingly 3-year) fixed terms, so the 2-year is sometimes available only on request rather than promoted.",
+    },
+    {
+      q: "What's the typical broker discount on a 2-year?",
+      a: "Usually 0.20–0.50% off posted, smaller than the 0.50–1.00% common on the 5-year fixed.",
+    },
+  ],
+  "3-year-fixed": [
+    {
+      q: "Why are 5-year rates often higher than 3-year today?",
+      a: "An inverted yield curve. Short-term Government of Canada bond yields are above long-term yields, which the bond market interprets as signaling rate cuts ahead. Lenders price fixed mortgages off these yields plus a margin.",
+    },
+    {
+      q: "Is 3-year the new default?",
+      a: "Increasingly common, but not the default. The 5-year fixed remains the most popular term in Canada because it aligns with bank promotion cycles and renewal patterns. The 3-year has gained share recently because of pricing inversions.",
+    },
+    {
+      q: "What's the IRD penalty difference vs 5-year?",
+      a: "3-year IRD penalties are typically smaller in absolute dollars but the calculation method is similar. Always read the lender's prepayment-and-portability terms before signing; IRD math varies by lender.",
+    },
+  ],
+  "4-year-fixed": [
+    {
+      q: "Why is the 4-year fixed less common than the 3 or 5?",
+      a: "The 4-year Government of Canada bond is less liquid than the 3- and 5-year benchmarks. Lenders often price the 4-year by interpolating between adjacent terms rather than from a clean market signal, so it rarely offers a meaningfully better deal.",
+    },
+    {
+      q: "When is a 4-year fixed actually the right pick?",
+      a: "When pricing puts the 4-year below both the 3- and 5-year (occasionally happens) and your life plans (job change, school cycle, planned move) genuinely align with a 4-year window.",
+    },
+  ],
+  "5-year-fixed": [
+    {
+      q: "Why are 5-year rates often higher than 3-year today?",
+      a: "An inverted yield curve. Short-term Government of Canada bond yields can sit above long-term yields when the bond market expects rate cuts. Since 5-year fixed mortgages are priced off the 5-year bond and 3-year fixed off the 3-year, an inverted curve flips their relative pricing.",
+    },
+    {
+      q: "What's the typical broker discount on the 5-year fixed?",
+      a: "Usually 0.50–1.00% below the lender's posted rate for well-qualified borrowers, depending on the lender's discount channel and the broker's volume relationship. Some lenders publish their discounted rate; others only release it through brokers.",
+    },
+    {
+      q: "Can I break a 5-year fixed early?",
+      a: "Yes, but the IRD (interest rate differential) penalty can be significant, often $10,000+ on a typical mortgage when posted-vs-broker spreads are wide. Read your lender's IRD calculation method carefully before signing.",
+    },
+  ],
+  "7-year-fixed": [
+    {
+      q: "Is the 7-year worth the premium over the 5-year?",
+      a: "Only if the premium is small (under ~30bp) and you genuinely value the extra two years of certainty. For most Canadian borrowers, the 5-year offers a better tradeoff between rate and term length.",
+    },
+    {
+      q: "What happens if I break a 7-year fixed early?",
+      a: "Same IRD penalty math as a 5-year, applied to a longer remaining term, meaning the absolute dollar penalty can be larger. The longer the term, the more careful you should be about prepayment and portability terms.",
+    },
+  ],
+  "10-year-fixed": [
+    {
+      q: "Can I really break a 10-year mortgage cheaply after 5 years?",
+      a: "Yes. Federal mortgage rules cap the penalty at three months' interest for terms longer than 5 years, but only after the first 5 years have elapsed. During the first 5 years, the standard IRD penalty applies and can be steep.",
+    },
+    {
+      q: "Why is the 10-year premium over the 5-year so variable?",
+      a: "It depends on the shape of the yield curve. In a steep upward-sloping curve, the 10-year is meaningfully more expensive. In a flat or inverted curve, the premium can shrink to almost nothing.",
+    },
+    {
+      q: "Why don't many lenders offer 10-year fixed?",
+      a: "Long-duration risk and low borrower demand. Most lenders fund mortgages from shorter-duration deposits, so a 10-year fixed creates more interest-rate risk on the lender's books than they want for a small slice of the market.",
+    },
+  ],
+  variable: [
+    {
+      q: "Variable vs fixed: what's the right choice today?",
+      a: "Depends on where the BoC is in its rate cycle. Variable typically wins in cycles where rates fall; fixed wins when rates rise. Use our fixed-vs-variable break-even tool to model both scenarios with your specific numbers.",
+    },
+    {
+      q: "What happens to my payment when prime moves?",
+      a: "It depends on whether your mortgage is variable-rate variable-payment (payment changes with prime) or variable-rate static-payment (payment stays the same but more goes to interest when rates rise). Confirm which one you have before assuming.",
+    },
+    {
+      q: "How big is the typical broker discount on variable?",
+      a: "Usually 0.50–1.20% off prime depending on lender, mortgage size, and broker channel. The lender's prime rate itself is uniform across the industry; what varies is the discount.",
+    },
+  ],
 };
 
 export async function getStaticPaths() {
@@ -32,75 +142,69 @@ export async function getStaticPaths() {
 
 const { term: slug } = Astro.params;
 const term = TERM_SLUGS[slug as string];
-if (!term) {
-  return Astro.redirect("/404");
-}
+if (!term) return Astro.redirect("/404");
 
 const data = await loadRatesData();
 const entries = ratesByTerm(data, term);
 const label = formatTermLabel(term);
+const faqItems = FAQS[slug as string] ?? [];
+const relatedSlugs = ["fixed-vs-variable", "affordability"];
 ---
 
 <Base
   title={`Best ${label} Mortgage Rates in Canada`}
-  description={`Compare ${label.toLowerCase()} mortgage rates across Canadian lenders. Posted vs. estimated discounted broker-channel rates, updated daily.`}
-  canonical={`https://yourdomain.ca/rates/${slug}`}
+  description={`Compare ${label.toLowerCase()} mortgage rates across Canadian lenders. Posted and bank-published discounted rates, updated daily.`}
+  canonical={`https://canadianrates.ca/rates/${slug}`}
 >
   <h1>Best {label} Mortgage Rates in Canada</h1>
   <p class="muted">Updated {formatUpdatedAt(data.updated_at)}.</p>
+
+  <TermIntro termSlug={slug as string} />
+
   <Disclaimer variant="rate" />
 
-  {
-    entries.length === 0 ? (
-      <p>No lenders currently offer this term.</p>
-    ) : (
-      <table class="rate-table">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Lender</th>
-            <th>Posted</th>
-            <th>Estimated discounted</th>
-            <th></th>
+  {entries.length === 0 ? (
+    <p>No lenders currently offer this term.</p>
+  ) : (
+    <table class="rate-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Lender</th>
+          <th>Posted</th>
+          <th>Discounted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {entries.map(({ lender, rate }, i) => (
+          <tr class="lender-row">
+            <td>{i + 1}</td>
+            <td class="lender-row__name">
+              <a href={`/lenders/${lender.slug}`}>{lender.name}</a>
+            </td>
+            <td>
+              <s class="lender-row__posted">{formatPercent(rate.posted)}</s>
+            </td>
+            <td>
+              <strong class="lender-row__discounted">{formatPercent(rate.discounted)}</strong>
+            </td>
+            <td>
+              {lender.affiliate_url ? (
+                <a class="cta" href={lender.affiliate_url} rel="sponsored noopener" target="_blank">Apply →</a>
+              ) : (
+                <a class="cta cta--secondary" href={lender.source_url} rel="noopener" target="_blank">Visit lender →</a>
+              )}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {entries.map(({ lender, rate }, i) => (
-            <tr class="lender-row">
-              <td>{i + 1}</td>
-              <td class="lender-row__name">
-                <a href={`/lenders/${lender.slug}`}>{lender.name}</a>
-              </td>
-              <td>
-                <s class="lender-row__posted">{formatPercent(rate.posted)}</s>
-              </td>
-              <td>
-                <strong class="lender-row__discounted">
-                  {formatPercent(rate.discounted)}
-                </strong>
-              </td>
-              <td>
-                {lender.affiliate_url ? (
-                  <a class="cta" href={lender.affiliate_url} rel="sponsored noopener" target="_blank">
-                    Apply →
-                  </a>
-                ) : (
-                  <a
-                    class="cta cta--secondary"
-                    href={lender.source_url}
-                    rel="noopener"
-                    target="_blank"
-                  >
-                    Visit lender →
-                  </a>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    )
-  }
+        ))}
+      </tbody>
+    </table>
+  )}
+
+  <TermFaq items={faqItems} />
+
+  <RelatedGuides slugs={relatedSlugs} />
 </Base>
 
 <style>

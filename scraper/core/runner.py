@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timezone
 
-from core.discount import DiscountFormula
 from core.models import Lender, RatesData
 from core.validator import (
     RateValidationError,
@@ -18,11 +17,10 @@ log = logging.getLogger(__name__)
 
 def build_rates_data(
     scrapers: list[LenderScraper],
-    formula: DiscountFormula,
     *,
     previous: RatesData | None = None,
 ) -> RatesData:
-    """Run every scraper, apply discount, validate, and assemble RatesData.
+    """Run every scraper, validate, and assemble RatesData.
 
     On per-lender failure: log the error. If a previous run exists for that
     lender, keep its data; otherwise drop the lender from this run.
@@ -33,7 +31,7 @@ def build_rates_data(
     out: list[Lender] = []
     for scraper in scrapers:
         try:
-            lender = _run_one(scraper, formula, previous_by_slug.get(scraper.slug))
+            lender = _run_one(scraper, previous_by_slug.get(scraper.slug))
             out.append(lender)
         except Exception as exc:  # noqa: BLE001 — per-lender errors must not crash the run
             log.error("scraper %s failed: %s", scraper.slug, exc)
@@ -44,14 +42,12 @@ def build_rates_data(
 
     return RatesData(
         updated_at=datetime.now(timezone.utc).replace(microsecond=0),
-        discount_formula=formula.to_dict(),
         lenders=out,
     )
 
 
 def _run_one(
     scraper: LenderScraper,
-    formula: DiscountFormula,
     previous: Lender | None,
 ) -> Lender:
     html = scraper.fetch()

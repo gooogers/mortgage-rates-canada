@@ -26,7 +26,7 @@ const cards = featured
           <p class="hero-card__label">Best {formatTermLabel(term)}</p>
           <p class="hero-card__rate">{formatPercent(best!.rate.discounted ?? best!.rate.posted)}</p>
           <p class="hero-card__lender">
-            <LenderBadge slug={best!.lender.slug} />
+            <LenderBadge slug={best!.lender.slug} name={best!.lender.name} />
             {best!.lender.name}
           </p>
           {best!.lender.affiliate_url ? (

@@ -1,7 +1,6 @@
 """Tests for the orchestration runner."""
 from datetime import datetime, timezone
 
-from core.discount import DiscountFormula
 from core.models import LenderType, Rate, RatesData, Term
 from core.runner import build_rates_data
 from lenders.base import LenderScraper
@@ -39,8 +38,7 @@ class FailingLender(LenderScraper):
 
 
 def test_build_rates_data_assembles_lenders():
-    formula = DiscountFormula(fixed=1.50, variable=1.00, heloc=None)
-    data = build_rates_data([StubLender()], formula)
+    data = build_rates_data([StubLender()])
     assert isinstance(data, RatesData)
     assert len(data.lenders) == 1
     rates = data.lenders[0].rates
@@ -57,17 +55,14 @@ def test_build_rates_data_assembles_lenders():
 
 
 def test_build_rates_data_skips_failed_lenders_with_no_previous():
-    formula = DiscountFormula(fixed=1.50, variable=1.00, heloc=None)
-    data = build_rates_data([StubLender(), FailingLender()], formula)
+    data = build_rates_data([StubLender(), FailingLender()])
     slugs = [lender.slug for lender in data.lenders]
     assert slugs == ["stub"]
 
 
 def test_build_rates_data_retains_previous_for_failed_lender():
-    formula = DiscountFormula(fixed=1.50, variable=1.00, heloc=None)
     previous = RatesData(
         updated_at=datetime(2026, 4, 24, tzinfo=timezone.utc),
-        discount_formula=formula.to_dict(),
         lenders=[
             StubLender().to_lender([
                 Rate(term=Term.FIVE_YEAR_FIXED, posted=5.50, discounted=4.00),
@@ -79,7 +74,6 @@ def test_build_rates_data_retains_previous_for_failed_lender():
     )
     data = build_rates_data(
         [StubLender(), FailingLender()],
-        formula,
         previous=previous,
     )
     slugs = sorted(l.slug for l in data.lenders)
@@ -89,21 +83,11 @@ def test_build_rates_data_retains_previous_for_failed_lender():
 
 
 def test_build_rates_data_sets_updated_at():
-    formula = DiscountFormula(fixed=1.50, variable=1.00, heloc=None)
     before = datetime.now(timezone.utc)
-    data = build_rates_data([StubLender()], formula)
+    data = build_rates_data([StubLender()])
     after = datetime.now(timezone.utc)
-    # `updated_at` should fall in [before, after]; pydantic stores it as datetime
-    # (or string after model_dump). Compare both ways.
     if isinstance(data.updated_at, str):
-        # Already serialized — re-parse.
         parsed = datetime.fromisoformat(data.updated_at.replace("Z", "+00:00"))
     else:
         parsed = data.updated_at
     assert before.replace(microsecond=0) <= parsed <= after.replace(microsecond=0) + datetime.now().resolution
-
-
-def test_build_rates_data_sets_discount_formula():
-    formula = DiscountFormula(fixed=1.50, variable=1.00, heloc=None)
-    data = build_rates_data([StubLender()], formula)
-    assert data.discount_formula == {"fixed": 1.50, "variable": 1.00, "heloc": None}

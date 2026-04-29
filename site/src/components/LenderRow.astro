@@ -13,12 +13,26 @@ const { lender, terms } = Astro.props;
 function rateFor(term: Term) {
   return lender.rates.find((r) => r.term === term);
 }
+
+function sortValueFor(term: Term): number | "" {
+  const r = rateFor(term);
+  if (!r) return "";
+  const v = r.discounted ?? r.posted;
+  return typeof v === "number" ? v : "";
+}
+
+const sortAttrs: Record<string, string | number> = {
+  "data-sort-name": lender.name.toLowerCase(),
+};
+for (const t of terms) {
+  sortAttrs[`data-sort-${t}`] = sortValueFor(t);
+}
 ---
 
-<tr class="lender-row">
+<tr class="lender-row" {...sortAttrs}>
   <td class="lender-row__name">
     <div class="lender-row__name-inner">
-      <LenderBadge slug={lender.slug} />
+      <LenderBadge slug={lender.slug} name={lender.name} />
       <a href={`/lenders/${lender.slug}`}>{lender.name}</a>
     </div>
   </td>

@@ -7,7 +7,6 @@ import logging
 import sys
 from pathlib import Path
 
-from core.discount import load_discount_formula
 from core.publisher import load_previous_rates, write_rates_json
 from core.runner import build_rates_data
 from lenders.base import LenderScraper
@@ -26,7 +25,6 @@ log = logging.getLogger("scraper")
 _SCRAPER_DIR = Path(__file__).resolve().parent.parent
 _REPO_ROOT = _SCRAPER_DIR.parent
 DEFAULT_OUTPUT = _REPO_ROOT / "data" / "rates.json"
-DEFAULT_DISCOUNTS = _SCRAPER_DIR / "config" / "discounts.yaml"
 
 
 def all_scrapers() -> list[LenderScraper]:
@@ -56,12 +54,6 @@ def main(argv: list[str] | None = None) -> int:
         help=f"Output path (default: {DEFAULT_OUTPUT}).",
     )
     parser.add_argument(
-        "--discounts",
-        type=Path,
-        default=DEFAULT_DISCOUNTS,
-        help=f"Discount formula YAML (default: {DEFAULT_DISCOUNTS}).",
-    )
-    parser.add_argument(
         "--verbose",
         "-v",
         action="store_true",
@@ -74,9 +66,8 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
 
-    formula = load_discount_formula(args.discounts)
     previous = load_previous_rates(args.output)
-    data = build_rates_data(all_scrapers(), formula, previous=previous)
+    data = build_rates_data(all_scrapers(), previous=previous)
 
     json_output = json.dumps(data.model_dump(mode="json"), indent=2)
     if args.dry_run:

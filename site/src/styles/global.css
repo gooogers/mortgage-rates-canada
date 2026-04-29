@@ -2,7 +2,7 @@
   --color-bg: #ffffff;
   --color-fg: #1a1a1a;
   --color-muted: #6b7280;
-  --color-accent: #0a7;
+  --color-accent: #0F2A4A;
   --color-accent-fg: #ffffff;
   --color-border: #e5e7eb;
   --color-row-alt: #f9fafb;
@@ -45,20 +45,74 @@ a {
 }
 
 .site-header__brand {
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
   font-size: 1.1rem;
   color: var(--color-fg);
   text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.site-header__brand svg {
+  display: block;
+  width: 32px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .site-header__nav a {
-  margin-left: 1rem;
   color: var(--color-fg);
   text-decoration: none;
 }
 
 .site-header__nav a:hover {
   text-decoration: underline;
+}
+
+/* Calculators dropdown */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown__menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin: 0;
+  padding: 0.4rem 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  min-width: 220px;
+  display: none;
+  z-index: 10;
+}
+
+.nav-dropdown:hover .nav-dropdown__menu,
+.nav-dropdown:focus-within .nav-dropdown__menu {
+  display: block;
+}
+
+.nav-dropdown__menu a {
+  display: block;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.nav-dropdown__menu a:hover {
+  background: var(--color-bg-muted, #f5f5f5);
+  text-decoration: none;
 }
 
 /* Footer */
@@ -193,42 +247,45 @@ a {
 
 .hero__cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 320px));
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 .hero-card {
   background: var(--color-accent);
   color: var(--color-accent-fg);
-  padding: 1.25rem;
+  padding: 0.75rem 1rem;
   border-radius: 8px;
   text-align: center;
 }
 
 .hero-card__label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   opacity: 0.9;
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.15rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .hero-card__rate {
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
   margin: 0;
   line-height: 1.1;
 }
 
 .hero-card__lender {
-  margin: 0.25rem 0 0.75rem;
-  font-size: 0.95rem;
+  margin: 0.15rem 0 0.4rem;
+  font-size: 0.85rem;
 }
 
 .hero-card .cta {
   background: var(--color-accent-fg);
   color: var(--color-accent);
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.9rem;
 }
 
 .hero-card .cta--secondary {

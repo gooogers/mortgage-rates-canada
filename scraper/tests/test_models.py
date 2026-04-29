@@ -46,10 +46,9 @@ def test_lender_minimal():
 def test_rates_data_serializes_to_spec_shape():
     data = RatesData(
         updated_at=datetime(2026, 4, 25, 10, 0, tzinfo=timezone.utc),
-        discount_formula={"fixed": 1.50, "variable": 1.00, "heloc": None},
         lenders=[],
     )
     json_dict = data.model_dump(mode="json")
     assert json_dict["updated_at"] == "2026-04-25T10:00:00Z"
-    assert json_dict["discount_formula"]["heloc"] is None
     assert json_dict["lenders"] == []
+    assert "discount_formula" not in json_dict

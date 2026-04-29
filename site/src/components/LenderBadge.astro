@@ -3,13 +3,23 @@ import { getLenderBrand } from "@lib/lenders";
 
 interface Props {
   slug: string;
+  name?: string;
 }
 
-const { slug } = Astro.props;
+const { slug, name } = Astro.props;
 const brand = getLenderBrand(slug);
+const altText = name ? `${name} logo` : `${brand.abbr} logo`;
 ---
 
-<span class="lender-badge" style={`background:${brand.bg}`}>{brand.abbr}</span>
+{
+  brand.logo ? (
+    <img class="lender-logo" src={brand.logo} alt={altText} loading="lazy" decoding="async" />
+  ) : (
+    <span class="lender-badge" style={`background:${brand.bg}`} aria-hidden="true">
+      {brand.abbr}
+    </span>
+  )
+}
 
 <style>
   .lender-badge {
@@ -26,5 +36,12 @@ const brand = getLenderBrand(slug);
     flex-shrink: 0;
     letter-spacing: -0.3px;
     line-height: 1;
+  }
+  .lender-logo {
+    height: 28px;
+    width: auto;
+    max-width: 120px;
+    flex-shrink: 0;
+    object-fit: contain;
   }
 </style>

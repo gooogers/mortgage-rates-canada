@@ -1,10 +1,5 @@
 {
   "updated_at": "2026-04-27T20:13:26Z",
-  "discount_formula": {
-    "fixed": 1.5,
-    "variable": 1.0,
-    "heloc": null
-  },
   "lenders": [
     {
       "slug": "rbc",

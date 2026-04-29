@@ -1,0 +1,74 @@
+---
+import type { LenderFacts } from "@lib/lenderFacts";
+
+interface Props {
+  facts: LenderFacts;
+}
+
+const { facts } = Astro.props;
+const channelList = facts.channels
+  .map((c) => c.charAt(0).toUpperCase() + c.slice(1))
+  .join(", ");
+const verifiedDate = new Date(facts.last_verified_at).toLocaleDateString("en-CA", {
+  year: "numeric",
+  month: "short",
+  timeZone: "UTC",
+});
+---
+
+<section class="lender-facts">
+  <h2>Lender facts</h2>
+  <dl class="lender-facts__grid">
+    <dt>Founded</dt>
+    <dd>{facts.founded_year}</dd>
+    <dt>Regulator</dt>
+    <dd>{facts.regulator}</dd>
+    <dt>Channels</dt>
+    <dd>{channelList}</dd>
+    <dt>Prepayment</dt>
+    <dd>
+      {facts.prepayment.lump_sum_pct}% lump sum / {facts.prepayment.payment_increase_pct}% payment increase
+    </dd>
+    {facts.notable_quirks.length > 0 && (
+      <>
+        <dt>Notes</dt>
+        <dd>
+          <ul class="lender-facts__notes">
+            {facts.notable_quirks.map((note) => <li>{note}</li>)}
+          </ul>
+        </dd>
+      </>
+    )}
+  </dl>
+  <p class="lender-facts__verified">Verified {verifiedDate}</p>
+</section>
+
+<style>
+  .lender-facts {
+    margin: 2rem 0;
+  }
+  .lender-facts__grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.4rem 1rem;
+    font-size: 0.95rem;
+  }
+  .lender-facts__grid dt {
+    color: var(--color-muted);
+  }
+  .lender-facts__grid dd {
+    margin: 0;
+  }
+  .lender-facts__notes {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+  .lender-facts__notes li {
+    margin-bottom: 0.25rem;
+  }
+  .lender-facts__verified {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+</style>

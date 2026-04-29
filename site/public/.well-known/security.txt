@@ -1,4 +1,4 @@
-Contact: mailto:gregbhatti@gmail.com
+Contact: mailto:security@canadianrates.ca
 Expires: 2027-04-29T00:00:00Z
 Preferred-Languages: en
 Canonical: https://canadianrates.ca/.well-known/security.txt

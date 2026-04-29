@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-29T20:23:40Z",
+  "updated_at": "2026-04-29T20:30:17Z",
   "lenders": [
     {
       "slug": "rbc",
@@ -7,22 +7,47 @@
       "type": "big6",
       "source_url": "https://www.rbcroyalbank.com/mortgages/mortgage-rates.html",
       "affiliate_url": null,
-      "scraped_at": "2026-04-29T20:23:36Z",
+      "scraped_at": "2026-04-29T20:30:13Z",
       "rates": [
+        {
+          "term": "1yr_fixed",
+          "posted": 5.49,
+          "discounted": 4.89
+        },
         {
           "term": "2yr_fixed",
           "posted": 5.09,
-          "discounted": null
+          "discounted": 4.49
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 6.05,
+          "discounted": 4.44
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 5.99,
+          "discounted": 4.54
         },
         {
           "term": "5yr_fixed",
           "posted": 6.09,
-          "discounted": null
+          "discounted": 4.59
         },
         {
           "term": "7yr_fixed",
           "posted": 6.4,
+          "discounted": 5.0
+        },
+        {
+          "term": "10yr_fixed",
+          "posted": 6.8,
           "discounted": null
+        },
+        {
+          "term": "variable",
+          "posted": 4.45,
+          "discounted": 3.95
         }
       ]
     },
@@ -32,7 +57,7 @@
       "type": "big6",
       "source_url": "https://www.td.com/ca/en/personal-banking/products/mortgages/mortgage-rates",
       "affiliate_url": null,
-      "scraped_at": "2026-04-29T20:23:38Z",
+      "scraped_at": "2026-04-29T20:30:15Z",
       "rates": [
         {
           "term": "3yr_fixed",
@@ -232,7 +257,7 @@
       "type": "big6",
       "source_url": "https://www.nbc.ca/personal/mortgages.html",
       "affiliate_url": null,
-      "scraped_at": "2026-04-29T20:23:40Z",
+      "scraped_at": "2026-04-29T20:30:17Z",
       "rates": [
         {
           "term": "1yr_fixed",

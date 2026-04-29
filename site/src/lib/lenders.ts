@@ -6,7 +6,7 @@ export interface LenderBrand {
 }
 
 export const LENDER_BRANDS: Record<string, LenderBrand> = {
-  rbc:        { bg: "#005DAA", abbr: "RBC"  },
+  rbc:        { bg: "#005DAA", abbr: "RBC",  logo: "/logos/rbc.svg" },
   td:         { bg: "#34B233", abbr: "TD",   logo: "/logos/td.svg" },
   bmo:        { bg: "#0075BE", abbr: "BMO"  },
   scotiabank: { bg: "#EC111A", abbr: "BNS"  },

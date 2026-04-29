@@ -15,7 +15,7 @@ guides.sort((a, b) => a.data.title.localeCompare(b.data.title));
 ---
 
 <Base
-  title="Canadian Rates — Compare today's posted and discounted rates"
+  title="Canadian Rates | Compare today's posted and discounted rates"
   description="Compare current Canadian mortgage rates from major banks. Posted rates and the bank's own published discounted rates, updated daily."
   canonical="https://canadianrates.ca/"
 >
@@ -27,7 +27,7 @@ guides.sort((a, b) => a.data.title.localeCompare(b.data.title));
       Updated {formatUpdatedAt(data.updated_at)}. Posted rates are the public
       rates each lender advertises; discounted rates are the bank's own
       special-offer rates published alongside posted. Both come directly from
-      the lender — see our <a href="/methodology">methodology</a>.
+      the lender. See our <a href="/methodology">methodology</a>.
     </p>
     <Disclaimer variant="rate" />
     <RateTable data={data} terms={["3yr_fixed", "5yr_fixed", "variable"]} />

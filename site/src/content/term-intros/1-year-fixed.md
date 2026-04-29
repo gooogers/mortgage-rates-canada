@@ -4,7 +4,7 @@ headline: "Shortest fixed term"
 last_reviewed_at: "2026-04-28"
 ---
 
-The 1-year fixed locks your rate for just twelve months. It exists for a narrow set of situations — most homeowners don't pick it.
+The 1-year fixed locks your rate for just twelve months. It exists for a narrow set of situations, and most homeowners don't pick it.
 
 **Who picks it.** Borrowers who expect rates to fall meaningfully within the year and want to roll into a much lower rate at the next renewal. Also: people in transitional situations (selling, divorcing, relocating) who need a place to park their mortgage briefly.
 
@@ -14,4 +14,4 @@ The 1-year fixed locks your rate for just twelve months. It exists for a narrow 
 
 **When to consider alternatives.** If you want flexibility cheaply, variable typically beats 1-year fixed because the variable break penalty is just three months' interest. If you want fixed-rate certainty, 3-year or 5-year fixed almost always offers a better rate.
 
-**How to read the table.** The discounted rate on 1-year fixed is usually narrower (smaller broker discount) than longer-term fixed. Posted-vs-discounted spreads tend to be 0.10–0.40% rather than the 0.50–1.00% common on the 5-year. Some lenders don't actively promote 1-year terms — if a row is missing here, that lender may not publish a 1-year rate.
+**How to read the table.** The discounted rate on 1-year fixed is usually narrower (smaller broker discount) than longer-term fixed. Posted-vs-discounted spreads tend to be 0.10–0.40% rather than the 0.50–1.00% common on the 5-year. Some lenders don't actively promote 1-year terms; if a row is missing here, that lender may not publish a 1-year rate.

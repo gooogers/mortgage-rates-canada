@@ -1,19 +1,23 @@
 ---
 import Footer from "@components/Footer.astro";
 import { isStaging } from "@lib/staging";
+import { organizationSchema, websiteSchema } from "@lib/schemas";
 import "../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
   canonical?: string;
+  /** Page-specific JSON-LD schemas; rendered after the sitewide ones. */
+  schemas?: Record<string, unknown>[];
 }
 
-const { title, description, canonical } = Astro.props;
+const { title, description, canonical, schemas = [] } = Astro.props;
 const fullTitle = title.includes("Canadian Rates")
   ? title
   : `${title} — Canadian Rates`;
 const staging = isStaging();
+const allSchemas = [organizationSchema(), websiteSchema(), ...schemas];
 ---
 
 <!doctype html>
@@ -26,6 +30,9 @@ const staging = isStaging();
     {canonical && <link rel="canonical" href={canonical} />}
     {staging && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+    {allSchemas.map((s) => (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(s)} />
+    ))}
   </head>
   <body>
     <header class="site-header">

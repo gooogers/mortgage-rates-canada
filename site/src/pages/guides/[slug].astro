@@ -5,6 +5,7 @@ import AuthorByline from "@components/AuthorByline.astro";
 import AffiliateDisclosure from "@components/AffiliateDisclosure.astro";
 import RelatedGuides from "@components/RelatedGuides.astro";
 import type { Guide } from "@lib/guides";
+import { breadcrumbSchema } from "@lib/schemas";
 
 export async function getStaticPaths() {
   const guides = await getCollection("guides");
@@ -32,15 +33,20 @@ const articleSchema = {
     url: "https://canadianrates.ca",
   },
 };
+
+const breadcrumb = breadcrumbSchema([
+  { name: "Home", path: "/" },
+  { name: "Guides", path: "/guides" },
+  { name: entry.data.title, path: `/guides/${entry.slug}` },
+]);
 ---
 
 <Base
   title={entry.data.title}
   description={entry.data.description}
   canonical={`https://canadianrates.ca/guides/${entry.slug}`}
+  schemas={[articleSchema, breadcrumb]}
 >
-  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
-
   <article class="guide">
     <h1>{entry.data.title}</h1>
     <AuthorByline lastReviewedAt={entry.data.last_reviewed_at} />

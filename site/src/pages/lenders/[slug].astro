@@ -6,6 +6,7 @@ import RelatedGuides from "@components/RelatedGuides.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
 import { loadRatesData } from "@lib/rates";
 import { getLenderFacts, renderLenderIntro } from "@lib/lenderFacts";
+import { breadcrumbSchema, financialServiceSchema } from "@lib/schemas";
 
 export async function getStaticPaths() {
   const data = await loadRatesData();
@@ -21,12 +22,27 @@ const { lender, updatedAt } = Astro.props as {
 };
 const facts = getLenderFacts(lender.slug);
 const intro = facts ? renderLenderIntro(facts) : null;
+
+const pageUrl = `https://canadianrates.ca/lenders/${lender.slug}`;
+const pageSchemas = [
+  breadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Lenders", path: "/" },
+    { name: lender.name, path: `/lenders/${lender.slug}` },
+  ]),
+  financialServiceSchema({
+    name: lender.name,
+    url: lender.source_url,
+    pageUrl,
+  }),
+];
 ---
 
 <Base
   title={`${lender.name} Mortgage Rates`}
   description={`Current posted and discounted mortgage rates for ${lender.name}, updated daily.`}
-  canonical={`https://canadianrates.ca/lenders/${lender.slug}`}
+  canonical={pageUrl}
+  schemas={pageSchemas}
 >
   <h1>{lender.name} Mortgage Rates</h1>
   <p class="muted">

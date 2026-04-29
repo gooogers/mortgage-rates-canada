@@ -2,15 +2,24 @@
 import Base from "@layouts/Base.astro";
 import GuideCard from "@components/GuideCard.astro";
 import { getAllGuides } from "@lib/guides";
+import { breadcrumbSchema } from "@lib/schemas";
 
 const guides = await getAllGuides();
 guides.sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+const pageSchemas = [
+  breadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Guides", path: "/guides" },
+  ]),
+];
 ---
 
 <Base
   title="Mortgage Guides"
   description="Plain-English explainers on Canadian mortgages: fixed vs variable, affordability, the stress test, and more."
   canonical="https://canadianrates.ca/guides"
+  schemas={pageSchemas}
 >
   <h1>Mortgage Guides</h1>
   <p class="muted">Researched and written by the Canadian Rates editorial team.</p>

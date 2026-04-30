@@ -18,35 +18,63 @@
 
 These are external tasks that don't block code work but need to start now since they have lead times.
 
+**Background — affiliate vs. personal referral:** Quality Canadian affiliate programs (Wealthsimple, Questrade) gate on traffic and won't approve a brand-new site. The bridge is personal referral programs, which every major brokerage runs alongside their affiliate program. Personal referral links are tied to your customer account — no application, no approval — and produce real per-signup payouts. We use these on day one and swap to network affiliate URLs months later when the site has traffic. The `/go/[slug]` plumbing makes the swap a one-line YAML change.
+
 **Files:** none
 
 - [ ] **Step 1: Buy the domain `myfireplan.ca`**
 
 Use any registrar (Namecheap, Cloudflare Registrar, hover.com). If the domain is unavailable, stop and revisit branding before continuing this plan — the design assumes this domain.
 
-- [ ] **Step 2: Apply for affiliate programs**
+- [ ] **Step 2: Open accounts and generate personal referral links**
 
-Apply for each in parallel. Approvals take 1–4 weeks.
+For each brokerage you want to feature on day one, you need a customer account so you can generate a personal referral link. Open accounts at any subset of these you don't already have — at minimum **Wealthsimple and Questrade**, since they cover ~80% of the audience.
 
-- Wealthsimple affiliate: https://www.wealthsimple.com/en-ca/legal/affiliate (or current canonical URL — search "Wealthsimple affiliate program")
-- Questrade affiliate: https://www.questrade.com (search their footer for "Affiliate" or "Refer a Friend")
-- Qtrade affiliate: contact via their site
-- Passiv affiliate: https://passiv.com (check their footer)
-- Interactive Brokers Canada referral: https://www.interactivebrokers.ca
+For each, after opening:
+1. Log in to the brokerage
+2. Find "Refer a friend" / "Refer & earn" / "Invite friends" in the menu
+3. Copy your personal referral URL
+4. Paste into the brokerage YAML (Task 6) once that file is created
 
-Record application status in a new file `affiliate-applications.md` in the repo root once Task 1 is complete:
+Brokerages with personal referral programs:
+- **Wealthsimple** — Settings → "Invite friends" — personal URL
+- **Questrade** — Account menu → "Refer a Friend"
+- **Qtrade** — has a refer-a-friend program; check after login
+- **NBDB** — has a referral promo; check after login
+- **Interactive Brokers Canada** — has a "Refer a Friend" program
+
+This is also valuable for editorial credibility: you should have first-hand experience with the brokerages you recommend.
+
+- [ ] **Step 3: Set up the referral / affiliate tracker file**
+
+Once Task 1 is complete, create `affiliate-applications.md` in the repo root:
 
 ```markdown
-# Affiliate Applications
+# Referral and Affiliate Tracker
 
-| Program | Applied | Approved | Affiliate URL | Notes |
-|---|---|---|---|---|
-| Wealthsimple | YYYY-MM-DD | — | — | |
-| Questrade | YYYY-MM-DD | — | — | |
-| Qtrade | YYYY-MM-DD | — | — | |
-| Passiv | YYYY-MM-DD | — | — | |
-| IBKR Canada | YYYY-MM-DD | — | — | |
+## Active personal referral links (day one)
+
+| Brokerage | Account opened | Referral URL | Notes |
+|---|---|---|---|
+| Wealthsimple | YYYY-MM-DD | — | |
+| Questrade | YYYY-MM-DD | — | |
+| Qtrade | — | — | |
+| NBDB | — | — | |
+| IBKR Canada | — | — | |
+
+## Affiliate program applications (apply once site has 3-6 months of consistent traffic)
+
+| Program | Network | Applied | Approved | Affiliate URL | Notes |
+|---|---|---|---|---|---|
+| Wealthsimple Affiliate | direct / Impact | — | — | — | gates on traffic |
+| Questrade Affiliate | direct | — | — | — | gates on traffic |
+| Passiv | direct | — | — | — | check after launch |
+| Impact Radius (network) | network | — | — | n/a | join network first, apply to merchants |
+| Rakuten LinkShare (network) | network | — | — | n/a | easier network approval |
+| FlexOffers (network) | network | — | — | n/a | |
 ```
+
+The two tables represent the timeline: top table is what you launch with (no approvals needed); bottom table is what you apply to once you have ~3–6 months of traffic to show.
 
 - [ ] **Step 3: Decide click-logging storage**
 
@@ -634,33 +662,33 @@ git commit -m "feat: add AffiliateDisclosure component"
 ```yaml
 - slug: wealthsimple
   name: Wealthsimple
-  affiliate_url: https://www.wealthsimple.com/  # replace with real affiliate URL once approved
-  affiliate_network: direct
+  affiliate_url: https://www.wealthsimple.com/  # replace with personal referral URL from your WS account
+  affiliate_network: personal_referral
   pick_this_if: "you want the simplest Canadian brokerage with $0 trades and a clean mobile app"
 - slug: questrade
   name: Questrade
-  affiliate_url: https://www.questrade.com/  # replace with real affiliate URL once approved
-  affiliate_network: direct
+  affiliate_url: https://www.questrade.com/  # replace with personal referral URL from your QT account
+  affiliate_network: personal_referral
   pick_this_if: "you want USD accounts, free ETF buys, and an established Norbert's Gambit story"
 - slug: qtrade
   name: Qtrade
-  affiliate_url: https://www.qtrade.ca/
-  affiliate_network: direct
+  affiliate_url: https://www.qtrade.ca/  # replace with personal referral URL when account opened
+  affiliate_network: personal_referral
   pick_this_if: "you want a Questrade alternative with strong customer service"
 - slug: nbdb
   name: National Bank Direct Brokerage
   affiliate_url: https://nbdb.ca/
-  affiliate_network: direct
+  affiliate_network: none  # no referral relationship initially
   pick_this_if: "you want $0 commissions backed by a big bank"
 - slug: ibkr-canada
   name: Interactive Brokers Canada
-  affiliate_url: https://www.interactivebrokers.ca/
-  affiliate_network: direct
+  affiliate_url: https://www.interactivebrokers.ca/  # replace with personal referral URL when account opened
+  affiliate_network: personal_referral
   pick_this_if: "you trade actively and want pro-grade tools and tiered pricing"
 - slug: ci-direct
   name: CI Direct Investing
   affiliate_url: https://www.cidirectinvesting.com/
-  affiliate_network: direct
+  affiliate_network: none
   pick_this_if: "you want a robo-advisor managing your portfolio for you"
 ```
 
@@ -1069,29 +1097,32 @@ const brokerages = loadBrokerages();
 
 <Base
   title="Affiliate disclosure"
-  description="How myfireplan.ca makes money and which partners we have affiliate relationships with."
+  description="How myfireplan.ca makes money and which brokerages we have referral relationships with."
   canonical="https://myfireplan.ca/disclosure"
 >
   <article class="prose">
     <h1>Affiliate disclosure</h1>
     <p>
-      myfireplan.ca earns affiliate commissions when readers open accounts through
-      some of our outbound links. This is how the site is funded.
+      myfireplan.ca may earn a referral bonus or affiliate commission when readers
+      open accounts through some of our outbound links. This is how the site is
+      funded.
     </p>
-    <h2>Active affiliate partners</h2>
+    <h2>Active referral relationships</h2>
     <p>
-      As of today, we have affiliate or referral relationships with the following
-      Canadian brokerages:
+      Some brokerages we feature are linked through the author's personal referral
+      program (the same kind of "refer a friend" link any customer can share); a
+      smaller number are linked through formal affiliate programs. Both produce a
+      bonus when a new account is opened. Brokerages we currently link to:
     </p>
     <ul>
-      {brokerages.map((b) => <li>{b.name}</li>)}
+      {brokerages.map((b) => <li>{b.name}{b.affiliate_network === "none" ? " (no referral relationship)" : ""}</li>)}
     </ul>
     <h2>How recommendations are made</h2>
     <p>
-      We recommend brokerages based on what we think fits your situation, not on which
-      partner pays the highest commission. Where two brokerages serve the same
-      audience, we say so. Where we think you should pick a non-affiliate option,
-      we say that too.
+      We recommend brokerages based on what we think fits your situation, not on
+      which one pays the highest bonus. Where two brokerages serve the same audience,
+      we say so. Where we think you should pick a brokerage we have no referral
+      relationship with, we say that too.
     </p>
     <h2>Transparency on links</h2>
     <p>
@@ -1484,15 +1515,13 @@ git tag -a v0.1.0 -m "Phase 1 foundation: deployable site with chrome and affili
 git push --tags
 ```
 
-- [ ] **Step 4: Update affiliate-applications.md if any approvals have come in during the build**
+- [ ] **Step 4: Paste real personal referral URLs into `src/data/brokerages.yaml`**
 
-Edit `affiliate-applications.md` to reflect any new approvals + paste the real affiliate URLs into `src/data/brokerages.yaml` (replace placeholder `https://www.wealthsimple.com/` etc.).
-
-If any are updated:
+For each brokerage where you've opened an account and copied a personal referral URL (Task 0 Step 2), replace the placeholder in `src/data/brokerages.yaml` with the real URL. Update `affiliate-applications.md` to reflect status.
 
 ```bash
 git add affiliate-applications.md src/data/brokerages.yaml
-git commit -m "chore: update affiliate URLs from approved programs"
+git commit -m "chore: replace placeholder URLs with personal referral links"
 git push
 ```
 
@@ -1508,7 +1537,7 @@ git push
 - [ ] KV click logging records clicks
 - [ ] `STAGING=true` keeps `noindex` active and `robots.txt` blocking
 - [ ] All Vitest tests pass
-- [ ] At least one affiliate program has been applied for (Task 0 step 2)
+- [ ] At least one personal referral URL is live in `brokerages.yaml` (Wealthsimple or Questrade)
 
 When all done-criteria are met, Plan 1 ships and we proceed to Plan 2 (calculator framework + 3 hero calculators).
 
@@ -1520,5 +1549,5 @@ When all done-criteria are met, Plan 1 ships and we proceed to Plan 2 (calculato
 - **Tests over verification ceremony.** TDD where it pays (the redirect logic, brokerage loader). Smoke build for chrome pages.
 - **If a step fails, stop and ask.** Don't paper over a failing test or skip a verification step.
 - **Each task ends in a commit.** Frequent commits make recovery easy.
-- **The affiliate URLs in `brokerages.yaml` are placeholders.** Real URLs come once programs approve.
+- **The affiliate URLs in `brokerages.yaml` are placeholders.** Replace with personal referral URLs (Task 0 Step 2) before launch. Network affiliate URLs come later, once the site has real traffic and you can apply to programs.
 - **The brand visual identity is unfinished.** Favicon, color palette, and brand-mark are placeholders. Replace before public launch (out of scope for Plan 1).

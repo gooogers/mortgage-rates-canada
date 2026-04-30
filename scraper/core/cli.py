@@ -9,14 +9,20 @@ from pathlib import Path
 
 from core.publisher import load_previous_rates, write_rates_json
 from core.runner import build_rates_data
+from lenders.alterna import AlternaScraper
+from lenders.atb import ATBScraper
 from lenders.base import LenderScraper
 from lenders.bmo import BMOScraper
 from lenders.cibc import CIBCScraper
+from lenders.coast_capital import CoastCapitalScraper
+from lenders.meridian import MeridianScraper
 from lenders.national import NationalScraper
 from lenders.rbc import RBCScraper
 from lenders.scotiabank import ScotiabankScraper
+from lenders.servus import ServusScraper
 from lenders.tangerine import TangerineScraper
 from lenders.td import TDScraper
+from lenders.vancity import VancityScraper
 
 log = logging.getLogger("scraper")
 
@@ -37,6 +43,13 @@ def all_scrapers() -> list[LenderScraper]:
         CIBCScraper(),
         NationalScraper(),
         TangerineScraper(),
+        # Provincial credit unions
+        MeridianScraper(),
+        AlternaScraper(),
+        VancityScraper(),
+        CoastCapitalScraper(),
+        ServusScraper(),
+        ATBScraper(),
     ]
 
 

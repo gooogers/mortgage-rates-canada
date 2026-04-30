@@ -11,7 +11,8 @@ class LenderScraper(ABC):
     """One subclass per lender. The runner discovers and calls these.
 
     Subclasses MUST set the class attributes (slug, name, type, source_url,
-    affiliate_url) and implement fetch() and parse().
+    affiliate_url) and implement fetch() and parse(). Provincial lenders
+    must also set `provinces` so the site can filter them by region.
     """
 
     slug: str
@@ -19,6 +20,8 @@ class LenderScraper(ABC):
     type: LenderType
     source_url: str
     affiliate_url: str | None
+    # ISO 3166-2 subdivision codes (e.g. ["ON"]). None = national lender.
+    provinces: list[str] | None = None
 
     @abstractmethod
     def fetch(self) -> str:
@@ -38,4 +41,5 @@ class LenderScraper(ABC):
             affiliate_url=self.affiliate_url,
             scraped_at=datetime.now(timezone.utc).replace(microsecond=0),
             rates=rates,
+            provinces=self.provinces,
         )

@@ -50,6 +50,8 @@ class Lender(BaseModel):
     affiliate_url: str | None = None
     scraped_at: datetime
     rates: list[Rate]
+    # ISO 3166-2 subdivision codes (e.g. ["ON"]). Omit for national lenders.
+    provinces: list[str] | None = None
 
     @field_serializer("scraped_at")
     def _serialize_scraped_at(self, dt: datetime) -> str:

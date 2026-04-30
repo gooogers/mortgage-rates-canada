@@ -21,7 +21,8 @@ Specifically:
 - 3 hero calculators with verified Canadian tax math
 - 3 long-form guides (one per calculator)
 - A `/plan` hub page that ties the calculators together as a guided sequence
-- A `/best-brokerage-for-you` recommender (replaces a generic comparison table)
+- A `/wealthsimple-vs-questrade` opinionated decision page (the primary brokerage SEO target)
+- A `/brokerages` index page covering edge-case picks (NBDB, IBKR, robo-only, big-bank brokerages)
 - Affiliate redirect plumbing usable across all CTAs
 - An `/about` and `/disclosure` page reusing existing patterns
 
@@ -51,7 +52,9 @@ Not goals for Phase 1: HISA / GIC rate tracking, credit cards, newsletter, accou
   should-i-invest-or-pay-down-mortgage   companion to #1
   coast-fire-canada                       companion to #2
   rrsp-vs-tfsa-canada                     companion to #3
-/best-brokerage-for-you   3-4 question recommender, outputs a brokerage + affiliate CTA
+/wealthsimple-vs-questrade   opinionated decision page (primary brokerage SEO target)
+/brokerages               index page: every brokerage with one-line "pick this if..." guidance
+/brokerages/[slug]        per-brokerage page (fees, account types, "pick this if...", affiliate CTA)
 /about
 /disclosure               affiliate disclosure (existing pattern)
 /privacy
@@ -59,7 +62,9 @@ Not goals for Phase 1: HISA / GIC rate tracking, credit cards, newsletter, accou
 /go/[slug]                affiliate redirect (Cloudflare Pages Function)
 ```
 
-**Top nav:** `My Plan` (→ `/plan`) | `Calculators` (→ `/calculators/`) | `Guides` (→ `/guides/`) | `Brokerage` (→ `/best-brokerage-for-you`) | `About` (→ `/about`)
+**Top nav:** `My Plan` (→ `/plan`) | `Calculators` (→ `/calculators/`) | `Guides` (→ `/guides/`) | `Brokerage` (→ `/brokerages`) | `About` (→ `/about`)
+
+The `/brokerages` index page features `/wealthsimple-vs-questrade` as the hero block, since that is the binary decision for ~80% of FIRE-track readers, with edge-case picks listed below.
 
 ## Hero calculators
 
@@ -150,23 +155,31 @@ A single page that tells visitors how the three calculators fit together as a se
 
 Each step has a one-paragraph framing and a CTA to the relevant page. This is the on-brand expression of "myfireplan" — a guided plan, not a comparison hub.
 
-## `/best-brokerage-for-you` recommender
+## Brokerage pages
 
-Asks 3–4 questions and recommends one brokerage with an affiliate CTA. Replaces a generic comparison table.
+The brokerage section has three pages, replacing what was originally scoped as a generic recommender. The reasoning: for ~80% of FIRE-track readers the choice is binary (Wealthsimple or Questrade), so an opinionated decision page serves them better than a 4-question quiz that produces the same answer most of the time.
 
-**Questions:**
-1. Are you a self-directed investor or do you want a robo-advisor managing your portfolio?
-2. What's your typical portfolio size?
-3. Do you trade frequently (>5 trades/month) or buy-and-hold?
-4. Do you need US-dollar accounts (e.g., for VTI, VOO)?
+### `/wealthsimple-vs-questrade` — opinionated decision page
 
-**Logic:** simple decision tree mapping answers to a brokerage. Initial mappings:
-- Robo + small balance → Wealthsimple
-- Self-directed + buy-and-hold + USD needed → Questrade or Qtrade (Norbert's Gambit story)
-- Self-directed + frequent trader → Questrade or IBKR
-- Robo + larger balance → Wealthsimple Premium or CI Direct Investing
+The primary brokerage SEO target ("wealthsimple vs questrade" is a high-intent Canadian search query). Long-form, opinionated, takes a position.
 
-Mappings live in YAML so they can be tuned without code changes. Each recommendation surfaces affiliate CTA + a "see why" expandable explanation.
+**Structure:**
+- Bottom-line-up-front recommendation in the first 100 words
+- Side-by-side comparison table (commissions, USD accounts, account fees, account types, fractional shares, mobile UX)
+- "Pick Wealthsimple if..." section with affiliate CTA
+- "Pick Questrade if..." section with affiliate CTA
+- "Why not the big banks?" sidebar
+- "Edge cases" linking to `/brokerages` for NBDB, IBKR, robo-only
+
+### `/brokerages` — index page
+
+Lists every brokerage with a one-line "pick this if..." sentence. The hero block is the WS vs QT comparison (with link to the decision page). Below: NBDB, IBKR Canada, Qtrade, CI Direct Investing, BMO InvestorLine, big-bank brokerages.
+
+Each entry: name, logo, one-line "pick this if...", "learn more" link to per-brokerage page.
+
+### `/brokerages/[slug]` — per-brokerage page
+
+Per-brokerage detail page: commissions, account types, fees, "pick this if...", affiliate CTA. Reuses the existing `[slug].astro` pattern from the mortgage site's lender pages. Useful for catching edge-case searches ("NBDB review Canada," "IBKR Canada FHSA").
 
 ## Brokerage data
 
@@ -180,11 +193,11 @@ Mappings live in YAML so they can be tuned without code changes. Each recommenda
 - `account_fee` (CAD/year)
 - `minimum_balance`
 - `affiliate_url`, `affiliate_network`, `payout_notes`
-- `recommender_tags` (e.g., `["robo", "small-balance"]` or `["self-directed", "frequent-trader", "usd"]`)
+- `pick_this_if` (one-line editorial sentence — e.g., "you want the simplest possible Canadian brokerage and don't trade much")
 
 **Initial brokerages (~6–8):** Wealthsimple, Questrade, Qtrade, NBDB, Interactive Brokers Canada, CI Direct Investing, BMO InvestorLine.
 
-Brokerage data does **not** drive a public comparison page. It powers the recommender + per-brokerage explanation cards on calculator output pages.
+Brokerage data drives the `/brokerages` index, the `/brokerages/[slug]` detail pages, and contextual brokerage callouts in calculators.
 
 ## Affiliate plumbing
 
@@ -255,7 +268,9 @@ Phase 1 ships when:
 - Each calculator has tested Canadian tax math, verified against at least 3 worked examples
 - 3 guides published, each linking to its calculator and to `/go/[slug]` brokerage CTAs
 - `/plan` hub page renders and links calculators in sequence
-- `/best-brokerage-for-you` recommender returns a brokerage based on inputs
+- `/wealthsimple-vs-questrade` decision page renders, with side-by-side comparison and dual affiliate CTAs
+- `/brokerages` index page renders ~6–8 brokerages with one-line guidance and links to per-brokerage pages
+- `/brokerages/[slug]` per-brokerage pages render from `manual-brokerages.yaml`
 - `/go/[slug]` redirects work with UTM tagging and click logging
 - `AffiliateDisclosure.astro` renders on every monetized page
 - `/about`, `/disclosure`, `/privacy`, `/terms` all live
@@ -269,7 +284,7 @@ Phase 1 ships when:
 2. **Affiliate program approvals can take 1–4 weeks.** Start applications immediately, before code is written. Site can launch with placeholder CTAs in the few cases where approval lags.
 3. **Brokerage fee data goes stale silently.** Add a quarterly review reminder: a GitHub Actions workflow that opens an issue on the first of every quarter prompting a fee data review.
 4. **The "invest vs. pay down" calculator is genuinely complex.** RRSP-deduction-recycling, prepayment privilege caps, and varying mortgage rate over time are real edge cases. Ship v1 with stated assumptions (constant mortgage rate, default tax-drag rate, default refund-recycled), not a v1 that pretends to handle every scenario.
-5. **The recommender can produce confident-but-wrong recommendations.** Mitigate by surfacing the "see why" explanation and noting alternatives. Add a "this isn't financial advice" disclaimer.
+5. **Opinionated decision pages are higher-conviction than recommenders, and that conviction has to be defensible.** The `/wealthsimple-vs-questrade` page takes a position; the position needs to be backed by accurate fee data and clear reasoning, with a "this isn't financial advice" disclaimer.
 6. **Domain availability.** `myfireplan.ca` should be purchased before further work — if unavailable, the brand needs revisiting before the spec is final.
 
 ## Out of scope (Phase 2+ candidates)

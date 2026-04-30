@@ -1,6 +1,8 @@
 # myfireplan.ca — Plan 1: Foundation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **⚠️ SUPERSEDED 2026-04-30 (same day).** Tasks 1–9 were executed and committed locally to `C:\Users\CSR\Documents\Claude\myfireplan` before discovering that `gooogers/myfireplan` on GitHub was already a more developed TanStack Start + shadcn/ui + ECharts FIRE planning app (3 weeks of prior work, including Shiller-backed historical backtest engine). The Astro scaffold built from this plan was renamed to `myfireplan-abandoned-astro-scaffold` and is no longer maintained. New work continues on the existing GitHub repo, in TanStack Start. The companion spec is also marked SUPERSEDED.
+
+> **For agentic workers (do not use this plan):** This plan is preserved for history; the active work is on `gooogers/myfireplan`'s codebase, not in a new Astro repo.
 
 **Goal:** Stand up a deployable Astro site at `myfireplan.ca` with chrome (layout, nav, footer), affiliate redirect plumbing, chrome pages (About / Disclosure / Privacy / Terms), and a placeholder homepage. No calculators or content yet — that's Plan 2 and Plan 3.
 

@@ -1,7 +1,9 @@
 # myfireplan.ca — Phase 1 Design
 
+> **⚠️ SUPERSEDED 2026-04-30 (same day).** This spec was written without knowledge that a more developed FIRE planning project (`gooogers/myfireplan`) already existed on GitHub — TanStack Start + React 19 + shadcn/ui + Apache ECharts, with three working FIRE projection engines (simple / Monte Carlo / Shiller-historical-backtest), a calculator UI, bracket-based tax modeling, and 11 test files. That repo's own design at `docs/superpowers/specs/2026-04-11-myfireplan-design.md` is the authoritative direction. Work continues there, not on a separate Astro site. The Astro scaffold built from this spec is preserved at `C:\Users\CSR\Documents\Claude\myfireplan-abandoned-astro-scaffold` for reference only. Domain target also shifts from `.ca` to `.app` to match the existing project.
+
 **Date:** 2026-04-30
-**Status:** Draft for review
+**Status:** Superseded — see banner above
 **Domain:** `myfireplan.ca` (to be purchased)
 **Repo:** new repo (separate from `mortgage-rates-canada`)
 

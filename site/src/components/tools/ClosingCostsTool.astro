@@ -1,0 +1,223 @@
+---
+import ToolFrame from "@components/ToolFrame.astro";
+import { PROVINCES_LIST } from "../../data/provinces";
+---
+
+<ToolFrame title="Closing costs calculator" toolId="closing-costs">
+  <div slot="inputs">
+    <form class="cc-form">
+      <label>Purchase price
+        <input type="number" name="price" min="0" step="1000" value="500000" required />
+      </label>
+
+      <label>Province
+        <select name="province">
+          {PROVINCES_LIST.map((p) => (
+            <option value={p.code} selected={p.code === "ON"}>{p.name}</option>
+          ))}
+        </select>
+      </label>
+
+      <label>City <span class="cc-help">(only Toronto / Halifax / Montreal change the math)</span>
+        <select name="city">
+          <option value="">— None / other —</option>
+          <option value="toronto">Toronto (Ontario)</option>
+          <option value="halifax">Halifax (Nova Scotia)</option>
+          <option value="montreal">Montreal (Quebec)</option>
+        </select>
+      </label>
+
+      <label class="cc-checkbox">
+        <input type="checkbox" name="firstTimeBuyer" />
+        First-time home buyer
+      </label>
+
+      <label class="cc-checkbox">
+        <input type="checkbox" name="newBuild" />
+        New construction (BC only — separate exemption)
+      </label>
+
+      <details class="cc-advanced">
+        <summary>Adjust standard fees</summary>
+        <label>Legal fees
+          <input type="number" name="legalFees" min="0" step="50" value="1500" />
+        </label>
+        <label>Title insurance
+          <input type="number" name="titleInsurance" min="0" step="25" value="250" />
+        </label>
+        <label>Home inspection
+          <input type="number" name="inspection" min="0" step="25" value="500" />
+        </label>
+      </details>
+    </form>
+  </div>
+
+  <div slot="result">
+    <p class="cc-label">Total closing costs</p>
+    <p class="cc-headline" data-result="total">—</p>
+    <dl class="cc-summary">
+      <div><dt>Net land transfer tax</dt><dd data-result="ltt-net">—</dd></div>
+      <div><dt>Legal + title + inspection</dt><dd data-result="fees-total">—</dd></div>
+    </dl>
+  </div>
+
+  <div slot="details">
+    <table class="cc-detail">
+      <tbody>
+        <tr><td>Provincial LTT</td><td data-detail="ltt-prov">—</td></tr>
+        <tr><td>Municipal LTT</td><td data-detail="ltt-muni">—</td></tr>
+        <tr><td>First-time buyer rebate</td><td data-detail="ltt-rebate">—</td></tr>
+        <tr><td><strong>Net LTT</strong></td><td data-detail="ltt-net2">—</td></tr>
+        <tr><td>Legal fees</td><td data-detail="legal">—</td></tr>
+        <tr><td>Title insurance</td><td data-detail="title">—</td></tr>
+        <tr><td>Home inspection</td><td data-detail="inspection">—</td></tr>
+      </tbody>
+    </table>
+    <p class="cc-note">
+      Estimate only. Foreign-buyer surcharges (BC, Ontario), the BC speculation
+      tax, and Quebec's notary fee aren't included — see the closing costs
+      guide for context. Always confirm with your lawyer or notary.
+    </p>
+  </div>
+</ToolFrame>
+
+<script>
+  import { calculateClosingCosts } from "@lib/closingCosts";
+  import type { Province } from "@lib/rates";
+  import { formatCurrency } from "@lib/format";
+
+  const form = document.querySelector<HTMLFormElement>(".cc-form");
+  if (!form) throw new Error("closing-costs form not found");
+  const root = form.closest('[data-tool-id="closing-costs"]') as HTMLElement;
+
+  function num(name: string): number {
+    return parseFloat((form!.elements.namedItem(name) as HTMLInputElement).value);
+  }
+  function str(name: string): string {
+    return (form!.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement).value;
+  }
+  function bool(name: string): boolean {
+    return (form!.elements.namedItem(name) as HTMLInputElement).checked;
+  }
+  function setText(sel: string, txt: string) {
+    const el = root.querySelector(sel);
+    if (el) el.textContent = txt;
+  }
+
+  function recalc() {
+    const r = calculateClosingCosts({
+      price: num("price"),
+      province: str("province") as Province,
+      city: str("city") || undefined,
+      firstTimeBuyer: bool("firstTimeBuyer"),
+      newBuild: bool("newBuild"),
+      legalFees: num("legalFees"),
+      titleInsurance: num("titleInsurance"),
+      inspection: num("inspection"),
+    });
+    setText("[data-result='total']", formatCurrency(r.total));
+    setText("[data-result='ltt-net']", formatCurrency(r.ltt.net));
+    setText(
+      "[data-result='fees-total']",
+      formatCurrency(r.legalFees + r.titleInsurance + r.inspection),
+    );
+    setText("[data-detail='ltt-prov']", formatCurrency(r.ltt.provincial));
+    setText("[data-detail='ltt-muni']", formatCurrency(r.ltt.municipal));
+    setText(
+      "[data-detail='ltt-rebate']",
+      r.ltt.fthbRebate > 0 ? `−${formatCurrency(r.ltt.fthbRebate)}` : formatCurrency(0),
+    );
+    setText("[data-detail='ltt-net2']", formatCurrency(r.ltt.net));
+    setText("[data-detail='legal']", formatCurrency(r.legalFees));
+    setText("[data-detail='title']", formatCurrency(r.titleInsurance));
+    setText("[data-detail='inspection']", formatCurrency(r.inspection));
+  }
+
+  form.addEventListener("input", recalc);
+  form.addEventListener("change", recalc);
+  recalc();
+</script>
+
+<style>
+  .cc-label {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin: 0;
+  }
+  .cc-headline {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.2rem 0 0.6rem;
+    color: var(--color-accent);
+  }
+  .cc-summary {
+    margin: 0.5rem 0 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 1rem;
+    border-top: 1px solid var(--color-border, #eee);
+    padding-top: 0.5rem;
+  }
+  .cc-summary > div {
+    display: contents;
+  }
+  .cc-summary dt {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+  .cc-summary dd {
+    margin: 0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .cc-detail {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .cc-detail td {
+    padding: 0.35rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--color-border, #eee);
+  }
+  .cc-detail td:last-child {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .cc-note {
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    line-height: 1.45;
+  }
+  .cc-help {
+    font-weight: normal;
+    color: var(--color-muted);
+    font-size: 0.8rem;
+  }
+  .cc-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    margin: 0.4rem 0;
+    cursor: pointer;
+  }
+  .cc-checkbox input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+  }
+  .cc-advanced {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--color-border, #eee);
+    padding-top: 0.5rem;
+  }
+  .cc-advanced summary {
+    cursor: pointer;
+    color: var(--color-accent);
+    font-size: 0.9rem;
+  }
+</style>

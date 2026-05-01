@@ -12,22 +12,21 @@ Daily snapshots aggregated by `snapshot-rates.mjs` into `rates-history.json`; SV
 
 `/provinces/[slug]` for all 10 provinces, plus a `/provinces` index. Each page surfaces best rates within the province scope (national + provincial lenders), the full provincial rate table with "Local" tags on credit unions, LTT summary with municipal add-ons (Toronto MLTT, Halifax HRM, Montreal), provincial first-time buyer programs, and local notes (BC PTT exemption, Ontario MLTT, Quebec notary system, etc.). Provinces link added to global nav.
 
+## Done
+
+### 3. Land transfer tax + closing cost calculator ✅
+
+Province-aware tool covering all 10 provinces with marginal-bracket schedules, Toronto/Halifax/Montreal municipal add-ons, and FTHB rebates for BC, ON, and PE. Pure math in `closingCosts.ts` with 16 unit tests; tool component in `ClosingCostsTool.astro`; `/guides/closing-costs` guide explains what's in/out of scope. Added to Calculators dropdown and home tools grid.
+
+### 6. Glossary ✅
+
+`/glossary` page with 28 plain-English Canadian mortgage term definitions (IRD, GDS, TDS, posted vs discounted, CMHC, stress test, etc.). Alphabetical, with jump-nav and anchor IDs for direct linking. Cross-links into related guides where applicable. Linked from the footer.
+
 ## In progress
 
 (none)
 
 ## Up next
-
-### 3. Land transfer tax + closing cost calculator
-
-Province-aware. Computes:
-- Provincial LTT (ON, BC, MB, NB, NS, PE, QC) with FTHB rebates where applicable
-- Toronto municipal LTT
-- Legal/title insurance (~$1,500 typical)
-- Inspection (~$500 typical)
-- Total closing costs
-
-High search volume; very few good Canadian implementations online. Pairs with the affordability tool.
 
 ### 8. Lender review pages
 

@@ -43,9 +43,9 @@ The full-site review on 2026-05-01 surfaced 12 concrete improvements. Grouped in
 - **C.2** ✅ `/calculators` index built — 5 tool cards with input/output summaries.
 - **C.3** ✅ Shared `Breadcrumb.astro` component renders the same trail used by the JSON-LD builder. Wired into rate, lender, province, guide, and rates/other-terms pages plus all 4 hub indexes.
 
-### Phase D — Discoverability + cross-linking
-- **D.1** Cross-link lender pages: "Compare with other major banks" + "Best [term] rates" blocks. Add NBC dual-channel editorial note (retail concentrated in QC, broker channel national) and parallel callouts on BC/AB/ON province pages.
-- **D.2** Auto-link glossary terms in MDX (first occurrence of IRD/GDS/TDS/CMHC/posted rate/stress test → `<a href="/glossary#…">`).
+### Phase D — Discoverability + cross-linking ✅
+- **D.1** ✅ Lender pages now have a "Best rates by term" block linking to each `/rates/[term]` they offer, plus a "Compare with other lenders" grid showing 4 same-type peers. NBC's lender page carries a dual-channel editorial note (retail in QC vs broker channel national); BC/AB/ON province pages carry parallel callouts.
+- **D.2** ✅ Glossary entries extracted to `src/data/glossary.ts` (with `aliases` for abbreviations like IRD/GDS/TDS/CMHC). New `plugins/remark-glossary-autolink.mjs` auto-links the first occurrence of each glossary term in any guide MDX. Verified across 6 guides.
 
 ### Phase E — Trust + UX polish
 - **E.1** `Article` `image` field on guide schemas; enrich `Organization` with `sameAs`/`description`; `FAQPage` schema on `/rates/other-terms`; homepage canonical slash-less.

@@ -2,6 +2,7 @@
 import Base from "@layouts/Base.astro";
 import Breadcrumb from "@components/Breadcrumb.astro";
 import Disclaimer from "@components/Disclaimer.astro";
+import LenderBadge from "@components/LenderBadge.astro";
 import LenderFacts from "@components/LenderFacts.astro";
 import RelatedGuides from "@components/RelatedGuides.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
@@ -13,16 +14,49 @@ export async function getStaticPaths() {
   const data = await loadRatesData();
   return data.lenders.map((lender) => ({
     params: { slug: lender.slug },
-    props: { lender, updatedAt: data.updated_at },
+    props: { lender, allLenders: data.lenders, updatedAt: data.updated_at },
   }));
 }
 
-const { lender, updatedAt } = Astro.props as {
+const { lender, allLenders, updatedAt } = Astro.props as {
   lender: import("@lib/rates").Lender;
+  allLenders: import("@lib/rates").Lender[];
   updatedAt: string;
 };
 const facts = getLenderFacts(lender.slug);
 const intro = facts ? renderLenderIntro(facts) : null;
+
+// Cross-link to other lenders of similar standing. Same type first
+// (Big 6 ↔ Big 6, monoline ↔ monoline, credit union ↔ credit union),
+// then up to two "of any type" fillers if same-type is thin.
+const sameType = allLenders
+  .filter((l) => l.slug !== lender.slug && l.type === lender.type)
+  .slice(0, 4);
+const otherTypeFillers = allLenders
+  .filter((l) => l.slug !== lender.slug && l.type !== lender.type)
+  .slice(0, Math.max(0, 4 - sameType.length));
+const compareLenders = [...sameType, ...otherTypeFillers].slice(0, 4);
+
+// Cross-link to the rate-term page for every term this lender offers.
+const TERM_TO_SLUG: Record<string, string> = {
+  "1yr_fixed": "1-year-fixed",
+  "2yr_fixed": "2-year-fixed",
+  "3yr_fixed": "3-year-fixed",
+  "4yr_fixed": "4-year-fixed",
+  "5yr_fixed": "5-year-fixed",
+  "7yr_fixed": "7-year-fixed",
+  "10yr_fixed": "10-year-fixed",
+  variable: "variable",
+};
+const termLinks = lender.rates
+  .filter((r) => TERM_TO_SLUG[r.term])
+  .map((r) => ({
+    term: r.term,
+    label: formatTermLabel(r.term),
+    slug: TERM_TO_SLUG[r.term],
+  }));
+
+const isNationalBank = lender.slug === "national";
 
 const pageUrl = `https://canadianrates.ca/lenders/${lender.slug}`;
 const breadcrumbTrail: BreadcrumbItem[] = [
@@ -87,6 +121,52 @@ const pageSchemas = [
     </p>
   )}
 
+  {isNationalBank && (
+    <section class="lender-context">
+      <h2>About {lender.name} for mortgages</h2>
+      <p>
+        National Bank's mortgage market is dual-channel. Retail and branch
+        banking are concentrated in Quebec, but the broker channel
+        (sometimes branded NBC Broker / NBI) is one of the most active
+        national wholesale lenders in Canada — most BC, Alberta, and
+        Ontario borrowers who end up with an NBC mortgage do so through
+        a broker rather than a branch. If you see National Bank on a
+        broker quote outside Quebec, that's why.
+      </p>
+    </section>
+  )}
+
+  <section class="lender-context">
+    <h2>Best rates by term</h2>
+    <p class="muted">
+      See how {lender.name}'s rates compare to the rest of the market for
+      each term they offer.
+    </p>
+    <ul class="lender-context__termlinks">
+      {termLinks.map((t) => (
+        <li>
+          <a href={`/rates/${t.slug}`}>Best {t.label} rates →</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {compareLenders.length > 0 && (
+    <section class="lender-context">
+      <h2>Compare with other lenders</h2>
+      <ul class="lender-context__compare">
+        {compareLenders.map((l) => (
+          <li>
+            <a href={`/lenders/${l.slug}`}>
+              <LenderBadge slug={l.slug} name={l.name} />
+              <span>{l.name}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
   <RelatedGuides slugs={["affordability"]} />
 </Base>
 
@@ -99,5 +179,49 @@ const pageSchemas = [
     font-size: 1rem;
     line-height: 1.55;
     margin: 1rem 0 1.25rem;
+  }
+  .lender-context {
+    margin: 2rem 0 0;
+  }
+  .lender-context h2 {
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem;
+  }
+  .lender-context p {
+    margin: 0 0 0.75rem;
+    line-height: 1.6;
+  }
+  .lender-context__termlinks {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.4rem 1rem;
+  }
+  .lender-context__termlinks a {
+    font-size: 0.95rem;
+  }
+  .lender-context__compare {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.5rem;
+  }
+  .lender-context__compare a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--color-border, #e0e4e8);
+    border-radius: 6px;
+    color: var(--color-fg);
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+  .lender-context__compare a:hover {
+    border-color: var(--color-accent);
   }
 </style>

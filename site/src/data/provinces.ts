@@ -68,6 +68,7 @@ export const PROVINCES: Partial<Record<Province, ProvinceData>> = {
     notes: [
       "ATB Financial is provincially owned (a Crown corporation), and Servus Credit Union is the largest credit union — both compete aggressively with the Big 6 in Alberta.",
       "Alberta credit unions are not federally regulated and may apply their own (sometimes looser) qualification standards. Useful if you're hitting the federal stress-test ceiling at a bank.",
+      "National Bank has minimal branch presence in Alberta; if it shows up on your quote, it's almost certainly through a broker (the broker channel is one of NBC's biggest national wholesale operations).",
       "No HST on resale homes; new builds are subject to GST (5%). The legacy partial rebate phases out between $350,000 and $450,000; first-time buyers also qualify for the May-2025 federal expansion (full GST rebate up to $1M, partial to $1.5M).",
     ],
   },
@@ -106,6 +107,7 @@ export const PROVINCES: Partial<Record<Province, ProvinceData>> = {
     notes: [
       "The 20% Speculation and Vacancy Tax applies to designated regions (Metro Vancouver, Victoria, Kelowna, others) for non-residents and out-of-province owners. Worth checking before buying as an investment.",
       "Vancity and Coast Capital Savings are the major BC credit unions — both not federally regulated, both offer competitive rates that often beat Big 6 in BC.",
+      "National Bank has minimal branch presence in BC; if it shows up on your quote, it's almost certainly through a broker (NBC's broker channel is national even though retail is concentrated in Quebec).",
       "Foreign buyers face a 20% Additional PTT on top of the regular PTT in BC's designated taxable regions (Metro Vancouver, Capital, Fraser Valley, Central Okanagan, Nanaimo) — and a federal foreign buyer ban remains in effect through Jan 1, 2027.",
     ],
   },
@@ -246,6 +248,7 @@ export const PROVINCES: Partial<Record<Province, ProvinceData>> = {
     notes: [
       "Toronto and Ottawa account for the majority of Ontario's mortgage market by dollar volume. Big 6 banks compete hardest in these markets — but brokers consistently beat them.",
       "Meridian (largest Ontario credit union by membership) and Alterna Savings are provincially regulated and often more flexible on qualifying, useful for borderline approvals.",
+      "National Bank has limited branch presence in Ontario — it's a meaningful Big 6 lender via brokers, but if you walk into a branch you'll be choosing among RBC / TD / Scotia / BMO / CIBC.",
       "The Non-Resident Speculation Tax (NRST) is 25% on foreign buyer purchases province-wide — separate from the federal foreign buyer ban.",
     ],
   },

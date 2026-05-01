@@ -3,12 +3,26 @@ import { fileURLToPath } from "url";
 import path from "path";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
+import remarkGlossaryAutolink from "./plugins/remark-glossary-autolink.mjs";
+import { GLOSSARY_LINK_TERMS } from "./src/data/glossary.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [mdx(), sitemap()],
+  markdown: {
+    remarkPlugins: [
+      [remarkGlossaryAutolink, { terms: GLOSSARY_LINK_TERMS }],
+    ],
+  },
+  integrations: [
+    mdx({
+      remarkPlugins: [
+        [remarkGlossaryAutolink, { terms: GLOSSARY_LINK_TERMS }],
+      ],
+    }),
+    sitemap(),
+  ],
   site: "https://canadianrates.ca",
   trailingSlash: "never",
   build: {

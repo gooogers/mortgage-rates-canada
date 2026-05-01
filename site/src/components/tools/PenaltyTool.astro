@@ -1,0 +1,192 @@
+---
+import ToolFrame from "@components/ToolFrame.astro";
+import { bestRateForTerm, loadRatesData, type Term } from "@lib/rates";
+
+const data = await loadRatesData();
+// Default the comparison rate to today's best 3-year fixed — the term most
+// likely to be closest to a typical "months remaining" figure.
+const comparison = bestRateForTerm(data, "3yr_fixed" satisfies Term);
+const defaultComparison = comparison?.rate.discounted ?? 4.0;
+---
+
+<ToolFrame title="Mortgage break penalty calculator" toolId="penalty">
+  <div slot="inputs">
+    <form class="pen-form" data-default-comparison={defaultComparison}>
+      <label>Mortgage balance
+        <input type="number" name="balance" min="0" step="1000" value="400000" required />
+      </label>
+      <label>Your contract rate (%)
+        <input type="number" name="contractRate" min="0" max="20" step="0.01" value="4.50" required />
+      </label>
+      <label>Months remaining in term
+        <input type="number" name="monthsRemaining" min="0" max="120" step="1" value="30" required />
+      </label>
+      <fieldset class="pen-type">
+        <legend>Mortgage type</legend>
+        <label><input type="radio" name="type" value="fixed" checked /> Fixed (closed)</label>
+        <label><input type="radio" name="type" value="variable" /> Variable (closed)</label>
+      </fieldset>
+      <label data-fixed-only>Lender's current rate, term closest to remaining (%)
+        <input type="number" name="comparisonRate" min="0" max="20" step="0.01" value={defaultComparison} required />
+      </label>
+      <label data-fixed-only>Original discount off posted (%) <span class="pen-help">(Big 6 only; 0 for monoline)</span>
+        <input type="number" name="postedSpread" min="0" max="5" step="0.05" value="0" required />
+      </label>
+      <button type="button" class="tool__use-rates" data-action="use-rates">Use today's rates</button>
+    </form>
+  </div>
+
+  <div slot="result">
+    <p class="pen-label">Estimated penalty to break</p>
+    <p class="pen-headline" data-result="penalty">—</p>
+    <p class="pen-sub" data-result="sub"></p>
+  </div>
+
+  <div slot="details">
+    <table class="pen-detail">
+      <tbody>
+        <tr><td>3 months' interest (3MI)</td><td data-detail="threemi">—</td></tr>
+        <tr><td>Interest rate differential (IRD)</td><td data-detail="ird">—</td></tr>
+        <tr><td>Binding formula</td><td data-detail="method">—</td></tr>
+      </tbody>
+    </table>
+    <p class="pen-note">
+      Estimate only. Each lender publishes its exact formula in your mortgage
+      contract; ask for a current discharge statement for the binding number.
+    </p>
+  </div>
+</ToolFrame>
+
+<script>
+  import { calculatePenalty } from "@lib/penalty";
+  import { formatCurrency } from "@lib/format";
+
+  const form = document.querySelector<HTMLFormElement>(".pen-form");
+  if (!form) throw new Error("penalty form not found");
+  const root = form.closest('[data-tool-id="penalty"]') as HTMLElement;
+
+  function num(name: string): number {
+    return parseFloat((form!.elements.namedItem(name) as HTMLInputElement).value);
+  }
+  function pickedType(): "fixed" | "variable" {
+    const checked = form!.querySelector<HTMLInputElement>('input[name="type"]:checked');
+    return (checked?.value as "fixed" | "variable") ?? "fixed";
+  }
+  function setText(sel: string, txt: string) {
+    const el = root.querySelector(sel);
+    if (el) el.textContent = txt;
+  }
+
+  function syncFieldVisibility() {
+    const isFixed = pickedType() === "fixed";
+    root.querySelectorAll<HTMLElement>("[data-fixed-only]").forEach((el) => {
+      el.style.display = isFixed ? "" : "none";
+    });
+  }
+
+  function recalc() {
+    syncFieldVisibility();
+    const r = calculatePenalty({
+      balance: num("balance"),
+      contractRate: num("contractRate"),
+      monthsRemaining: num("monthsRemaining"),
+      type: pickedType(),
+      comparisonRate: num("comparisonRate"),
+      postedSpread: num("postedSpread"),
+    });
+    setText("[data-result='penalty']", formatCurrency(r.penalty));
+    const sub =
+      pickedType() === "variable"
+        ? "Variable closed mortgages charge 3 months' interest only."
+        : r.method === "IRD"
+          ? "IRD exceeds 3 months' interest, so it's binding."
+          : "3 months' interest is higher than IRD, so it's binding.";
+    setText("[data-result='sub']", sub);
+    setText("[data-detail='threemi']", formatCurrency(r.threeMonthsInterest));
+    setText("[data-detail='ird']", formatCurrency(r.ird));
+    setText("[data-detail='method']", r.method);
+  }
+
+  function applyTodaysRates() {
+    (form!.elements.namedItem("comparisonRate") as HTMLInputElement).value =
+      form!.dataset.defaultComparison!;
+    recalc();
+  }
+
+  form.addEventListener("input", recalc);
+  form.addEventListener("change", recalc);
+  form.querySelector('[data-action="use-rates"]')?.addEventListener("click", applyTodaysRates);
+  recalc();
+</script>
+
+<style>
+  .pen-label {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin: 0;
+  }
+  .pen-headline {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0.2rem 0 0.4rem;
+  }
+  .pen-sub {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+  .pen-detail {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .pen-detail td {
+    padding: 0.3rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--color-border, #eee);
+  }
+  .pen-detail td:last-child {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .pen-note {
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    line-height: 1.4;
+  }
+  .pen-help {
+    font-weight: normal;
+    color: var(--color-muted);
+    font-size: 0.8rem;
+  }
+  .pen-type {
+    border: none;
+    padding: 0;
+    margin: 0.25rem 0 0.5rem;
+  }
+  .pen-type legend {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    padding: 0;
+    margin-bottom: 0.3rem;
+  }
+  .pen-type label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    margin: 0;
+    padding: 0.35rem 0;
+    min-height: 2rem;
+    font-weight: normal;
+    line-height: 1.3;
+    cursor: pointer;
+  }
+  .pen-type input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    flex: 0 0 auto;
+  }
+</style>

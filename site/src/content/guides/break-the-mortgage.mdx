@@ -1,0 +1,30 @@
+---
+title: "Should I break my mortgage to get a lower rate?"
+description: "Breaking a closed mortgage triggers a penalty — three months' interest for variable, the greater of 3 months' interest or IRD for fixed. Run your numbers before you call the bank."
+tool_id: "penalty"
+related_guides: ["renewal", "fixed-vs-variable", "prepayment-privileges"]
+related_terms: ["5-year-fixed", "3-year-fixed", "variable"]
+last_reviewed_at: "2026-05-01"
+---
+import PenaltyTool from "@components/tools/PenaltyTool.astro";
+
+If today's rates are well below what you signed for, the math on breaking your mortgage early can work — but only after you net the penalty against the interest you'd save. The tool below estimates the penalty using the two formulas Canadian lenders apply: three months' interest, and the interest rate differential (IRD).
+
+<PenaltyTool />
+
+The rule of thumb: break if (penalty + new-mortgage closing costs) is meaningfully less than the interest you would save over the months you have left. A rough check — multiply your remaining months by `balance × (oldRate − newRate) / 12 / 100` for the gross savings, then subtract the tool's penalty figure plus a few hundred dollars in legal/discharge fees.
+
+## Why fixed penalties at big banks look so much worse
+
+Variable-rate closed mortgages are simple: three months' interest at your contract rate. Fixed-rate closed mortgages take the **greater** of three months' interest and the IRD. The IRD math diverges sharply by lender:
+
+- **Monolines and credit unions** typically calculate IRD as `balance × (yourRate − comparisonRate) × monthsRemaining / 12`, where the comparison rate is the lender's *current* rate for the term closest to your remaining months. If rates rose since you signed, this is often $0 and the 3-month formula binds.
+- **Big-bank fixed** (RBC, TD, BMO, Scotiabank, CIBC, National Bank) substitutes the comparison rate with `currentPosted − originalDiscount`. Since your discount off posted at signing is usually 1.5–2 percentage points, the spread gets inflated by that amount. A penalty that would be $4,500 at a monoline can be $25,000+ at a big bank for the same loan.
+
+Set "original discount off posted" to whatever you negotiated at signing for big-bank fixed. For a monoline or any variable mortgage, leave it at zero.
+
+## When breaking usually does not work
+
+If you're more than halfway through a five-year fixed at a big bank, the IRD typically dwarfs your prospective savings. Same if rates haven't moved much — the spread is too thin to make the math work. And if you're considering breaking just to lock in a lower rate "in case rates go back up," you're paying a real penalty today against an imagined risk; usually a [renewal early option](/guides/renewal) (some lenders let you renew up to 120 days before maturity) is the cheaper way to hedge.
+
+The penalty figure here is an estimate. Always ask your lender for a current discharge statement before committing — they'll give you the binding number, often by email within a few business days.

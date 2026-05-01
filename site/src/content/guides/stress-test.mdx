@@ -1,0 +1,42 @@
+---
+title: "The Canadian mortgage stress test, explained"
+description: "Federal regulators make every borrower qualify at a rate higher than their contract — typically contract+2% or 5.25%, whichever is higher. Here's how it actually works."
+tool_id: "affordability"
+related_guides: ["affordability", "down-payment", "insured-vs-uninsured"]
+related_terms: ["5-year-fixed"]
+last_reviewed_at: "2026-05-01"
+---
+import AffordabilityTool from "@components/tools/AffordabilityTool.astro";
+
+The stress test (formally **Guideline B-20**) is a federal rule from the Office of the Superintendent of Financial Institutions (OSFI). It requires every borrower at a federally regulated lender — every bank, every nationwide monoline — to qualify for the mortgage at a higher rate than the one they'll actually pay.
+
+## The formula
+
+Your **qualifying rate** is `max(contractRate + 2.0%, 5.25%)`.
+
+So if your contract rate is 4.0%, you qualify at 6.0%. If your contract is 3.0%, you qualify at the 5.25% floor. Lenders run the GDS/TDS ratios at this qualifying rate, not your real one. This is why the affordability tool below shows your qualifying rate separately from your contract rate.
+
+<AffordabilityTool />
+
+## Why it exists
+
+The stress test was introduced in 2018 to prevent borrowers from over-leveraging at unusually low rates. The premise: if rates rise by 2 percentage points before your renewal, your real-world payment shouldn't break you. The 5.25% floor was added to keep the test meaningful when contract rates were near 2%.
+
+In effect, the stress test reduces every borrower's maximum mortgage by roughly 20–25%. A household that could "afford" $700,000 at the contract rate qualifies for closer to $560,000 at the stressed rate.
+
+## Three exemptions worth knowing
+
+1. **Renewing with the same lender on a straight switch** — no stress test re-applied (rule changed late 2024). You can shop renewal quotes from competing federally regulated lenders too without re-testing, as long as you're not topping up the loan or extending the amortization.
+2. **Provincially regulated credit unions** — not bound by B-20. Some apply their own stress tests; many don't. This is one of the main reasons provincial credit unions are useful for buyers near the federal qualifying ceiling.
+3. **Private lenders and Mortgage Investment Corporations (MICs)** — not federally regulated, no B-20. Higher rates and fees, but the qualifying math is on the contract rate alone. Fallback option, not first choice.
+
+## What this means for shopping
+
+The stress test is a **hard ceiling** at any federally regulated lender — no negotiation, no exception. If you're hitting it, the levers are:
+
+- Increase down payment (lower the loan amount).
+- Lower other monthly debts (pay off the car loan; close the unused line of credit).
+- Pick a lower-rate term (shorter terms qualify at slightly lower rates because the +2% applies to a smaller base — a 4.0% 3-year stresses to 6.0%, same as a 4.0% 5-year, but 3-year contract rates are often lower).
+- Look at provincial credit unions if you're a few thousand dollars short of qualifying.
+
+The stress test is the single biggest lever between "the bank's mathematical maximum" and what you'll be approved for. The affordability tool above bakes it in by default.

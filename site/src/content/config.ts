@@ -5,7 +5,7 @@ const guides = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    tool_id: z.enum(["break-even", "affordability"]).optional(),
+    tool_id: z.enum(["break-even", "affordability", "penalty"]).optional(),
     related_guides: z.array(z.string()).default([]),
     related_terms: z.array(z.string()).default([]),
     last_reviewed_at: z.string(), // ISO date

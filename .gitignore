@@ -4,6 +4,7 @@
 node_modules/
 .venv/
 site/src/data/rates.json
+site/src/data/rates-history.json
 __pycache__/
 *.pyc
 .pytest_cache/

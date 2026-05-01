@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/fetch-rates.mjs",
+    "prebuild": "node scripts/fetch-rates.mjs && node scripts/snapshot-rates.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",

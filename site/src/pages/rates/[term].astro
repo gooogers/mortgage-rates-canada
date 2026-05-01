@@ -3,6 +3,7 @@ import Base from "@layouts/Base.astro";
 import Disclaimer from "@components/Disclaimer.astro";
 import TermIntro from "@components/TermIntro.astro";
 import TermFaq from "@components/TermFaq.astro";
+import RateHistoryChart from "@components/RateHistoryChart.astro";
 import RelatedGuides from "@components/RelatedGuides.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
 import { loadRatesData, ratesByTerm, type Term } from "@lib/rates";
@@ -214,6 +215,12 @@ if (faqItems.length > 0) {
       </tbody>
     </table>
   )}
+
+  <RateHistoryChart
+    terms={[term]}
+    heading={`${label} rate trend`}
+    caption="Lowest discounted rate across tracked lenders, by day."
+  />
 
   <TermFaq items={faqItems} />
 

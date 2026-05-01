@@ -52,6 +52,22 @@ const data = await loadRatesData();
     last successfully scraped.
   </p>
 
+  <h2>How the rate trend chart works</h2>
+  <p>
+    Each successful scraper run also writes a single-day aggregate to a rate-
+    history file: the lowest discounted rate across tracked lenders for each
+    term, plus the average across the lenders that offered that term, plus a
+    count. The chart on the home page and the term pages plots the daily
+    "best discounted" line.
+  </p>
+  <p>
+    We only show data we actually collected — there is no synthesised
+    history. The first daily snapshot is dated {formatUpdatedAt(data.updated_at)};
+    earlier days are not represented because we did not track them. The
+    chart's empty-state message appears until at least two distinct days
+    of snapshots have accumulated.
+  </p>
+
   <h2>How we write our guides</h2>
   <p>
     Each guide is researched against primary sources (the Bank of Canada, OSFI,

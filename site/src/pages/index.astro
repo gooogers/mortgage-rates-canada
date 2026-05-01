@@ -3,6 +3,7 @@ import Base from "@layouts/Base.astro";
 import Disclaimer from "@components/Disclaimer.astro";
 import GuideCard from "@components/GuideCard.astro";
 import HeroFeaturedRates from "@components/HeroFeaturedRates.astro";
+import RateHistoryChart from "@components/RateHistoryChart.astro";
 import RateTable from "@components/RateTable.astro";
 import { formatUpdatedAt } from "@lib/format";
 import { getAllGuides } from "@lib/guides";
@@ -34,6 +35,12 @@ guides.sort((a, b) => a.data.title.localeCompare(b.data.title));
       <a href="/rates/5-year-fixed">See full 5-year fixed rankings →</a>
     </p>
   </section>
+
+  <RateHistoryChart
+    terms={["5yr_fixed", "3yr_fixed", "variable"]}
+    heading="Rate trend (best discounted)"
+    caption="Lowest discounted rate across tracked lenders, by day."
+  />
 
   <section class="learn-section">
     <h2>Learn before you choose</h2>

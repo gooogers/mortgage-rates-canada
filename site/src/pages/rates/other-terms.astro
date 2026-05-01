@@ -5,7 +5,7 @@ import Disclaimer from "@components/Disclaimer.astro";
 import LenderBadge from "@components/LenderBadge.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
 import { bestRateForTerm, loadRatesData, type Term } from "@lib/rates";
-import { breadcrumbSchema, type BreadcrumbItem } from "@lib/schemas";
+import { breadcrumbSchema, faqPageSchema, type BreadcrumbItem } from "@lib/schemas";
 
 interface OtherTerm {
   slug: string;
@@ -54,7 +54,23 @@ const breadcrumbTrail: BreadcrumbItem[] = [
   { name: "Rates", path: "/rates" },
   { name: "Other terms", path: "/rates/other-terms" },
 ];
-const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
+
+const FAQS = [
+  {
+    q: "Which mortgage terms are 'less common' in Canada?",
+    a: "1, 2, 4, 7, and 10-year fixed. The popular three are 5-year fixed, 3-year fixed, and variable — that's roughly 90% of new originations.",
+  },
+  {
+    q: "When is a 1-year fixed worth a look?",
+    a: "When you're in a transitional life situation (selling, divorcing, relocating within the year) or you have specific evidence rates will be materially lower in 12 months and want to renew into them.",
+  },
+  {
+    q: "Why is the 10-year fixed almost never the math winner?",
+    a: "Section 10 of the federal Interest Act caps the prepayment penalty at three months' interest for fixed terms longer than 5 years, but only after year 5. So functionally a 10-year fixed is a 5-year with the option to keep going at the same rate — but you pay a premium of 30-100bps over a 5-year fixed for that option, which usually outweighs the value.",
+  },
+];
+
+const pageSchemas = [breadcrumbSchema(breadcrumbTrail), faqPageSchema(FAQS)];
 ---
 
 <Base
@@ -115,6 +131,16 @@ const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
       </div>
     ))}
   </section>
+
+  <section class="other-faqs">
+    <h2>Common questions</h2>
+    {FAQS.map((qa) => (
+      <div class="other-faq">
+        <h3>{qa.q}</h3>
+        <p>{qa.a}</p>
+      </div>
+    ))}
+  </section>
 </Base>
 
 <style>
@@ -163,5 +189,25 @@ const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
     margin: 0;
     line-height: 1.55;
     color: var(--color-fg, #222);
+  }
+  .other-faqs {
+    margin: 2.5rem 0 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border, #e0e4e8);
+  }
+  .other-faqs > h2 {
+    margin: 0 0 1rem;
+    font-size: 1.1rem;
+  }
+  .other-faq {
+    margin-bottom: 1.25rem;
+  }
+  .other-faq h3 {
+    margin: 0 0 0.3rem;
+    font-size: 1rem;
+  }
+  .other-faq p {
+    margin: 0;
+    line-height: 1.55;
   }
 </style>

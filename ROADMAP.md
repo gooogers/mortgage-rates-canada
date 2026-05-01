@@ -47,10 +47,10 @@ The full-site review on 2026-05-01 surfaced 12 concrete improvements. Grouped in
 - **D.1** ✅ Lender pages now have a "Best rates by term" block linking to each `/rates/[term]` they offer, plus a "Compare with other lenders" grid showing 4 same-type peers. NBC's lender page carries a dual-channel editorial note (retail in QC vs broker channel national); BC/AB/ON province pages carry parallel callouts.
 - **D.2** ✅ Glossary entries extracted to `src/data/glossary.ts` (with `aliases` for abbreviations like IRD/GDS/TDS/CMHC). New `plugins/remark-glossary-autolink.mjs` auto-links the first occurrence of each glossary term in any guide MDX. Verified across 6 guides.
 
-### Phase E — Trust + UX polish
-- **E.1** `Article` `image` field on guide schemas; enrich `Organization` with `sameAs`/`description`; `FAQPage` schema on `/rates/other-terms`; homepage canonical slash-less.
-- **E.2** Calculator page (`/calculator`) expanded to ~400+ words + `WebApplication` JSON-LD.
-- **E.3** Form UX: `aria-live="polite"` on result regions; help text on AffordabilityTool tax/heat and PenaltyTool `postedSpread`; "Last reviewed" date on calculator/methodology/about/glossary/province/term pages; server-side correct `data-fixed-only` rendering; visible validation on negative/empty inputs.
+### Phase E — Trust + UX polish ✅
+- **E.1** ✅ `image` + `publisher.logo` on Article schema; `description` enriched on Organization; `FAQPage` schema on `/rates/other-terms` (with 3 visible Q&As to match); homepage canonical now slash-less.
+- **E.2** ✅ `/calculator` expanded with sections on semi-annual compounding, bi-weekly vs accelerated bi-weekly, and URL sharing (~400 words); `WebApplication` JSON-LD added.
+- **E.3** ✅ `aria-live="polite"` on every calculator's result region; help text added to AffordabilityTool monthly tax/heat and PenaltyTool `postedSpread` (with link to the break-the-mortgage guide); "Last reviewed" date on about / glossary / calculator. Skipped the audit's `data-fixed-only` SSR fix — recommendation was misstated (the default radio is `fixed`, so visible-by-default is correct for the no-JS path).
 
 ### 8. Lender review pages
 

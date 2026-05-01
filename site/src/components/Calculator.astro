@@ -46,7 +46,7 @@ const defaultRate = best?.rate.discounted ?? 5.0;
     </label>
   </div>
 
-  <div class="calculator__results">
+  <div class="calculator__results" aria-live="polite" aria-atomic="true">
     <div class="calculator__result">
       <span class="calculator__result-label">Payment</span>
       <span class="calculator__result-value" data-result="payment">$0</span>

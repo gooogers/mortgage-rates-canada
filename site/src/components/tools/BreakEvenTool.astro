@@ -62,7 +62,7 @@ const defaultVar = bestVar?.rate.discounted ?? 4.20;
     </form>
   </div>
 
-  <div slot="result">
+  <div slot="result" aria-live="polite" aria-atomic="true">
     <p class="be-headline" data-result="headline">—</p>
     <p class="be-sub" data-result="sub"></p>
     <svg class="be-chart" data-result="chart" viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cumulative interest over the term for fixed vs variable mortgage."></svg>

@@ -1,30 +1,135 @@
 ---
 import Base from "@layouts/Base.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
 import CalculatorWidget from "@components/Calculator.astro";
+import { breadcrumbSchema, type BreadcrumbItem } from "@lib/schemas";
+
+const breadcrumbTrail: BreadcrumbItem[] = [
+  { name: "Home", path: "/" },
+  { name: "Calculators", path: "/calculators" },
+  { name: "Payment", path: "/calculator" },
+];
+
+const webApplicationSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Canadian Mortgage Payment Calculator",
+  url: "https://canadianrates.ca/calculator",
+  applicationCategory: "FinanceApplication",
+  operatingSystem: "Any",
+  description:
+    "Estimate Canadian mortgage payments with CMHC insurance, semi-annual compounding, and accelerated bi-weekly options. Includes a balance + cumulative-interest amortization chart.",
+  offers: { "@type": "Offer", price: 0, priceCurrency: "CAD" },
+  inLanguage: "en-CA",
+};
+
+const pageSchemas = [breadcrumbSchema(breadcrumbTrail), webApplicationSchema];
 ---
 
 <Base
   title="Mortgage Payment Calculator Canada"
   description="Calculate your Canadian mortgage payment with CMHC insurance, down payment, amortization, and payment frequency. Share scenarios via URL."
   canonical="https://canadianrates.ca/calculator"
+  schemas={pageSchemas}
 >
+  <Breadcrumb trail={breadcrumbTrail} />
   <h1>Mortgage Payment Calculator</h1>
-  <p>
+  <p class="page-meta">Math last reviewed May 1, 2026.</p>
+  <p class="intro">
     Estimate your monthly, bi-weekly, or accelerated bi-weekly mortgage
-    payment, including CMHC insurance for down payments under 20%.
+    payment, including CMHC insurance for down payments under 20%. The
+    calculator uses the Canadian semi-annual compounding convention every
+    federally regulated lender applies, and outputs a full amortization
+    chart so you can see how much of each payment goes to interest versus
+    principal across the life of the loan.
   </p>
+
   <CalculatorWidget />
+
   <h2>How this calculator works</h2>
   <p>
-    Canadian mortgages are compounded semi-annually (not monthly), so the
-    effective per-payment rate is derived from the nominal annual rate as
-    <code>(1 + annual / 2)<sup>2</sup> − 1</code>. CMHC insurance is required
-    when the down payment is less than 20% and is added to the loan principal.
+    Canadian mortgages compound semi-annually but are paid monthly (or
+    bi-weekly). To get the per-payment rate, the calculator derives the
+    effective annual rate from the nominal annual rate using
+    <code>(1 + annual / 2)<sup>2</sup> − 1</code>, then converts that to
+    a periodic rate matching your payment frequency. The standard payment
+    formula <code>P = L × i / (1 − (1 + i)<sup>−n</sup>)</code> gives the
+    fixed dollar amount that fully amortizes the loan over the chosen term.
+  </p>
+  <p>
+    CMHC insurance applies when the down payment is below 20%. The premium
+    is added to the loan principal — you don't pay it up front, but you do
+    pay interest on it for the life of the mortgage. The current tiers are:
   </p>
   <ul>
-    <li>5.00–9.99% down: 4.00% CMHC premium</li>
-    <li>10.00–14.99% down: 3.10% CMHC premium</li>
-    <li>15.00–19.99% down: 2.80% CMHC premium</li>
-    <li>20%+ down: no CMHC required</li>
+    <li><strong>5.00–9.99% down:</strong> 4.00% CMHC premium</li>
+    <li><strong>10.00–14.99% down:</strong> 3.10% CMHC premium</li>
+    <li><strong>15.00–19.99% down:</strong> 2.80% CMHC premium</li>
+    <li><strong>20%+ down:</strong> no CMHC required (conventional mortgage)</li>
   </ul>
+
+  <h2>Why semi-annual compounding matters</h2>
+  <p>
+    The 0.5–1% gap between "rate" and "effective rate" sounds small, but
+    over a 25-year amortization on a $500,000 mortgage it's worth several
+    thousand dollars in either direction. Canadian Bank Act rules require
+    semi-annual compounding for fixed mortgages — a stricter standard than
+    the monthly compounding used in most US calculators. If you've used a
+    US-built calculator, expect this one to show payments roughly 0.1–0.2%
+    lower for the same posted rate.
+  </p>
+
+  <h2>Bi-weekly versus accelerated bi-weekly</h2>
+  <p>
+    Standard <strong>bi-weekly</strong> payments split the equivalent
+    monthly payment across 26 periods per year (the same total annual
+    cash, with rate compounded at bi-weekly intervals). Total interest
+    is essentially identical to monthly payments.
+  </p>
+  <p>
+    <strong>Accelerated bi-weekly</strong> takes the monthly payment and
+    divides by two — meaning you pay 26 half-monthly amounts per year
+    instead of 24. That's roughly one extra monthly payment per year,
+    applied directly to principal. On a typical mortgage it shaves
+    3–5 years off the amortization and saves $20,000–$50,000 in interest
+    over the life of the loan. The calculator surfaces both so you can
+    see the trade-off side by side.
+  </p>
+
+  <h2>Sharing scenarios</h2>
+  <p>
+    Every input is encoded into the URL as you change it. Bookmark or
+    share the page and the next visitor lands on the same scenario you
+    saw. Useful when comparing quotes with a broker, partner, or co-buyer.
+  </p>
+
+  <p class="see-also">
+    Related: <a href="/guides/affordability">how much mortgage you can
+    afford</a>, <a href="/guides/down-payment">down payment minimums and
+    CMHC tiers</a>, <a href="/methodology">how we test the math</a>.
+  </p>
 </Base>
+
+<style>
+  .page-meta {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    margin: 0 0 1rem;
+  }
+  .intro {
+    margin: 1rem 0 1.5rem;
+    line-height: 1.65;
+    max-width: 65ch;
+  }
+  h2 {
+    margin-top: 2rem;
+  }
+  ul {
+    line-height: 1.7;
+  }
+  .see-also {
+    margin-top: 2rem;
+    font-size: 0.95rem;
+    color: var(--color-muted);
+  }
+</style>

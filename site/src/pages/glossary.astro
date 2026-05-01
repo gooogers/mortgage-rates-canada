@@ -22,6 +22,7 @@ const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
 >
   <Breadcrumb trail={breadcrumbTrail} />
   <h1>Canadian mortgage glossary</h1>
+  <p class="page-meta">Last reviewed May 1, 2026.</p>
   <p class="muted">
     Plain-English definitions for the terms that come up when you're getting
     a Canadian mortgage. Linked entries deepen the definition with a guide.
@@ -55,6 +56,11 @@ const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
     color: var(--color-muted);
     font-size: 0.95rem;
     line-height: 1.55;
+  }
+  .page-meta {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    margin: 0 0 1rem;
   }
   .glossary-jump {
     margin: 1.25rem 0 2rem;

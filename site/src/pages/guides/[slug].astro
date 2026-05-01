@@ -20,6 +20,10 @@ const articleSchema = {
   "@type": "Article",
   headline: entry.data.title,
   description: entry.data.description,
+  // Reuses the sitewide OG share image. Required for Article rich-result
+  // eligibility; a per-guide hero would be better long term but the
+  // default unblocks Google's validator.
+  image: "https://canadianrates.ca/og-image.svg",
   datePublished: entry.data.last_reviewed_at,
   dateModified: entry.data.last_reviewed_at,
   author: {
@@ -31,6 +35,10 @@ const articleSchema = {
     "@type": "Organization",
     name: "Canadian Rates",
     url: "https://canadianrates.ca",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://canadianrates.ca/favicon.svg",
+    },
   },
 };
 

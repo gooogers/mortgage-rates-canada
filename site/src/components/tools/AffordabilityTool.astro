@@ -16,10 +16,10 @@ const defaultRate = best?.rate.discounted ?? 5.0;
       <label>Monthly debts (cars, cards, loans)
         <input type="number" name="monthlyDebts" min="0" step="50" value="500" required />
       </label>
-      <label>Monthly property tax
+      <label>Monthly property tax <span class="aff-help">(annual ÷ 12)</span>
         <input type="number" name="estimatedPropertyTax" min="0" step="25" value="400" required />
       </label>
-      <label>Monthly heat
+      <label>Monthly heat <span class="aff-help">(lenders use ~$150 if unsure)</span>
         <input type="number" name="estimatedHeat" min="0" step="10" value="100" required />
       </label>
       <label>Monthly condo fees (0 if none)
@@ -41,7 +41,7 @@ const defaultRate = best?.rate.discounted ?? 5.0;
     </form>
   </div>
 
-  <div slot="result">
+  <div slot="result" aria-live="polite" aria-atomic="true">
     <p class="aff-label">Maximum purchase price</p>
     <p class="aff-headline" data-result="price">—</p>
     <p class="aff-sub" data-result="sub"></p>
@@ -214,5 +214,10 @@ const defaultRate = best?.rate.discounted ?? 5.0;
     width: 100%;
     height: auto;
     max-width: 360px;
+  }
+  .aff-help {
+    font-weight: normal;
+    color: var(--color-muted);
+    font-size: 0.8rem;
   }
 </style>

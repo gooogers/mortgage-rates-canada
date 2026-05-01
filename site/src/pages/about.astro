@@ -8,6 +8,7 @@ import Base from "@layouts/Base.astro";
   canonical="https://canadianrates.ca/about"
 >
   <h1>About Canadian Rates</h1>
+  <p class="page-meta">Last reviewed May 1, 2026.</p>
   <p>
     Canadian Rates displays publicly-published posted and discounted
     mortgage rates from major Canadian lenders. Both rates come directly
@@ -42,3 +43,11 @@ import Base from "@layouts/Base.astro";
     See our <a href="/methodology">methodology</a> for the full process.
   </p>
 </Base>
+
+<style>
+  .page-meta {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    margin: 0 0 1.25rem;
+  }
+</style>

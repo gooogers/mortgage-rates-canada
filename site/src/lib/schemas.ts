@@ -18,6 +18,8 @@ export function organizationSchema() {
     name: ORGANIZATION_NAME,
     url: SITE_URL,
     logo: ORGANIZATION_LOGO,
+    description:
+      "Canadian Rates is an independent mortgage rate comparison and decision-tools site. Daily-updated posted and discounted rates from Canadian banks and credit unions, plus calculators and plain-English guides.",
   };
 }
 

@@ -11,7 +11,7 @@ import {
   type Term,
 } from "@lib/rates";
 import { breadcrumbSchema } from "@lib/schemas";
-import { getProvinceBySlug, PROVINCES_LIST, type ProvinceData } from "../../data/provinces";
+import { PROVINCES_LIST, type ProvinceData } from "../../data/provinces";
 
 export async function getStaticPaths() {
   return PROVINCES_LIST.map((p) => ({

@@ -42,7 +42,11 @@ export interface ProvinceData {
   notes: string[];
 }
 
-export const PROVINCES: Record<Province, ProvinceData> = {
+// Territories (NT, NU, YT) intentionally omitted — small populations, no
+// provincial-only lenders in the dataset, low search volume. Using
+// Partial<Record> keeps the keys constrained to the Province union without
+// forcing entries for every territory.
+export const PROVINCES: Partial<Record<Province, ProvinceData>> = {
   AB: {
     code: "AB",
     slug: "alberta",
@@ -336,10 +340,11 @@ export const PROVINCES: Record<Province, ProvinceData> = {
   },
 };
 
-/** All provinces sorted alphabetically by name. */
-export const PROVINCES_LIST: ProvinceData[] = Object.values(PROVINCES).sort((a, b) =>
-  a.name.localeCompare(b.name),
-);
+/** All provinces sorted alphabetically by name. Territories filtered out
+ *  via the Partial<Record> shape above. */
+export const PROVINCES_LIST: ProvinceData[] = Object.values(PROVINCES)
+  .filter((p): p is ProvinceData => p !== undefined)
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 export function getProvinceBySlug(slug: string): ProvinceData | undefined {
   return PROVINCES_LIST.find((p) => p.slug === slug);

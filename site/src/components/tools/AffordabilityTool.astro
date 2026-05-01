@@ -7,7 +7,7 @@ const best = bestRateForTerm(data, "5yr_fixed");
 const defaultRate = best?.rate.discounted ?? 5.0;
 ---
 
-<ToolFrame title="How much can I afford?" toolId="affordability">
+<ToolFrame title="Mortgage Affordability Calculator" toolId="affordability">
   <div slot="inputs">
     <form class="aff-form" data-default-rate={defaultRate}>
       <label>Gross annual income
@@ -28,7 +28,7 @@ const defaultRate = best?.rate.discounted ?? 5.0;
       <label>Down payment
         <input type="number" name="downPayment" min="0" step="1000" value="80000" required />
       </label>
-      <label>Contract rate (%)
+      <label>Interest rate (%)
         <input type="number" name="contractRate" min="0" max="20" step="0.01" value={defaultRate} required />
       </label>
       <label>Amortization (years)
@@ -46,8 +46,8 @@ const defaultRate = best?.rate.discounted ?? 5.0;
     <p class="aff-headline" data-result="price">—</p>
     <p class="aff-sub" data-result="sub"></p>
     <figure class="aff-chart-wrap">
-      <figcaption class="aff-chart-caption">Max purchase price by contract rate</figcaption>
-      <svg class="aff-chart" data-chart viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Maximum purchase price across a band of contract rates around your input."></svg>
+      <figcaption class="aff-chart-caption">Max purchase price by interest rate</figcaption>
+      <svg class="aff-chart" data-chart viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Maximum purchase price across a band of interest rates around your input."></svg>
     </figure>
   </div>
 
@@ -149,7 +149,7 @@ const defaultRate = best?.rate.discounted ?? 5.0;
       })
       .join("");
 
-    const xAxisTitle = `<text x="${PAD_L + innerW / 2}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#444">Contract rate</text>`;
+    const xAxisTitle = `<text x="${PAD_L + innerW / 2}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#444">Interest rate</text>`;
     const yAxisTitle = `<text x="14" y="${PAD_T + innerH / 2}" text-anchor="middle" font-size="11" fill="#444" transform="rotate(-90, 14, ${PAD_T + innerH / 2})">Max price</text>`;
 
     svg.innerHTML = `

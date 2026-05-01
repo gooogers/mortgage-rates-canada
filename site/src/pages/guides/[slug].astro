@@ -41,7 +41,7 @@ const breadcrumb = breadcrumbSchema([
 ---
 
 <Base
-  title={entry.data.title}
+  title={entry.data.seo_title ?? entry.data.title}
   description={entry.data.description}
   canonical={`https://canadianrates.ca/guides/${entry.slug}`}
   schemas={[articleSchema, breadcrumb]}

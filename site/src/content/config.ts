@@ -4,6 +4,10 @@ const guides = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
+    /** Optional shorter title for the <title> tag and OG metadata. Falls
+     *  back to `title` when absent. Used to keep SERP titles under ~60
+     *  chars after the " — Canadian Rates" suffix is appended. */
+    seo_title: z.string().optional(),
     description: z.string(),
     tool_id: z
       .enum(["break-even", "affordability", "penalty", "closing-costs"])

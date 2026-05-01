@@ -68,7 +68,7 @@ export const PROVINCES: Partial<Record<Province, ProvinceData>> = {
     notes: [
       "ATB Financial is provincially owned (a Crown corporation), and Servus Credit Union is the largest credit union — both compete aggressively with the Big 6 in Alberta.",
       "Alberta credit unions are not federally regulated and may apply their own (sometimes looser) qualification standards. Useful if you're hitting the federal stress-test ceiling at a bank.",
-      "No HST on resale homes; new builds are subject to GST (5%) with a partial rebate available below $450,000.",
+      "No HST on resale homes; new builds are subject to GST (5%). The legacy partial rebate phases out between $350,000 and $450,000; first-time buyers also qualify for the May-2025 federal expansion (full GST rebate up to $1M, partial to $1.5M).",
     ],
   },
 
@@ -106,7 +106,7 @@ export const PROVINCES: Partial<Record<Province, ProvinceData>> = {
     notes: [
       "The 20% Speculation and Vacancy Tax applies to designated regions (Metro Vancouver, Victoria, Kelowna, others) for non-residents and out-of-province owners. Worth checking before buying as an investment.",
       "Vancity and Coast Capital Savings are the major BC credit unions — both not federally regulated, both offer competitive rates that often beat Big 6 in BC.",
-      "Foreign buyers face a 20% Additional PTT on top of the regular PTT — and a federal foreign buyer ban remains in effect through at least 2027.",
+      "Foreign buyers face a 20% Additional PTT on top of the regular PTT in BC's designated taxable regions (Metro Vancouver, Capital, Fraser Valley, Central Okanagan, Nanaimo) — and a federal foreign buyer ban remains in effect through Jan 1, 2027.",
     ],
   },
 
@@ -208,7 +208,7 @@ export const PROVINCES: Partial<Record<Province, ProvinceData>> = {
       },
     ],
     notes: [
-      "Nova Scotia's foreign buyer / non-resident DTT surcharge of 5% was repealed in 2023 — only the standard 1.5% applies regardless of residency.",
+      "Nova Scotia's 5% Non-Resident Deed Transfer Tax was reduced to 0% effective April 1, 2024 — only the standard 1.5% applies regardless of residency. (The earlier annual non-resident property tax was repealed in 2023; the two were sometimes conflated in coverage.)",
     ],
   },
 
@@ -286,7 +286,7 @@ export const PROVINCES: Partial<Record<Province, ProvinceData>> = {
       "Quebec runs on a unique notary-led closing system, charges a tiered welcome tax (Taxe de Bienvenue), and has the most distinct mortgage market in Canada — Desjardins, Caisses Populaires, and the Mouvement Desjardins network are the dominant lenders.",
     ltt: {
       summary:
-        "Quebec's land transfer tax (Droit de mutation, popularly the 'Welcome Tax'): 0.5% on first $58,900; 1.0% on $58,900–$294,600; 1.5% on $294,600–$552,300; 2.0% on $552,300–$1,104,700; 2.5% on $1,104,700–$2,041,900; 3.0% above $2,041,900. Brackets are 2026 figures and indexed annually. On a $500,000 Montreal home that's $5,720.",
+        "Quebec's land transfer tax (Droit de mutation, popularly the 'Welcome Tax'): 0.5% on first $58,900; 1.0% on $58,900–$294,600; 1.5% on $294,600–$552,300; 2.0% on $552,300–$1,104,700; 2.5% on $1,104,700–$2,041,900; 3.0% above $2,041,900. Brackets are 2026 figures and indexed annually. On a $500,000 Montreal home that's about $5,733.",
       municipal: {
         city: "Montreal",
         description:

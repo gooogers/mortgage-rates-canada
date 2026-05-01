@@ -241,6 +241,11 @@ const PROVINCES = Object.entries(PROVINCE_NAMES)
           else localStorage.removeItem("province");
         } catch {}
       }
+      // Broadcast so other province-aware widgets (e.g. HeroFeaturedRates)
+      // can react without coupling to this select element.
+      document.dispatchEvent(
+        new CustomEvent("province-change", { detail: { province } }),
+      );
     };
 
     select.addEventListener("change", () => setProvince(select.value));

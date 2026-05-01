@@ -1,7 +1,7 @@
 ---
 import LenderBadge from "@components/LenderBadge.astro";
 import { formatPercent, formatTermLabel } from "@lib/format";
-import { bestRateForTerm, type RatesData, type Term } from "@lib/rates";
+import type { BestRate, Province, RatesData, Term } from "@lib/rates";
 
 interface Props {
   data: RatesData;
@@ -12,41 +12,86 @@ interface Props {
 const DEFAULT_FEATURED: Term[] = ["5yr_fixed", "variable"];
 const { data, featured = DEFAULT_FEATURED } = Astro.props;
 
-const cards = featured
-  .map((term) => ({ term, best: bestRateForTerm(data, term) }))
-  .filter((c) => c.best !== null);
+// Best rate within a province scope. scope === "" means "national lenders
+// only" (the All Canada view); a province code includes national lenders plus
+// any provincial lender available there. Mirrors the visibility rules that
+// RateTable applies to its rows.
+function bestForScope(term: Term, scope: string): BestRate | null {
+  let best: BestRate | null = null;
+  let bestRate = Infinity;
+  for (const lender of data.lenders) {
+    const provs = lender.provinces ?? [];
+    const isNational = provs.length === 0;
+    const matches = isNational || (scope !== "" && provs.includes(scope as Province));
+    if (!matches) continue;
+    const rate = lender.rates.find((r) => r.term === term);
+    if (!rate) continue;
+    const effective = rate.discounted ?? rate.posted;
+    if (effective < bestRate) {
+      bestRate = effective;
+      best = { lender, rate };
+    }
+  }
+  return best;
+}
+
+// Provinces represented by at least one provincial lender — the only scopes
+// where the best rate could differ from national. Other provinces fall back
+// to the national card.
+const provincesWithLenders = new Set<string>();
+for (const lender of data.lenders) {
+  for (const code of lender.provinces ?? []) {
+    provincesWithLenders.add(code);
+  }
+}
+const scopes: string[] = ["", ...Array.from(provincesWithLenders).sort()];
+
+const groups = featured.map((term) => ({
+  term,
+  cards: scopes
+    .map((scope) => ({ scope, best: bestForScope(term, scope) }))
+    .filter((c): c is { scope: string; best: BestRate } => c.best !== null),
+}));
 ---
 
 <section class="hero">
   <h1 class="hero__title">Today's Lowest Canadian Mortgage Rates</h1>
   <div class="hero__cards">
     {
-      cards.map(({ term, best }) => (
-        <article class="hero-card">
-          <p class="hero-card__label">Best {formatTermLabel(term)}</p>
-          <p class="hero-card__rate">{formatPercent(best!.rate.discounted ?? best!.rate.posted)}</p>
-          <p class="hero-card__lender">
-            <LenderBadge slug={best!.lender.slug} name={best!.lender.name} />
-            {best!.lender.name}
-          </p>
-          {best!.lender.affiliate_url ? (
-            <a
-              class="cta"
-              href={best!.lender.affiliate_url}
-              rel="sponsored noopener"
-              target="_blank"
+      groups.map(({ term, cards }) => (
+        <div class="hero-card-slot" data-hero-term={term}>
+          {cards.map(({ scope, best }) => (
+            <article
+              class="hero-card"
+              data-hero-card
+              data-province={scope}
+              hidden={scope !== "" ? true : undefined}
             >
-              Get this rate →
-            </a>
-          ) : (
-            <a
-              class="cta cta--secondary"
-              href={`/lenders/${best!.lender.slug}`}
-            >
-              View lender →
-            </a>
-          )}
-        </article>
+              <p class="hero-card__label">Best {formatTermLabel(term)}</p>
+              <p class="hero-card__rate">
+                {formatPercent(best.rate.discounted ?? best.rate.posted)}
+              </p>
+              <p class="hero-card__lender">
+                <LenderBadge slug={best.lender.slug} name={best.lender.name} />
+                {best.lender.name}
+              </p>
+              {best.lender.affiliate_url ? (
+                <a
+                  class="cta"
+                  href={best.lender.affiliate_url}
+                  rel="sponsored noopener"
+                  target="_blank"
+                >
+                  Get this rate →
+                </a>
+              ) : (
+                <a class="cta cta--secondary" href={`/lenders/${best.lender.slug}`}>
+                  View lender →
+                </a>
+              )}
+            </article>
+          ))}
+        </div>
       ))
     }
   </div>
@@ -59,3 +104,43 @@ const cards = featured
     gap: 6px;
   }
 </style>
+
+<script>
+  function applyHeroProvince(province: string) {
+    const slots = document.querySelectorAll<HTMLElement>("[data-hero-term]");
+    slots.forEach((slot) => {
+      const cards = slot.querySelectorAll<HTMLElement>("[data-hero-card]");
+      // Prefer a province-specific card; fall back to the national card if
+      // this province has no provincial lender (or no card was rendered for it).
+      let target =
+        slot.querySelector<HTMLElement>(
+          `[data-hero-card][data-province="${province}"]`,
+        ) ?? slot.querySelector<HTMLElement>('[data-hero-card][data-province=""]');
+      cards.forEach((c) => {
+        c.hidden = c !== target;
+      });
+    });
+  }
+
+  function initHeroProvince() {
+    // Match RateTable's first-paint behavior: stored preference wins.
+    let stored = "";
+    try {
+      stored = localStorage.getItem("province") ?? "";
+    } catch {}
+    if (stored) applyHeroProvince(stored);
+
+    // RateTable broadcasts every province transition (manual change, stored
+    // preference, IP-detected region) on this event.
+    document.addEventListener("province-change", (e) => {
+      const detail = (e as CustomEvent).detail;
+      applyHeroProvince(detail?.province ?? "");
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initHeroProvince);
+  } else {
+    initHeroProvince();
+  }
+</script>

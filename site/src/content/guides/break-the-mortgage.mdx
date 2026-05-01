@@ -8,11 +8,13 @@ last_reviewed_at: "2026-05-01"
 ---
 import PenaltyTool from "@components/tools/PenaltyTool.astro";
 
-If today's rates are well below what you signed for, the math on breaking your mortgage early can work — but only after you net the penalty against the interest you'd save. The tool below estimates the penalty using the two formulas Canadian lenders apply: three months' interest, and the interest rate differential (IRD).
+If today's rates are well below what you signed for, the math on breaking your mortgage early can work — but only after you net the penalty against the interest you'd save. The tool below works through both sides: it estimates the penalty (3 months' interest vs IRD, with big-bank posted-rate inflation if applicable), estimates the interest you'd save by refinancing at today's rate over the months remaining in your term, and tells you whether breaking comes out ahead.
 
 <PenaltyTool />
 
-The rule of thumb: break if (penalty + new-mortgage closing costs) is meaningfully less than the interest you would save over the months you have left. A rough check — multiply your remaining months by `balance × (oldRate − newRate) / 12 / 100` for the gross savings, then subtract the tool's penalty figure plus a few hundred dollars in legal/discharge fees.
+The math behind the verdict is simple: **net benefit = (balance × rate spread × months remaining ÷ 12) − penalty**. If that's clearly positive (more than ~$1,000), breaking saves real money. If it's clearly negative, the penalty is eating the savings and you should stay. Anything within $1,000 of zero is "marginal" — get a real discharge quote from your lender before committing, since the calculator's estimate could easily be off by that much.
+
+A few caveats the verdict line doesn't capture: refinancing also has closing costs (legal, title transfer, sometimes appraisal — typically $1,000–$2,000), and your new rate may extend your amortization, which trades short-term savings for long-term interest. Use this tool as the go/no-go check before you go further.
 
 ## Why fixed penalties at big banks look so much worse
 

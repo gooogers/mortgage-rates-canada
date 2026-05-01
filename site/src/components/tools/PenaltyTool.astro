@@ -3,8 +3,9 @@ import ToolFrame from "@components/ToolFrame.astro";
 import { bestRateForTerm, loadRatesData, type Term } from "@lib/rates";
 
 const data = await loadRatesData();
-// Default the comparison rate to today's best 3-year fixed — the term most
-// likely to be closest to a typical "months remaining" figure.
+// Default the comparison/new rate to today's best 3-year fixed — the term most
+// likely to be closest to a typical "months remaining" figure, and a reasonable
+// stand-in for "what could I refinance at today" in either direction.
 const comparison = bestRateForTerm(data, "3yr_fixed" satisfies Term);
 const defaultComparison = comparison?.rate.discounted ?? 4.0;
 ---
@@ -26,7 +27,7 @@ const defaultComparison = comparison?.rate.discounted ?? 4.0;
         <label><input type="radio" name="type" value="fixed" checked /> Fixed (closed)</label>
         <label><input type="radio" name="type" value="variable" /> Variable (closed)</label>
       </fieldset>
-      <label data-fixed-only>Lender's current rate, term closest to remaining (%)
+      <label>Today's rate for a new mortgage (%) <span class="pen-help">(used for IRD and savings)</span>
         <input type="number" name="comparisonRate" min="0" max="20" step="0.01" value={defaultComparison} required />
       </label>
       <label data-fixed-only>Original discount off posted (%) <span class="pen-help">(Big 6 only; 0 for monoline)</span>
@@ -37,12 +38,18 @@ const defaultComparison = comparison?.rate.discounted ?? 4.0;
   </div>
 
   <div slot="result">
-    <p class="pen-label">Estimated penalty to break</p>
-    <p class="pen-headline" data-result="penalty">—</p>
+    <p class="pen-label" data-result="verdict-label">Should you break your mortgage?</p>
+    <p class="pen-headline" data-result="verdict-headline" data-verdict="">—</p>
     <p class="pen-sub" data-result="sub"></p>
+    <dl class="pen-summary">
+      <div><dt>Penalty to break</dt><dd data-result="penalty">—</dd></div>
+      <div><dt>Interest saved (rest of term)</dt><dd data-result="savings">—</dd></div>
+      <div class="pen-summary__net"><dt>Net benefit</dt><dd data-result="net">—</dd></div>
+    </dl>
   </div>
 
   <div slot="details">
+    <h3 class="pen-detail-heading">Penalty breakdown</h3>
     <table class="pen-detail">
       <tbody>
         <tr><td>3 months' interest (3MI)</td><td data-detail="threemi">—</td></tr>
@@ -50,16 +57,26 @@ const defaultComparison = comparison?.rate.discounted ?? 4.0;
         <tr><td>Binding formula</td><td data-detail="method">—</td></tr>
       </tbody>
     </table>
+    <h3 class="pen-detail-heading">Savings breakdown</h3>
+    <table class="pen-detail">
+      <tbody>
+        <tr><td>Rate spread (current − new)</td><td data-detail="spread">—</td></tr>
+        <tr><td>Months remaining</td><td data-detail="months">—</td></tr>
+        <tr><td>Estimated interest saved</td><td data-detail="savings-detail">—</td></tr>
+      </tbody>
+    </table>
     <p class="pen-note">
-      Estimate only. Each lender publishes its exact formula in your mortgage
-      contract; ask for a current discharge statement for the binding number.
+      Estimates only. The penalty assumes a standard IRD formula; actual lender
+      math varies. The savings figure is balance × rate spread × months/12,
+      a rough approximation that ignores monthly amortization. Ask your lender
+      for a binding discharge statement before deciding.
     </p>
   </div>
 </ToolFrame>
 
 <script>
-  import { calculatePenalty } from "@lib/penalty";
-  import { formatCurrency } from "@lib/format";
+  import { compareBreakingMortgage } from "@lib/penalty";
+  import { formatCurrency, formatPercent } from "@lib/format";
 
   const form = document.querySelector<HTMLFormElement>(".pen-form");
   if (!form) throw new Error("penalty form not found");
@@ -86,25 +103,62 @@ const defaultComparison = comparison?.rate.discounted ?? 4.0;
 
   function recalc() {
     syncFieldVisibility();
-    const r = calculatePenalty({
+    const contractRate = num("contractRate");
+    const compRate = num("comparisonRate");
+    const months = num("monthsRemaining");
+    const r = compareBreakingMortgage({
       balance: num("balance"),
-      contractRate: num("contractRate"),
-      monthsRemaining: num("monthsRemaining"),
+      contractRate,
+      monthsRemaining: months,
       type: pickedType(),
-      comparisonRate: num("comparisonRate"),
+      comparisonRate: compRate,
       postedSpread: num("postedSpread"),
     });
-    setText("[data-result='penalty']", formatCurrency(r.penalty));
-    const sub =
-      pickedType() === "variable"
-        ? "Variable closed mortgages charge 3 months' interest only."
-        : r.method === "IRD"
-          ? "IRD exceeds 3 months' interest, so it's binding."
-          : "3 months' interest is higher than IRD, so it's binding.";
-    setText("[data-result='sub']", sub);
-    setText("[data-detail='threemi']", formatCurrency(r.threeMonthsInterest));
-    setText("[data-detail='ird']", formatCurrency(r.ird));
-    setText("[data-detail='method']", r.method);
+
+    // Verdict line.
+    const headline = root.querySelector<HTMLElement>("[data-result='verdict-headline']");
+    if (headline) {
+      headline.dataset.verdict = r.verdict;
+      if (r.verdict === "break") {
+        headline.textContent = `Yes — breaking saves ~${formatCurrency(r.netBenefit)}`;
+      } else if (r.verdict === "stay") {
+        const overBy = Math.abs(r.netBenefit);
+        headline.textContent = `No — penalty exceeds savings by ~${formatCurrency(overBy)}`;
+      } else {
+        headline.textContent = `It's close — net ${formatCurrency(r.netBenefit)}`;
+      }
+    }
+    setText(
+      "[data-result='sub']",
+      r.verdict === "marginal"
+        ? "Within $1,000 either way. Get a real discharge statement before deciding."
+        : r.verdict === "break"
+          ? r.penalty.method === "IRD"
+            ? "IRD applies. Verify with your lender — penalty math varies."
+            : "Three months' interest is the binding formula."
+          : "Penalty math (especially big-bank IRD) is eating the savings.",
+    );
+
+    // Summary cards.
+    setText("[data-result='penalty']", formatCurrency(r.penalty.penalty));
+    setText("[data-result='savings']", formatCurrency(r.estimatedSavings));
+    setText(
+      "[data-result='net']",
+      r.netBenefit >= 0
+        ? `+${formatCurrency(r.netBenefit)}`
+        : `−${formatCurrency(Math.abs(r.netBenefit))}`,
+    );
+
+    // Details — penalty breakdown.
+    setText("[data-detail='threemi']", formatCurrency(r.penalty.threeMonthsInterest));
+    setText("[data-detail='ird']", formatCurrency(r.penalty.ird));
+    setText("[data-detail='method']", r.penalty.method);
+
+    // Details — savings breakdown.
+    const spread = Math.max(0, contractRate - compRate);
+    setText("[data-detail='spread']", `${formatPercent(spread)} (${formatPercent(contractRate)} − ${formatPercent(compRate)})`);
+    setText("[data-detail='months']", String(months));
+    setText("[data-detail='savings-detail']", formatCurrency(r.estimatedSavings));
   }
 
   function applyTodaysRates() {
@@ -124,16 +178,64 @@ const defaultComparison = comparison?.rate.discounted ?? 4.0;
     font-size: 0.85rem;
     color: var(--color-muted);
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
   .pen-headline {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0.2rem 0 0.4rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0.25rem 0 0.4rem;
+    line-height: 1.25;
+  }
+  .pen-headline[data-verdict="break"] {
+    color: #16a34a;
+  }
+  .pen-headline[data-verdict="stay"] {
+    color: #b91c1c;
+  }
+  .pen-headline[data-verdict="marginal"] {
+    color: #ca8a04;
   }
   .pen-sub {
+    margin: 0 0 0.75rem;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+  .pen-summary {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.3rem 1rem;
+    border-top: 1px solid var(--color-border, #eee);
+    padding-top: 0.6rem;
+  }
+  .pen-summary > div {
+    display: contents;
+  }
+  .pen-summary dt {
     margin: 0;
     color: var(--color-muted);
     font-size: 0.9rem;
+  }
+  .pen-summary dd {
+    margin: 0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .pen-summary__net dt,
+  .pen-summary__net dd {
+    border-top: 1px solid var(--color-border, #eee);
+    padding-top: 0.4rem;
+    margin-top: 0.2rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .pen-detail-heading {
+    margin: 0.75rem 0 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 600;
   }
   .pen-detail {
     width: 100%;

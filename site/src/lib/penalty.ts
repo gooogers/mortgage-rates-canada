@@ -49,6 +49,40 @@ export interface PenaltyResult {
   method: "3MI" | "IRD";
 }
 
+export interface BreakComparisonResult {
+  penalty: PenaltyResult;
+  /** Approximate interest you'd save over the months remaining by refinancing
+   *  at the new rate. Computed as balance × (current − new) × months/12.
+   *  Approximation: ignores monthly amortization, but accurate enough for the
+   *  go/no-go decision since the balance is roughly flat over the remaining term. */
+  estimatedSavings: number;
+  /** estimatedSavings − penalty.penalty. Positive means breaking saves money. */
+  netBenefit: number;
+  /** "break" / "stay" if clearly one-sided (>$1k either way); "marginal" near zero. */
+  verdict: "break" | "stay" | "marginal";
+}
+
+/** Decide whether breaking the mortgage to refinance saves money over the
+ *  months remaining. Pairs the penalty with an interest-savings estimate. */
+export function compareBreakingMortgage(input: PenaltyInput): BreakComparisonResult {
+  const penalty = calculatePenalty(input);
+  const rateDelta = Math.max(0, input.contractRate - input.comparisonRate) / 100;
+  const estimatedSavings =
+    input.balance * rateDelta * (input.monthsRemaining / 12);
+  const netBenefit = estimatedSavings - penalty.penalty;
+  const THRESHOLD = 1000;
+  let verdict: BreakComparisonResult["verdict"];
+  if (netBenefit > THRESHOLD) verdict = "break";
+  else if (netBenefit < -THRESHOLD) verdict = "stay";
+  else verdict = "marginal";
+  return {
+    penalty,
+    estimatedSavings: Math.round(estimatedSavings * 100) / 100,
+    netBenefit: Math.round(netBenefit * 100) / 100,
+    verdict,
+  };
+}
+
 export function calculatePenalty(input: PenaltyInput): PenaltyResult {
   const balance = Math.max(0, input.balance);
   const contract = Math.max(0, input.contractRate) / 100;

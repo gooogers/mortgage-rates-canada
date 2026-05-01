@@ -3,11 +3,12 @@ import Base from "@layouts/Base.astro";
 import Disclaimer from "@components/Disclaimer.astro";
 import TermIntro from "@components/TermIntro.astro";
 import TermFaq from "@components/TermFaq.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
 import RateHistoryChart from "@components/RateHistoryChart.astro";
 import RelatedGuides from "@components/RelatedGuides.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
 import { loadRatesData, ratesByTerm, type Term } from "@lib/rates";
-import { breadcrumbSchema, faqPageSchema } from "@lib/schemas";
+import { breadcrumbSchema, faqPageSchema, type BreadcrumbItem } from "@lib/schemas";
 
 const TERM_SLUGS: Record<string, Term> = {
   "1-year-fixed": "1yr_fixed",
@@ -152,13 +153,12 @@ const label = formatTermLabel(term);
 const faqItems = FAQS[slug as string] ?? [];
 const relatedSlugs = ["fixed-vs-variable", "affordability"];
 
-const pageSchemas: Record<string, unknown>[] = [
-  breadcrumbSchema([
-    { name: "Home", path: "/" },
-    { name: "Rates", path: "/" },
-    { name: `${label} Mortgage Rates`, path: `/rates/${slug}` },
-  ]),
+const breadcrumbTrail: BreadcrumbItem[] = [
+  { name: "Home", path: "/" },
+  { name: "Rates", path: "/rates" },
+  { name: `${label} Mortgage Rates`, path: `/rates/${slug}` },
 ];
+const pageSchemas: Record<string, unknown>[] = [breadcrumbSchema(breadcrumbTrail)];
 if (faqItems.length > 0) {
   pageSchemas.push(faqPageSchema(faqItems));
 }
@@ -170,6 +170,7 @@ if (faqItems.length > 0) {
   canonical={`https://canadianrates.ca/rates/${slug}`}
   schemas={pageSchemas}
 >
+  <Breadcrumb trail={breadcrumbTrail} />
   <h1>Best {label} Mortgage Rates in Canada</h1>
   <p class="muted">Updated {formatUpdatedAt(data.updated_at)}.</p>
 

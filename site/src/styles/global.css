@@ -165,6 +165,13 @@ a {
   text-decoration: none;
 }
 
+.nav-dropdown__divider {
+  display: block;
+  height: 1px;
+  margin: 0.3rem 0;
+  background: var(--color-border);
+}
+
 /* Mobile nav — collapse to a stacked menu under the hamburger. */
 @media (max-width: 720px) {
   .site-header {

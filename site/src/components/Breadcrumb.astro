@@ -1,0 +1,74 @@
+---
+/**
+ * Visible breadcrumb. Takes the same BreadcrumbItem[] the JSON-LD builder
+ * uses, so the schema and the visible UI never drift.
+ *
+ * The last item is rendered as plain text (current page); preceding items
+ * become links. Separator is a literal "/" — no icon dependency.
+ */
+import type { BreadcrumbItem } from "@lib/schemas";
+
+interface Props {
+  trail: BreadcrumbItem[];
+}
+
+const { trail } = Astro.props;
+---
+
+{trail.length > 1 && (
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol>
+      {trail.map((item, i) => {
+        const isLast = i === trail.length - 1;
+        return (
+          <li>
+            {isLast ? (
+              <span aria-current="page">{item.name}</span>
+            ) : (
+              <>
+                <a href={item.path}>{item.name}</a>
+                <span class="breadcrumb__sep" aria-hidden="true">/</span>
+              </>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .breadcrumb {
+    margin: 0.75rem 0 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+  .breadcrumb ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .breadcrumb li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .breadcrumb a {
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+  .breadcrumb a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  .breadcrumb__sep {
+    color: var(--color-border, #ccc);
+  }
+  .breadcrumb [aria-current="page"] {
+    color: var(--color-fg);
+    font-weight: 500;
+  }
+</style>

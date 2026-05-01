@@ -1,0 +1,154 @@
+---
+import Base from "@layouts/Base.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+import Disclaimer from "@components/Disclaimer.astro";
+import LenderBadge from "@components/LenderBadge.astro";
+import { formatPercent, formatUpdatedAt } from "@lib/format";
+import { loadRatesData, type Lender } from "@lib/rates";
+import { breadcrumbSchema, type BreadcrumbItem } from "@lib/schemas";
+
+const data = await loadRatesData();
+
+// Sort: nationals first (alphabetical), then provincial. Within each group
+// the alphabetical order is stable and reads naturally on the page.
+const lenders = [...data.lenders].sort((a, b) => {
+  const aNational = (a.provinces ?? []).length === 0 ? 0 : 1;
+  const bNational = (b.provinces ?? []).length === 0 ? 0 : 1;
+  if (aNational !== bNational) return aNational - bNational;
+  return a.name.localeCompare(b.name);
+});
+
+function bestRow(lender: Lender) {
+  const five = lender.rates.find((r) => r.term === "5yr_fixed");
+  const variable = lender.rates.find((r) => r.term === "variable");
+  return {
+    five: five ? (five.discounted ?? five.posted) : null,
+    variable: variable ? (variable.discounted ?? variable.posted) : null,
+    isProvincial: (lender.provinces ?? []).length > 0,
+  };
+}
+
+const TYPE_LABEL: Record<Lender["type"], string> = {
+  big6: "Big 6",
+  monoline: "Monoline",
+  credit_union: "Credit union",
+};
+
+const breadcrumbTrail: BreadcrumbItem[] = [
+  { name: "Home", path: "/" },
+  { name: "Lenders", path: "/lenders" },
+];
+const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
+---
+
+<Base
+  title="Canadian Mortgage Lenders"
+  description="Every Canadian mortgage lender Canadian Rates tracks — Big 6 banks, monolines, and provincial credit unions. Today's 5-year fixed and variable rates per lender."
+  canonical="https://canadianrates.ca/lenders"
+  schemas={pageSchemas}
+>
+  <Breadcrumb trail={breadcrumbTrail} />
+  <h1>Canadian mortgage lenders</h1>
+  <p class="muted">Updated {formatUpdatedAt(data.updated_at)}.</p>
+  <p class="lede">
+    Lenders we track. National lenders appear in every province; provincial
+    credit unions are tagged "Local" and only show up on their province
+    pages by default.
+  </p>
+
+  <Disclaimer variant="rate" />
+
+  <table class="lenders-index-table">
+    <thead>
+      <tr>
+        <th>Lender</th>
+        <th>Type</th>
+        <th>5-yr fixed</th>
+        <th>Variable</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {lenders.map((lender) => {
+        const row = bestRow(lender);
+        return (
+          <tr>
+            <td>
+              <span class="lenders-index-table__lender">
+                <LenderBadge slug={lender.slug} name={lender.name} />
+                <a href={`/lenders/${lender.slug}`}>{lender.name}</a>
+                {row.isProvincial && <span class="lenders-index-table__tag">Local</span>}
+              </span>
+            </td>
+            <td>{TYPE_LABEL[lender.type]}</td>
+            <td class="lenders-index-table__rate">
+              {row.five !== null ? formatPercent(row.five) : "—"}
+            </td>
+            <td class="lenders-index-table__rate">
+              {row.variable !== null ? formatPercent(row.variable) : "—"}
+            </td>
+            <td><a href={`/lenders/${lender.slug}`}>View →</a></td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+
+  <p class="lenders-index-also">
+    Looking for the best rate by term across all lenders? See <a href="/rates">
+    rates by term</a>. Or pick a province to surface local credit unions
+    alongside the nationals: <a href="/provinces">rates by province</a>.
+  </p>
+</Base>
+
+<style>
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+  .lede {
+    margin: 1rem 0 1.5rem;
+    line-height: 1.6;
+    max-width: 60ch;
+  }
+  .lenders-index-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 2rem;
+  }
+  .lenders-index-table th,
+  .lenders-index-table td {
+    padding: 0.65rem 0.5rem;
+    border-bottom: 1px solid var(--color-border, #e0e4e8);
+    text-align: left;
+    font-size: 0.95rem;
+  }
+  .lenders-index-table th {
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+  .lenders-index-table__lender {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .lenders-index-table__tag {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0.05rem 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #e8f0fe;
+    color: #1f6feb;
+    border-radius: 3px;
+  }
+  .lenders-index-table__rate {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .lenders-index-also {
+    margin-top: 1.5rem;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+</style>

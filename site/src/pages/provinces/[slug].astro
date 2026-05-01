@@ -1,5 +1,6 @@
 ---
 import Base from "@layouts/Base.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
 import Disclaimer from "@components/Disclaimer.astro";
 import LenderBadge from "@components/LenderBadge.astro";
 import RelatedGuides from "@components/RelatedGuides.astro";
@@ -10,7 +11,7 @@ import {
   loadRatesData,
   type Term,
 } from "@lib/rates";
-import { breadcrumbSchema } from "@lib/schemas";
+import { breadcrumbSchema, type BreadcrumbItem } from "@lib/schemas";
 import { PROVINCES_LIST, type ProvinceData } from "../../data/provinces";
 
 export async function getStaticPaths() {
@@ -43,13 +44,12 @@ const fiveYrSorted = [...provLenders].sort((a, b) => {
 // — surfaced as "local lenders" since the user came here for that.
 const localOnly = provLenders.filter((l) => (l.provinces ?? []).length > 0);
 
-const pageSchemas = [
-  breadcrumbSchema([
-    { name: "Home", path: "/" },
-    { name: "Provinces", path: "/provinces" },
-    { name: province.name, path: `/provinces/${province.slug}` },
-  ]),
+const breadcrumbTrail: BreadcrumbItem[] = [
+  { name: "Home", path: "/" },
+  { name: "Provinces", path: "/provinces" },
+  { name: province.name, path: `/provinces/${province.slug}` },
 ];
+const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
 
 const relatedSlugs = [
   "down-payment",
@@ -65,6 +65,7 @@ const relatedSlugs = [
   canonical={`https://canadianrates.ca/provinces/${province.slug}`}
   schemas={pageSchemas}
 >
+  <Breadcrumb trail={breadcrumbTrail} />
   <h1>Mortgage rates in {province.name}</h1>
   <p class="muted">Updated {formatUpdatedAt(data.updated_at)}.</p>
   <p class="lede">{province.headline}</p>

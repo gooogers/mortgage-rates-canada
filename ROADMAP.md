@@ -38,10 +38,10 @@ The full-site review on 2026-05-01 surfaced 12 concrete improvements. Grouped in
 - **B.1** Content fixes: NS non-resident DTT history (reduced 2024, not repealed 2023); BC 20% Additional PTT geographic qualifier; Big 6 prepayment 15/15–20/20; 2025 GST rebate expansion mention; QC LTT $5,732.50 example correction; "as of 2025" → 2026; "5×" → "3–5×".
 - **B.2** Trim 11 over-length titles (target ≤43 chars page-supplied — auto-append eats 17); tighten 8 over-length meta descriptions to 150–160 chars; beef up 5 thin utility-page descriptions.
 
-### Phase C — Hub pages + structure
-- **C.1** Build `/rates/index.astro` and `/lenders/index.astro` (auto-fixes the breadcrumb URL/name mismatch).
-- **C.2** Build `/calculators/index.astro` listing all 5 tools.
-- **C.3** Visible breadcrumb component on province/term/lender/guide pages; consume the same array the JSON-LD builder uses.
+### Phase C — Hub pages + structure ✅
+- **C.1** ✅ `/rates` and `/lenders` hub pages built; rate/lender detail breadcrumbs now point at the real hubs (no more "name=Rates / item=/" mismatch). Nav updated with "All rates" and "Lenders" entries plus an "All calculators" entry.
+- **C.2** ✅ `/calculators` index built — 5 tool cards with input/output summaries.
+- **C.3** ✅ Shared `Breadcrumb.astro` component renders the same trail used by the JSON-LD builder. Wired into rate, lender, province, guide, and rates/other-terms pages plus all 4 hub indexes.
 
 ### Phase D — Discoverability + cross-linking
 - **D.1** Cross-link lender pages: "Compare with other major banks" + "Best [term] rates" blocks. Add NBC dual-channel editorial note (retail concentrated in QC, broker channel national) and parallel callouts on BC/AB/ON province pages.

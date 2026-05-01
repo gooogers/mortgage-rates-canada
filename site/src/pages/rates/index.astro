@@ -1,0 +1,147 @@
+---
+import Base from "@layouts/Base.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+import Disclaimer from "@components/Disclaimer.astro";
+import LenderBadge from "@components/LenderBadge.astro";
+import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
+import { bestRateForTerm, loadRatesData, type Term } from "@lib/rates";
+import { breadcrumbSchema, type BreadcrumbItem } from "@lib/schemas";
+
+const data = await loadRatesData();
+
+interface RateRow {
+  slug: string;
+  term: Term;
+  blurb: string;
+}
+
+// Sorted by popularity / typical user interest. Mirrors the menu order so
+// expectations match.
+const RATE_ROWS: RateRow[] = [
+  { slug: "5-year-fixed", term: "5yr_fixed", blurb: "The Canadian default. Locked rate, locked payment, five-year horizon." },
+  { slug: "3-year-fixed", term: "3yr_fixed", blurb: "Often cheaper than 5-year when the curve is inverted; better if you expect cuts." },
+  { slug: "variable", term: "variable", blurb: "Floats with the lender's prime. Cheaper to break (3 months' interest) than fixed." },
+  { slug: "1-year-fixed", term: "1yr_fixed", blurb: "Short fixed for transitional plans or aggressive views on near-term cuts." },
+  { slug: "2-year-fixed", term: "2yr_fixed", blurb: "Rare but occasionally well-priced. Useful when 24 months matches your plans." },
+  { slug: "4-year-fixed", term: "4yr_fixed", blurb: "Less liquid bond market behind it; rarely the cheapest option." },
+  { slug: "7-year-fixed", term: "7yr_fixed", blurb: "Premium over 5-year for two more years of certainty. Worth it only if the spread is small." },
+  { slug: "10-year-fixed", term: "10yr_fixed", blurb: "Effectively a 5-year with worse pricing — federal law caps the post-year-5 penalty at 3MI." },
+];
+
+const rows = RATE_ROWS.map((r) => ({ ...r, best: bestRateForTerm(data, r.term) }));
+
+const breadcrumbTrail: BreadcrumbItem[] = [
+  { name: "Home", path: "/" },
+  { name: "Rates", path: "/rates" },
+];
+const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
+---
+
+<Base
+  title="Best Canadian Mortgage Rates"
+  description="Compare the best discounted Canadian mortgage rates by term — 5-year fixed, 3-year fixed, variable, plus less-common terms — from major banks and credit unions."
+  canonical="https://canadianrates.ca/rates"
+  schemas={pageSchemas}
+>
+  <Breadcrumb trail={breadcrumbTrail} />
+  <h1>Canadian mortgage rates by term</h1>
+  <p class="muted">Updated {formatUpdatedAt(data.updated_at)}.</p>
+  <p class="lede">
+    Best discounted rate across tracked lenders, by term. Each row links to
+    the full ranking for that term, including national lenders and provincial
+    credit unions.
+  </p>
+
+  <Disclaimer variant="rate" />
+
+  <table class="rates-index-table">
+    <thead>
+      <tr>
+        <th>Term</th>
+        <th>Best discounted rate</th>
+        <th>Lender</th>
+        <th>Why it might be the right pick</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ slug, term, blurb, best }) => (
+        <tr>
+          <td>
+            <a href={`/rates/${slug}`}>
+              <strong>{formatTermLabel(term)}</strong>
+            </a>
+          </td>
+          <td class="rates-index-table__rate">
+            {best ? <strong>{formatPercent(best.rate.discounted ?? best.rate.posted)}</strong> : "—"}
+          </td>
+          <td>
+            {best ? (
+              <span class="rates-index-table__lender">
+                <LenderBadge slug={best.lender.slug} name={best.lender.name} />
+                <a href={`/lenders/${best.lender.slug}`}>{best.lender.name}</a>
+              </span>
+            ) : (
+              "—"
+            )}
+          </td>
+          <td class="rates-index-table__blurb">{blurb}</td>
+          <td><a href={`/rates/${slug}`}>See all →</a></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <p class="rates-index-also">
+    Looking for province-specific rankings? See <a href="/provinces">rates by province</a>,
+    where provincial credit unions are surfaced alongside national lenders.
+  </p>
+</Base>
+
+<style>
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+  .lede {
+    margin: 1rem 0 1.5rem;
+    line-height: 1.6;
+    max-width: 60ch;
+  }
+  .rates-index-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 2rem;
+  }
+  .rates-index-table th,
+  .rates-index-table td {
+    padding: 0.65rem 0.5rem;
+    border-bottom: 1px solid var(--color-border, #e0e4e8);
+    text-align: left;
+    font-size: 0.95rem;
+    vertical-align: top;
+  }
+  .rates-index-table th {
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+  .rates-index-table__rate {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .rates-index-table__lender {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .rates-index-table__blurb {
+    color: var(--color-fg, #222);
+    line-height: 1.5;
+    max-width: 38ch;
+  }
+  .rates-index-also {
+    margin-top: 1.5rem;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+</style>

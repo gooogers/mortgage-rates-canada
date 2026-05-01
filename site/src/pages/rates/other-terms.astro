@@ -1,10 +1,11 @@
 ---
 import Base from "@layouts/Base.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
 import Disclaimer from "@components/Disclaimer.astro";
 import LenderBadge from "@components/LenderBadge.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
 import { bestRateForTerm, loadRatesData, type Term } from "@lib/rates";
-import { breadcrumbSchema } from "@lib/schemas";
+import { breadcrumbSchema, type BreadcrumbItem } from "@lib/schemas";
 
 interface OtherTerm {
   slug: string;
@@ -48,13 +49,12 @@ const rows = OTHER_TERMS.map((t) => ({
   best: bestRateForTerm(data, t.term),
 }));
 
-const pageSchemas = [
-  breadcrumbSchema([
-    { name: "Home", path: "/" },
-    { name: "Rates", path: "/" },
-    { name: "Other terms", path: "/rates/other-terms" },
-  ]),
+const breadcrumbTrail: BreadcrumbItem[] = [
+  { name: "Home", path: "/" },
+  { name: "Rates", path: "/rates" },
+  { name: "Other terms", path: "/rates/other-terms" },
 ];
+const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
 ---
 
 <Base
@@ -63,6 +63,7 @@ const pageSchemas = [
   canonical="https://canadianrates.ca/rates/other-terms"
   schemas={pageSchemas}
 >
+  <Breadcrumb trail={breadcrumbTrail} />
   <h1>Other mortgage terms</h1>
   <p class="muted">Updated {formatUpdatedAt(data.updated_at)}.</p>
 

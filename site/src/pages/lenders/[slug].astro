@@ -1,12 +1,13 @@
 ---
 import Base from "@layouts/Base.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
 import Disclaimer from "@components/Disclaimer.astro";
 import LenderFacts from "@components/LenderFacts.astro";
 import RelatedGuides from "@components/RelatedGuides.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
 import { loadRatesData } from "@lib/rates";
 import { getLenderFacts, renderLenderIntro } from "@lib/lenderFacts";
-import { breadcrumbSchema, financialServiceSchema } from "@lib/schemas";
+import { breadcrumbSchema, financialServiceSchema, type BreadcrumbItem } from "@lib/schemas";
 
 export async function getStaticPaths() {
   const data = await loadRatesData();
@@ -24,12 +25,13 @@ const facts = getLenderFacts(lender.slug);
 const intro = facts ? renderLenderIntro(facts) : null;
 
 const pageUrl = `https://canadianrates.ca/lenders/${lender.slug}`;
+const breadcrumbTrail: BreadcrumbItem[] = [
+  { name: "Home", path: "/" },
+  { name: "Lenders", path: "/lenders" },
+  { name: lender.name, path: `/lenders/${lender.slug}` },
+];
 const pageSchemas = [
-  breadcrumbSchema([
-    { name: "Home", path: "/" },
-    { name: "Lenders", path: "/" },
-    { name: lender.name, path: `/lenders/${lender.slug}` },
-  ]),
+  breadcrumbSchema(breadcrumbTrail),
   financialServiceSchema({
     name: lender.name,
     url: lender.source_url,
@@ -44,6 +46,7 @@ const pageSchemas = [
   canonical={pageUrl}
   schemas={pageSchemas}
 >
+  <Breadcrumb trail={breadcrumbTrail} />
   <h1>{lender.name} Mortgage Rates</h1>
   <p class="muted">
     Source: <a href={lender.source_url} rel="noopener" target="_blank">{lender.source_url}</a>

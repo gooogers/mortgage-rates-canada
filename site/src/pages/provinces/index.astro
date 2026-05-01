@@ -1,8 +1,9 @@
 ---
 import Base from "@layouts/Base.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
 import { formatPercent } from "@lib/format";
 import { bestRateForTermInScope, loadRatesData } from "@lib/rates";
-import { breadcrumbSchema } from "@lib/schemas";
+import { breadcrumbSchema, type BreadcrumbItem } from "@lib/schemas";
 import { PROVINCES_LIST } from "../../data/provinces";
 
 const data = await loadRatesData();
@@ -17,12 +18,11 @@ const rows = PROVINCES_LIST.map((p) => {
   };
 });
 
-const pageSchemas = [
-  breadcrumbSchema([
-    { name: "Home", path: "/" },
-    { name: "Provinces", path: "/provinces" },
-  ]),
+const breadcrumbTrail: BreadcrumbItem[] = [
+  { name: "Home", path: "/" },
+  { name: "Provinces", path: "/provinces" },
 ];
+const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
 ---
 
 <Base
@@ -31,6 +31,7 @@ const pageSchemas = [
   canonical="https://canadianrates.ca/provinces"
   schemas={pageSchemas}
 >
+  <Breadcrumb trail={breadcrumbTrail} />
   <h1>Mortgage rates by province</h1>
   <p class="muted">
     Each province has its own land transfer tax, first-time buyer programs,

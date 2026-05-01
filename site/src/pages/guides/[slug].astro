@@ -2,9 +2,10 @@
 import { getCollection, render } from "astro:content";
 import Base from "@layouts/Base.astro";
 import AuthorByline from "@components/AuthorByline.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
 import RelatedGuides from "@components/RelatedGuides.astro";
 import type { Guide } from "@lib/guides";
-import { breadcrumbSchema } from "@lib/schemas";
+import { breadcrumbSchema, type BreadcrumbItem } from "@lib/schemas";
 
 export async function getStaticPaths() {
   const guides = await getCollection("guides");
@@ -33,11 +34,12 @@ const articleSchema = {
   },
 };
 
-const breadcrumb = breadcrumbSchema([
+const breadcrumbTrail: BreadcrumbItem[] = [
   { name: "Home", path: "/" },
   { name: "Guides", path: "/guides" },
-  { name: entry.data.title, path: `/guides/${entry.slug}` },
-]);
+  { name: entry.data.seo_title ?? entry.data.title, path: `/guides/${entry.slug}` },
+];
+const breadcrumb = breadcrumbSchema(breadcrumbTrail);
 ---
 
 <Base
@@ -46,6 +48,7 @@ const breadcrumb = breadcrumbSchema([
   canonical={`https://canadianrates.ca/guides/${entry.slug}`}
   schemas={[articleSchema, breadcrumb]}
 >
+  <Breadcrumb trail={breadcrumbTrail} />
   <article class="guide">
     <h1>{entry.data.title}</h1>
     <AuthorByline lastReviewedAt={entry.data.last_reviewed_at} />

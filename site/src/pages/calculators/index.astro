@@ -1,0 +1,157 @@
+---
+import Base from "@layouts/Base.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+import { breadcrumbSchema, type BreadcrumbItem } from "@lib/schemas";
+
+interface CalcCard {
+  href: string;
+  title: string;
+  blurb: string;
+  inputs: string;
+  output: string;
+}
+
+// Each tool's "Open" link points at the page that hosts it. The dedicated
+// payment calculator lives at /calculator; the other four are embedded in
+// guides where the supporting prose belongs alongside the math.
+const CALCULATORS: CalcCard[] = [
+  {
+    href: "/calculator",
+    title: "Mortgage Payment Calculator",
+    blurb: "Estimate your payment, total interest, and CMHC premium with the Canadian semi-annual compounding convention.",
+    inputs: "Home price, down payment %, rate, amortization, frequency.",
+    output: "Per-payment dollars, CMHC premium, total interest, total cost. Includes a balance + cumulative-interest line chart.",
+  },
+  {
+    href: "/guides/affordability",
+    title: "Mortgage Affordability Calculator",
+    blurb: "How much mortgage you'd qualify for under GDS/TDS ratios and the federal stress test, plus a rate-sensitivity bar chart.",
+    inputs: "Income, debts, property tax, heat, condo fees, down payment, rate, amortization.",
+    output: "Maximum purchase price + binding constraint (GDS or TDS), with a chart of how the max moves at ±2pp around your rate.",
+  },
+  {
+    href: "/guides/fixed-vs-variable",
+    title: "Fixed vs Variable Mortgage Calculator",
+    blurb: "Model the break-even between locking in a fixed rate and riding a variable through hold/cuts/hike scenarios.",
+    inputs: "Loan amount, amortization, term length, fixed rate, variable rate, projected variable-rate change, pace.",
+    output: "Total interest under each path, winner, and a side-by-side cumulative-interest chart over the term.",
+  },
+  {
+    href: "/guides/break-the-mortgage",
+    title: "Mortgage Break Penalty Calculator",
+    blurb: "Estimate the 3 months' interest or IRD penalty before breaking — and net it against the interest you'd save by refinancing.",
+    inputs: "Balance, current rate, months remaining, mortgage type, today's rate, posted-rate spread (Big 6 only).",
+    output: "Break/Stay/Marginal verdict with the net dollar impact, plus penalty and savings breakdowns.",
+  },
+  {
+    href: "/guides/closing-costs",
+    title: "Closing Costs Calculator",
+    blurb: "Province-aware land transfer tax, municipal LTT (Toronto/Halifax/Montreal), first-time buyer rebates, and standard closing fees.",
+    inputs: "Purchase price, province, city, first-time buyer flag, new-build flag, optional fee overrides.",
+    output: "Net LTT (provincial − municipal − rebate), legal/title/inspection, total closing costs.",
+  },
+];
+
+const breadcrumbTrail: BreadcrumbItem[] = [
+  { name: "Home", path: "/" },
+  { name: "Calculators", path: "/calculators" },
+];
+const pageSchemas = [breadcrumbSchema(breadcrumbTrail)];
+---
+
+<Base
+  title="Canadian Mortgage Calculators"
+  description="Five Canadian mortgage calculators: payment, affordability, fixed vs variable, break penalty, and closing costs. Math is open-source and unit-tested."
+  canonical="https://canadianrates.ca/calculators"
+  schemas={pageSchemas}
+>
+  <Breadcrumb trail={breadcrumbTrail} />
+  <h1>Canadian mortgage calculators</h1>
+  <p class="lede">
+    Five tools for the decisions you'll actually face when getting or
+    renewing a Canadian mortgage. The math behind each one is implemented
+    as pure functions with unit tests, so the calculator and our test
+    suite use the same code.
+  </p>
+
+  <div class="calc-grid">
+    {CALCULATORS.map((c) => (
+      <a class="calc-card" href={c.href}>
+        <h2 class="calc-card__title">{c.title}</h2>
+        <p class="calc-card__blurb">{c.blurb}</p>
+        <dl class="calc-card__io">
+          <dt>Inputs</dt>
+          <dd>{c.inputs}</dd>
+          <dt>Output</dt>
+          <dd>{c.output}</dd>
+        </dl>
+        <span class="calc-card__cta">Open calculator →</span>
+      </a>
+    ))}
+  </div>
+
+  <p class="calc-also">
+    See <a href="/methodology">how we build and test the calculators</a>.
+  </p>
+</Base>
+
+<style>
+  .lede {
+    margin: 1rem 0 2rem;
+    line-height: 1.65;
+    max-width: 65ch;
+  }
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+  }
+  .calc-card {
+    display: block;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--color-border, #e0e4e8);
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+    background: var(--color-surface, #fafbfc);
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .calc-card:hover {
+    border-color: var(--color-accent, #0066cc);
+    transform: translateY(-2px);
+  }
+  .calc-card__title {
+    margin: 0 0 0.5rem;
+    font-size: 1.15rem;
+  }
+  .calc-card__blurb {
+    margin: 0 0 0.75rem;
+    line-height: 1.5;
+    color: var(--color-fg);
+  }
+  .calc-card__io {
+    margin: 0 0 0.75rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .calc-card__io dt {
+    font-weight: 600;
+    color: var(--color-muted);
+    margin-top: 0.4rem;
+  }
+  .calc-card__io dd {
+    margin: 0;
+    color: var(--color-fg);
+  }
+  .calc-card__cta {
+    color: var(--color-accent, #0066cc);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .calc-also {
+    margin-top: 1rem;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+</style>

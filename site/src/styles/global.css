@@ -68,16 +68,60 @@ a {
   gap: 1rem;
 }
 
-.site-header__nav a {
+.site-header__nav a,
+.site-header__nav .nav-dropdown__trigger {
   color: var(--color-fg);
   text-decoration: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
-.site-header__nav a:hover {
+.site-header__nav a:hover,
+.site-header__nav .nav-dropdown__trigger:hover {
   text-decoration: underline;
 }
 
-/* Calculators dropdown */
+.nav-dropdown__trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Hamburger — hidden on desktop, visible <720px (see media query below). */
+.site-header__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.site-header__hamburger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--color-fg);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.site-header__hamburger[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.site-header__hamburger[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+.site-header__hamburger[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Dropdowns */
 .nav-dropdown {
   position: relative;
 }
@@ -98,8 +142,14 @@ a {
   z-index: 10;
 }
 
-.nav-dropdown:hover .nav-dropdown__menu,
-.nav-dropdown:focus-within .nav-dropdown__menu {
+/* Desktop: hover/focus opens; click-toggle (--open) also opens. */
+@media (hover: hover) {
+  .nav-dropdown:hover .nav-dropdown__menu,
+  .nav-dropdown:focus-within .nav-dropdown__menu {
+    display: block;
+  }
+}
+.nav-dropdown--open .nav-dropdown__menu {
   display: block;
 }
 
@@ -113,6 +163,53 @@ a {
 .nav-dropdown__menu a:hover {
   background: var(--color-bg-muted, #f5f5f5);
   text-decoration: none;
+}
+
+/* Mobile nav — collapse to a stacked menu under the hamburger. */
+@media (max-width: 720px) {
+  .site-header {
+    flex-wrap: wrap;
+  }
+  .site-header__hamburger {
+    display: flex;
+  }
+  .site-header__nav {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .site-header__nav--open {
+    display: flex;
+  }
+  .site-header__nav > a,
+  .site-header__nav .nav-dropdown {
+    padding: 0.85rem 0.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .site-header__nav .nav-dropdown__trigger {
+    width: 100%;
+    text-align: left;
+    display: block;
+  }
+  /* On mobile, dropdowns expand inline rather than floating. */
+  .nav-dropdown__menu {
+    position: static;
+    margin-top: 0.5rem;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    background: transparent;
+    min-width: 0;
+  }
+  .nav-dropdown__menu a {
+    padding: 0.6rem 0.75rem;
+  }
 }
 
 /* Footer */

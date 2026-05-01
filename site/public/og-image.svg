@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fafbfc"/>
+      <stop offset="100%" stop-color="#eef1f5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Brand mark: chevron + maple stripe, scaled-up version of the favicon -->
+  <g transform="translate(110, 165)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M0 200 L130 30 L260 200" stroke="#1f2937" stroke-width="22"/>
+    <path d="M0 240 L260 240" stroke="#C8102E" stroke-width="18"/>
+  </g>
+
+  <!-- Wordmark + tagline -->
+  <text x="430" y="270" font-family="-apple-system, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="84" font-weight="700" fill="#0f172a">
+    Canadian Rates
+  </text>
+  <text x="430" y="345" font-family="-apple-system, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="38" font-weight="500" fill="#475569">
+    Compare today's posted and discounted
+  </text>
+  <text x="430" y="395" font-family="-apple-system, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="38" font-weight="500" fill="#475569">
+    mortgage rates across Canada.
+  </text>
+
+  <!-- Bottom strip -->
+  <rect x="0" y="588" width="1200" height="42" fill="#0f172a"/>
+  <text x="600" y="616" text-anchor="middle" font-family="-apple-system, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="600" fill="#fafbfc" letter-spacing="2">
+    canadianrates.ca
+  </text>
+</svg>

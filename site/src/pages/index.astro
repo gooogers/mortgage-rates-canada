@@ -6,12 +6,29 @@ import HeroFeaturedRates from "@components/HeroFeaturedRates.astro";
 import RateHistoryChart from "@components/RateHistoryChart.astro";
 import RateTable from "@components/RateTable.astro";
 import { formatUpdatedAt } from "@lib/format";
-import { getAllGuides } from "@lib/guides";
+import { getGuidesBySlug } from "@lib/guides";
 import { loadRatesData } from "@lib/rates";
+import { loadRateHistory } from "@lib/rateHistory";
 
 const data = await loadRatesData();
-const guides = await getAllGuides();
-guides.sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+// Surface the four most decision-shaped guides on the homepage. Full
+// list lives at /guides — the homepage shouldn't double as the index.
+const FEATURED_GUIDE_SLUGS = [
+  "fixed-vs-variable",
+  "affordability",
+  "bank-vs-broker",
+  "stress-test",
+];
+const featuredGuides = await getGuidesBySlug(FEATURED_GUIDE_SLUGS);
+
+// Only render the rate-trend chart once we've collected at least two
+// distinct days of snapshots — empty-state below the rate table is
+// visual noise on a fresh deploy. Component still handles its own
+// pending message defensively.
+const history = await loadRateHistory();
+const distinctDates = new Set(history.snapshots.map((s) => s.date));
+const showRateTrend = distinctDates.size >= 2;
 ---
 
 <Base
@@ -36,17 +53,19 @@ guides.sort((a, b) => a.data.title.localeCompare(b.data.title));
     </p>
   </section>
 
-  <RateHistoryChart
-    terms={["5yr_fixed", "3yr_fixed", "variable"]}
-    heading="Rate trend (best discounted)"
-    caption="Lowest discounted rate across tracked lenders, by day."
-  />
+  {showRateTrend && (
+    <RateHistoryChart
+      terms={["5yr_fixed", "3yr_fixed", "variable"]}
+      heading="Rate trend (best discounted)"
+      caption="Lowest discounted rate across tracked lenders, by day."
+    />
+  )}
 
   <section class="learn-section">
     <h2>Learn before you choose</h2>
-    <p class="muted">Plain-English guides covering the decisions every Canadian homeowner faces.</p>
+    <p class="muted">A few of the decisions every Canadian homeowner faces — see all guides for the full set.</p>
     <div class="learn-grid">
-      {guides.map((g) => (
+      {featuredGuides.map((g) => (
         <GuideCard
           href={`/guides/${g.slug}`}
           title={g.data.title}
@@ -73,22 +92,15 @@ guides.sort((a, b) => a.data.title.localeCompare(b.data.title));
         <p class="tool-card__desc">See your maximum approval based on GDS/TDS ratios and the federal stress test.</p>
         <span class="tool-card__cta">Open →</span>
       </a>
-      <a class="tool-card" href="/guides/fixed-vs-variable">
-        <h3 class="tool-card__title">Fixed vs Variable</h3>
-        <p class="tool-card__desc">Model the break-even point between locking in a fixed rate and riding a variable.</p>
-        <span class="tool-card__cta">Open →</span>
-      </a>
-      <a class="tool-card" href="/guides/break-the-mortgage">
-        <h3 class="tool-card__title">Break Penalty</h3>
-        <p class="tool-card__desc">Estimate the 3-month-interest or IRD penalty before you break a closed mortgage to refinance.</p>
-        <span class="tool-card__cta">Open →</span>
-      </a>
       <a class="tool-card" href="/guides/closing-costs">
         <h3 class="tool-card__title">Closing Costs</h3>
         <p class="tool-card__desc">Province-aware land transfer tax + legal + title + inspection. Toronto MLTT and first-time buyer rebates baked in.</p>
         <span class="tool-card__cta">Open →</span>
       </a>
     </div>
+    <p>
+      <a href="/calculators">All calculators →</a>
+    </p>
   </section>
 </Base>
 

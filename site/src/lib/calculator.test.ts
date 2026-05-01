@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateMortgage, cmhcPremiumRate } from "@lib/calculator";
+import { buildAmortization, calculateMortgage, cmhcPremiumRate } from "@lib/calculator";
 
 describe("cmhcPremiumRate", () => {
   it("returns 0 when down payment is 20% or more", () => {
@@ -110,5 +110,46 @@ describe("calculateMortgage", () => {
     expect(result.principal).toBe(192_000);
     expect(result.payment).toBeCloseTo(800, 2);
     expect(result.totalInterest).toBeCloseTo(0, 2);
+  });
+});
+
+describe("buildAmortization", () => {
+  const baseInput = {
+    homePrice: 500_000,
+    downPaymentPct: 0.20,
+    annualRatePct: 5.0,
+    amortizationYears: 25,
+    frequency: "monthly" as const,
+  };
+
+  it("starts at the loan amount and ends near zero", () => {
+    const sched = buildAmortization(baseInput);
+    expect(sched.balance).toHaveLength(301); // 25 * 12 + 1
+    expect(sched.balance[0]).toBe(400_000);
+    expect(sched.balance[sched.balance.length - 1]).toBeCloseTo(0, 1);
+  });
+
+  it("cumulative interest matches calculateMortgage's total interest", () => {
+    const sched = buildAmortization(baseInput);
+    const result = calculateMortgage(baseInput);
+    expect(sched.cumulativeInterest[0]).toBe(0);
+    expect(sched.cumulativeInterest[sched.cumulativeInterest.length - 1]).toBeCloseTo(
+      result.totalInterest,
+      0,
+    );
+  });
+
+  it("balance is monotonically non-increasing across the schedule", () => {
+    const sched = buildAmortization(baseInput);
+    for (let i = 1; i < sched.balance.length; i++) {
+      expect(sched.balance[i]).toBeLessThanOrEqual(sched.balance[i - 1] + 1e-6);
+    }
+  });
+
+  it("handles bi-weekly frequency with 26 periods per year", () => {
+    const sched = buildAmortization({ ...baseInput, frequency: "biweekly" });
+    expect(sched.paymentsPerYear).toBe(26);
+    expect(sched.balance).toHaveLength(25 * 26 + 1);
+    expect(sched.balance[sched.balance.length - 1]).toBeCloseTo(0, 1);
   });
 });

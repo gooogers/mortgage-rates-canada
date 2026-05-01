@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { calculateAffordability, qualifyingRate } from "@lib/affordability";
+import {
+  affordabilityRateSensitivity,
+  calculateAffordability,
+  qualifyingRate,
+} from "@lib/affordability";
 
 describe("qualifyingRate", () => {
   it("uses contract + 2 when above floor", () => {
@@ -60,5 +64,40 @@ describe("calculateAffordability", () => {
     const noCondo = calculateAffordability(base);
     const withCondo = calculateAffordability({ ...base, estimatedCondoFees: 600 });
     expect(withCondo.maxMortgage).toBeLessThan(noCondo.maxMortgage);
+  });
+});
+
+describe("affordabilityRateSensitivity", () => {
+  const base = {
+    grossAnnualIncome: 120_000,
+    monthlyDebts: 500,
+    estimatedPropertyTax: 400,
+    estimatedHeat: 100,
+    estimatedCondoFees: 0,
+    downPayment: 80_000,
+    contractRate: 5.0,
+    amortizationYears: 25,
+  };
+
+  it("returns one point per offset and flags the user's contract rate", () => {
+    const points = affordabilityRateSensitivity(base);
+    expect(points).toHaveLength(6);
+    const current = points.filter((p) => p.current);
+    expect(current).toHaveLength(1);
+    expect(current[0].contractRate).toBeCloseTo(5.0);
+  });
+
+  it("max purchase price decreases monotonically as rate rises", () => {
+    const points = affordabilityRateSensitivity(base);
+    for (let i = 1; i < points.length; i++) {
+      expect(points[i].maxPurchasePrice).toBeLessThanOrEqual(
+        points[i - 1].maxPurchasePrice + 1e-6,
+      );
+    }
+  });
+
+  it("clamps negative rates to zero", () => {
+    const points = affordabilityRateSensitivity({ ...base, contractRate: 1.0 }, [-3, 0]);
+    expect(points[0].contractRate).toBe(0);
   });
 });

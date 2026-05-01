@@ -96,3 +96,32 @@ export function calculateAffordability(input: AffordabilityInput): Affordability
     bindingConstraint,
   };
 }
+
+export interface RateSensitivityPoint {
+  contractRate: number; // %
+  maxPurchasePrice: number;
+  /** True for the contract rate the user actually entered. */
+  current: boolean;
+}
+
+/**
+ * Recompute max purchase price across a band of contract rates around the
+ * user's input — typically contract−2pp through contract+3pp. Surfaces how
+ * sensitive the approval ceiling is to rate moves; the stress test means a
+ * 1pp swing in the contract rate moves the qualifying rate by exactly 1pp,
+ * which compounds into a meaningful change in maximum mortgage.
+ */
+export function affordabilityRateSensitivity(
+  input: AffordabilityInput,
+  offsets: number[] = [-2, -1, 0, 1, 2, 3],
+): RateSensitivityPoint[] {
+  return offsets.map((delta) => {
+    const rate = Math.max(0, input.contractRate + delta);
+    const r = calculateAffordability({ ...input, contractRate: rate });
+    return {
+      contractRate: rate,
+      maxPurchasePrice: r.maxPurchasePrice,
+      current: delta === 0,
+    };
+  });
+}

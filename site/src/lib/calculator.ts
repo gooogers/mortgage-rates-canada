@@ -91,6 +91,53 @@ export function calculateMortgage(input: MortgageInput): MortgageResult {
   };
 }
 
+export interface AmortizationSchedule {
+  /** Remaining loan balance after each period. Length = totalPayments + 1. */
+  balance: number[];
+  /** Cumulative interest paid through each period. Length = totalPayments + 1. */
+  cumulativeInterest: number[];
+  /** Payments per year for chart x-axis scaling. */
+  paymentsPerYear: number;
+}
+
+/**
+ * Period-by-period amortization schedule. Index 0 is the starting state
+ * (balance = totalLoan, interest = 0); index N is end of amortization
+ * (balance ≈ 0, interest = totalInterest). Useful for plotting balance
+ * and cumulative interest curves over the life of the loan.
+ */
+export function buildAmortization(input: MortgageInput): AmortizationSchedule {
+  const result = calculateMortgage(input);
+  const paymentsPerYear = result.paymentsPerYear;
+  const totalPayments = paymentsPerYear * input.amortizationYears;
+
+  // Periodic rate matching the cash-flow frequency. Accelerated bi-weekly is
+  // 26 payments/year of size monthly_payment/2; the periodic rate the loan
+  // experiences is still the bi-weekly compounding rate, not the monthly rate.
+  const annualRate = input.annualRatePct / 100;
+  const effectiveAnnual = Math.pow(1 + annualRate / 2, 2) - 1;
+  const periodicRate =
+    annualRate === 0 ? 0 : Math.pow(1 + effectiveAnnual, 1 / paymentsPerYear) - 1;
+
+  const balance: number[] = new Array(totalPayments + 1);
+  const cumulativeInterest: number[] = new Array(totalPayments + 1);
+  balance[0] = result.totalLoan;
+  cumulativeInterest[0] = 0;
+
+  let bal = result.totalLoan;
+  let interestSum = 0;
+  for (let m = 1; m <= totalPayments; m++) {
+    const interest = bal * periodicRate;
+    const principal = result.payment - interest;
+    bal = Math.max(0, bal - principal);
+    interestSum += interest;
+    balance[m] = bal;
+    cumulativeInterest[m] = interestSum;
+  }
+
+  return { balance, cumulativeInterest, paymentsPerYear };
+}
+
 function computePayment(
   totalLoan: number,
   annualRatePct: number,

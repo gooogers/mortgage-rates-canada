@@ -358,3 +358,51 @@ a {
   font-weight: 700;
   color: var(--color-accent);
 }
+
+.calculator__chart {
+  margin: 1.5rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.calculator__chart-caption {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin: 0 0 0.5rem;
+}
+
+.calculator__chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 480px;
+}
+
+.calculator__chart-legend {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-top: 0.25rem;
+}
+
+.calculator__chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.calculator__chart-legend-item::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 2px;
+}
+
+.calculator__chart-legend-item--balance::before {
+  background: #1f6feb;
+}
+
+.calculator__chart-legend-item--interest::before {
+  background: #d97706;
+}

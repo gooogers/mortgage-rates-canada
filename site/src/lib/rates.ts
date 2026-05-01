@@ -156,6 +156,46 @@ export function bestRateForTerm(
   return best;
 }
 
+/**
+ * Best rate within a province scope. `province === ""` means "national lenders
+ * only" — the All-Canada view. A province code includes national lenders plus
+ * any provincial lender available there. Mirrors the visibility rules
+ * RateTable applies to its rows and HeroFeaturedRates uses for its cards.
+ */
+export function bestRateForTermInScope(
+  data: RatesData,
+  term: Term,
+  province: string,
+): BestRate | null {
+  let best: BestRate | null = null;
+  let bestRate = Infinity;
+  for (const lender of data.lenders) {
+    const provs = lender.provinces ?? [];
+    const isNational = provs.length === 0;
+    const matches = isNational || (province !== "" && provs.includes(province as Province));
+    if (!matches) continue;
+    const rate = lender.rates.find((r) => r.term === term);
+    if (!rate) continue;
+    const effective = rate.discounted ?? rate.posted;
+    if (effective < bestRate) {
+      bestRate = effective;
+      best = { lender, rate };
+    }
+  }
+  return best;
+}
+
+/** Lenders visible in a given province scope (national + provincial that operate there). */
+export function lendersInScope(data: RatesData, province: string): Lender[] {
+  if (province === "") {
+    return data.lenders.filter((l) => (l.provinces ?? []).length === 0);
+  }
+  return data.lenders.filter((l) => {
+    const provs = l.provinces ?? [];
+    return provs.length === 0 || provs.includes(province as Province);
+  });
+}
+
 /** Return one (lender, rate) entry per lender for the given term, sorted by discounted ascending. */
 export function ratesByTerm(data: RatesData, term: Term): BestRate[] {
   const entries: BestRate[] = [];

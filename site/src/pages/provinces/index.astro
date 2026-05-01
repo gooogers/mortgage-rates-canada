@@ -1,0 +1,94 @@
+---
+import Base from "@layouts/Base.astro";
+import { formatPercent } from "@lib/format";
+import { bestRateForTermInScope, loadRatesData } from "@lib/rates";
+import { breadcrumbSchema } from "@lib/schemas";
+import { PROVINCES_LIST } from "../../data/provinces";
+
+const data = await loadRatesData();
+
+const rows = PROVINCES_LIST.map((p) => {
+  const best5 = bestRateForTermInScope(data, "5yr_fixed", p.code);
+  const bestVar = bestRateForTermInScope(data, "variable", p.code);
+  return {
+    province: p,
+    best5,
+    bestVar,
+  };
+});
+
+const pageSchemas = [
+  breadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Provinces", path: "/provinces" },
+  ]),
+];
+---
+
+<Base
+  title="Best Mortgage Rates by Province | Canadian Rates"
+  description="Best mortgage rates in every Canadian province. Provincial credit unions, land transfer tax, and first-time home buyer programs for Ontario, BC, Quebec, Alberta, and the rest of Canada."
+  canonical="https://canadianrates.ca/provinces"
+  schemas={pageSchemas}
+>
+  <h1>Mortgage rates by province</h1>
+  <p class="muted">
+    Each province has its own land transfer tax, first-time buyer programs,
+    and provincial credit unions. The pages below surface the best rates
+    available in each province — including provincial lenders that don't
+    appear in the national view.
+  </p>
+
+  <table class="prov-table">
+    <thead>
+      <tr>
+        <th>Province</th>
+        <th>Best 5-year fixed</th>
+        <th>Best variable</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(({ province, best5, bestVar }) => (
+        <tr>
+          <td><strong><a href={`/provinces/${province.slug}`}>{province.name}</a></strong></td>
+          <td class="prov-table__rate">
+            {best5 ? formatPercent(best5.rate.discounted ?? best5.rate.posted) : "—"}
+          </td>
+          <td class="prov-table__rate">
+            {bestVar ? formatPercent(bestVar.rate.discounted ?? bestVar.rate.posted) : "—"}
+          </td>
+          <td><a href={`/provinces/${province.slug}`}>View →</a></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</Base>
+
+<style>
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+  .prov-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+  }
+  .prov-table th,
+  .prov-table td {
+    padding: 0.65rem 0.5rem;
+    border-bottom: 1px solid var(--color-border, #e0e4e8);
+    text-align: left;
+    font-size: 0.95rem;
+  }
+  .prov-table th {
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+  .prov-table__rate {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+</style>

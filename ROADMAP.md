@@ -2,27 +2,21 @@
 
 Tracks committed-but-not-yet-built improvements. Items here are decided; the prioritization is fixed unless the user revises it.
 
+## Done
+
+### 1. Rate history charts ✅
+
+Daily snapshots aggregated by `snapshot-rates.mjs` into `rates-history.json`; SVG line chart on home page (5/3/variable) and per-term pages (single line). Empty-state until ≥2 days; methodology page documents the no-synthesised-history rule. Shipped in commit `a458a9f`.
+
+### 2. Province landing pages ✅
+
+`/provinces/[slug]` for all 10 provinces, plus a `/provinces` index. Each page surfaces best rates within the province scope (national + provincial lenders), the full provincial rate table with "Local" tags on credit unions, LTT summary with municipal add-ons (Toronto MLTT, Halifax HRM, Montreal), provincial first-time buyer programs, and local notes (BC PTT exemption, Ontario MLTT, Quebec notary system, etc.). Provinces link added to global nav.
+
 ## In progress
 
-### 1. Rate history charts
-
-Show how 5-year fixed, 3-year fixed, and variable rates have moved over the last 12–24 months on the home page and per-term pages. Single biggest feature differentiator versus other Canadian rate-comparison sites.
-
-**Data plan**: scraper writes a daily snapshot (best discounted + average discounted per term) to `site/src/data/rates-history.json`. Site renders an SVG line chart from the time series.
-
-**Status**: building.
+(none)
 
 ## Up next
-
-### 2. Province landing pages
-
-`/provinces/ontario`, `/provinces/bc`, `/provinces/quebec`, etc. Each surfaces:
-- Provincial credit unions first in the rate table
-- Province-specific land transfer tax notes
-- First-time-home-buyer programs available in that province
-- Local notes (e.g. BC speculation tax, Quebec notary system, Toronto LTT)
-
-Major SEO multiplier — Canadian mortgage searches frequently include the province.
 
 ### 3. Land transfer tax + closing cost calculator
 

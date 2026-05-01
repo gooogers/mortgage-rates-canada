@@ -1,0 +1,302 @@
+---
+import Base from "@layouts/Base.astro";
+import Disclaimer from "@components/Disclaimer.astro";
+import LenderBadge from "@components/LenderBadge.astro";
+import RelatedGuides from "@components/RelatedGuides.astro";
+import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
+import {
+  bestRateForTermInScope,
+  lendersInScope,
+  loadRatesData,
+  type Term,
+} from "@lib/rates";
+import { breadcrumbSchema } from "@lib/schemas";
+import { getProvinceBySlug, PROVINCES_LIST, type ProvinceData } from "../../data/provinces";
+
+export async function getStaticPaths() {
+  return PROVINCES_LIST.map((p) => ({
+    params: { slug: p.slug },
+    props: { province: p },
+  }));
+}
+
+const { province } = Astro.props as { province: ProvinceData };
+const data = await loadRatesData();
+
+const FEATURED: Term[] = ["5yr_fixed", "3yr_fixed", "variable"];
+const featured = FEATURED.map((term) => ({
+  term,
+  best: bestRateForTermInScope(data, term, province.code),
+})).filter((f): f is { term: Term; best: NonNullable<typeof f.best> } => f.best !== null);
+
+// Lenders available in this province (national + provincial), sorted by best 5yr discounted.
+const provLenders = lendersInScope(data, province.code);
+const fiveYrSorted = [...provLenders].sort((a, b) => {
+  const ar = a.rates.find((r) => r.term === "5yr_fixed");
+  const br = b.rates.find((r) => r.term === "5yr_fixed");
+  const av = ar ? (ar.discounted ?? ar.posted) : Infinity;
+  const bv = br ? (br.discounted ?? br.posted) : Infinity;
+  return av - bv;
+});
+
+// Provincial-only lenders (those that listed this province but aren't national)
+// — surfaced as "local lenders" since the user came here for that.
+const localOnly = provLenders.filter((l) => (l.provinces ?? []).length > 0);
+
+const pageSchemas = [
+  breadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Provinces", path: "/provinces" },
+    { name: province.name, path: `/provinces/${province.slug}` },
+  ]),
+];
+
+const relatedSlugs = [
+  "down-payment",
+  "stress-test",
+  "bank-vs-broker",
+  "fixed-vs-variable",
+];
+---
+
+<Base
+  title={`Best Mortgage Rates in ${province.name} | Canadian Rates`}
+  description={`Compare today's best mortgage rates in ${province.name}, including provincial credit unions. Land transfer tax, first-time buyer programs, and local notes for ${province.name} buyers.`}
+  canonical={`https://canadianrates.ca/provinces/${province.slug}`}
+  schemas={pageSchemas}
+>
+  <h1>Mortgage rates in {province.name}</h1>
+  <p class="muted">Updated {formatUpdatedAt(data.updated_at)}.</p>
+  <p class="lede">{province.headline}</p>
+
+  <Disclaimer variant="rate" />
+
+  <section class="prov-hero">
+    {featured.map(({ term, best }) => (
+      <article class="prov-card">
+        <p class="prov-card__label">Best {formatTermLabel(term)}</p>
+        <p class="prov-card__rate">{formatPercent(best.rate.discounted ?? best.rate.posted)}</p>
+        <p class="prov-card__lender">
+          <LenderBadge slug={best.lender.slug} name={best.lender.name} />
+          <a href={`/lenders/${best.lender.slug}`}>{best.lender.name}</a>
+        </p>
+      </article>
+    ))}
+  </section>
+
+  <section>
+    <h2>All lenders available in {province.name}</h2>
+    <p class="muted">
+      Includes national lenders plus provincial credit unions and lenders
+      operating in {province.name}.
+    </p>
+    <table class="rate-table">
+      <thead>
+        <tr>
+          <th>Lender</th>
+          <th>3-Year Fixed</th>
+          <th>5-Year Fixed</th>
+          <th>Variable</th>
+        </tr>
+      </thead>
+      <tbody>
+        {fiveYrSorted.map((lender) => {
+          const r3 = lender.rates.find((r) => r.term === "3yr_fixed");
+          const r5 = lender.rates.find((r) => r.term === "5yr_fixed");
+          const rv = lender.rates.find((r) => r.term === "variable");
+          const cell = (r: typeof r3) =>
+            r ? formatPercent(r.discounted ?? r.posted) : "—";
+          const isLocal = (lender.provinces ?? []).length > 0;
+          return (
+            <tr>
+              <td>
+                <span class="prov-lender-cell">
+                  <LenderBadge slug={lender.slug} name={lender.name} />
+                  <a href={`/lenders/${lender.slug}`}>{lender.name}</a>
+                  {isLocal && <span class="prov-tag">Local</span>}
+                </span>
+              </td>
+              <td>{cell(r3)}</td>
+              <td>{cell(r5)}</td>
+              <td>{cell(rv)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </section>
+
+  {localOnly.length > 0 && (
+    <section>
+      <h2>Provincial credit unions and lenders</h2>
+      <p>
+        These lenders operate primarily in {province.name} and don't appear
+        in the national-only "All Canada" view on the home page. Provincially
+        regulated credit unions are not bound by the federal stress test
+        (B-20) at the same threshold, which can be an opening if you're
+        close to the federal qualifying ceiling.
+      </p>
+      <ul class="prov-local-list">
+        {localOnly.map((lender) => (
+          <li>
+            <strong><a href={`/lenders/${lender.slug}`}>{lender.name}</a></strong>
+            {" — "}
+            <a href={lender.source_url} rel="noopener" target="_blank">{lender.source_url.replace(/^https?:\/\//, "").split("/")[0]}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <section>
+    <h2>Land transfer tax in {province.name}</h2>
+    <p>{province.ltt.summary}</p>
+    {province.ltt.municipal && (
+      <>
+        <h3>{province.ltt.municipal.city}</h3>
+        <p>{province.ltt.municipal.description}</p>
+      </>
+    )}
+    {province.ltt.fthbRebate && (
+      <>
+        <h3>First-time buyer rebate</h3>
+        <p>{province.ltt.fthbRebate}</p>
+      </>
+    )}
+  </section>
+
+  <section>
+    <h2>First-time home buyer programs</h2>
+    <p class="muted">
+      Federal programs apply everywhere — the FHSA, RRSP Home Buyers' Plan,
+      and federal Home Buyers' Tax Credit. The programs below are specific
+      to {province.name}.
+    </p>
+    {province.fthbPrograms.length > 0 ? (
+      <ul class="prov-fthb-list">
+        {province.fthbPrograms.map((p) => (
+          <li>
+            <strong>{p.link ? <a href={p.link} rel="noopener" target="_blank">{p.name}</a> : p.name}</strong>
+            <p>{p.summary}</p>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No standalone provincial programs beyond federal benefits.</p>
+    )}
+  </section>
+
+  {province.notes.length > 0 && (
+    <section>
+      <h2>Local notes</h2>
+      <ul class="prov-notes">
+        {province.notes.map((note) => (
+          <li>{note}</li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <RelatedGuides slugs={relatedSlugs} />
+</Base>
+
+<style>
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+  .lede {
+    margin: 1rem 0 1.5rem;
+    line-height: 1.65;
+    font-size: 1.05rem;
+  }
+  .prov-hero {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0 2rem;
+  }
+  .prov-card {
+    border: 1px solid var(--color-border, #e0e4e8);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    background: var(--color-surface, #fafbfc);
+  }
+  .prov-card__label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin: 0 0 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .prov-card__rate {
+    margin: 0 0 0.5rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+  .prov-card__lender {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+  }
+  .prov-lender-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .prov-tag {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0.05rem 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #e8f0fe;
+    color: #1f6feb;
+    border-radius: 3px;
+  }
+  .rate-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 1.5rem;
+  }
+  .rate-table th,
+  .rate-table td {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--color-border, #e0e4e8);
+    text-align: left;
+    font-size: 0.95rem;
+  }
+  .rate-table th {
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+  .prov-local-list {
+    line-height: 1.7;
+  }
+  .prov-fthb-list {
+    list-style: none;
+    padding: 0;
+  }
+  .prov-fthb-list > li {
+    margin-bottom: 1rem;
+  }
+  .prov-fthb-list > li > p {
+    margin: 0.25rem 0 0;
+    color: var(--color-fg);
+    line-height: 1.55;
+  }
+  .prov-notes li {
+    margin-bottom: 0.5rem;
+    line-height: 1.55;
+  }
+  section h2 {
+    margin-top: 2rem;
+  }
+  section h3 {
+    margin-top: 1.25rem;
+    font-size: 1rem;
+  }
+</style>

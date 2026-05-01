@@ -1,7 +1,7 @@
 ---
 import LenderBadge from "@components/LenderBadge.astro";
 import { formatPercent, formatTermLabel } from "@lib/format";
-import type { BestRate, Province, RatesData, Term } from "@lib/rates";
+import { bestRateForTermInScope, type BestRate, type RatesData, type Term } from "@lib/rates";
 
 interface Props {
   data: RatesData;
@@ -11,29 +11,6 @@ interface Props {
 
 const DEFAULT_FEATURED: Term[] = ["5yr_fixed", "variable"];
 const { data, featured = DEFAULT_FEATURED } = Astro.props;
-
-// Best rate within a province scope. scope === "" means "national lenders
-// only" (the All Canada view); a province code includes national lenders plus
-// any provincial lender available there. Mirrors the visibility rules that
-// RateTable applies to its rows.
-function bestForScope(term: Term, scope: string): BestRate | null {
-  let best: BestRate | null = null;
-  let bestRate = Infinity;
-  for (const lender of data.lenders) {
-    const provs = lender.provinces ?? [];
-    const isNational = provs.length === 0;
-    const matches = isNational || (scope !== "" && provs.includes(scope as Province));
-    if (!matches) continue;
-    const rate = lender.rates.find((r) => r.term === term);
-    if (!rate) continue;
-    const effective = rate.discounted ?? rate.posted;
-    if (effective < bestRate) {
-      bestRate = effective;
-      best = { lender, rate };
-    }
-  }
-  return best;
-}
 
 // Provinces represented by at least one provincial lender — the only scopes
 // where the best rate could differ from national. Other provinces fall back
@@ -49,7 +26,7 @@ const scopes: string[] = ["", ...Array.from(provincesWithLenders).sort()];
 const groups = featured.map((term) => ({
   term,
   cards: scopes
-    .map((scope) => ({ scope, best: bestForScope(term, scope) }))
+    .map((scope) => ({ scope, best: bestRateForTermInScope(data, term, scope) }))
     .filter((c): c is { scope: string; best: BestRate } => c.best !== null),
 }));
 ---

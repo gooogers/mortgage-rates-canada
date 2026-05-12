@@ -4,11 +4,19 @@ import Breadcrumb from "@components/Breadcrumb.astro";
 import Disclaimer from "@components/Disclaimer.astro";
 import LenderBadge from "@components/LenderBadge.astro";
 import LenderFacts from "@components/LenderFacts.astro";
+import RateHistoryChart from "@components/RateHistoryChart.astro";
 import RelatedGuides from "@components/RelatedGuides.astro";
+import TermFaq from "@components/TermFaq.astro";
 import { formatPercent, formatTermLabel, formatUpdatedAt } from "@lib/format";
-import { loadRatesData } from "@lib/rates";
+import { loadRatesData, type Lender, type Term } from "@lib/rates";
 import { getLenderFacts, renderLenderIntro } from "@lib/lenderFacts";
-import { breadcrumbSchema, financialServiceSchema, type BreadcrumbItem } from "@lib/schemas";
+import { buildLenderFaq } from "@lib/lenderFaq";
+import {
+  breadcrumbSchema,
+  faqPageSchema,
+  financialServiceSchema,
+  type BreadcrumbItem,
+} from "@lib/schemas";
 
 export async function getStaticPaths() {
   const data = await loadRatesData();
@@ -19,8 +27,8 @@ export async function getStaticPaths() {
 }
 
 const { lender, allLenders, updatedAt } = Astro.props as {
-  lender: import("@lib/rates").Lender;
-  allLenders: import("@lib/rates").Lender[];
+  lender: Lender;
+  allLenders: Lender[];
   updatedAt: string;
 };
 const facts = getLenderFacts(lender.slug);
@@ -36,6 +44,42 @@ const otherTypeFillers = allLenders
   .filter((l) => l.slug !== lender.slug && l.type !== lender.type)
   .slice(0, Math.max(0, 4 - sameType.length));
 const compareLenders = [...sameType, ...otherTypeFillers].slice(0, 4);
+
+// "vs other lenders" table: pick the most common comparison term that this
+// lender publishes — 5-year fixed first (highest-volume queries), then variable,
+// then 3-year. The table compares this lender's rate alongside the comparison
+// set for the SAME term, so head-to-head queries ("CIBC vs BMO 5-year fixed")
+// land on a page that answers the question on the page.
+const COMPARE_TERM_PRIORITY: Term[] = ["5yr_fixed", "variable", "3yr_fixed"];
+const compareTerm =
+  COMPARE_TERM_PRIORITY.find((t) => lender.rates.some((r) => r.term === t)) ?? null;
+
+interface CompareRow {
+  lender: Lender;
+  posted: number | null;
+  discounted: number | null;
+  effective: number;
+  isCurrent: boolean;
+}
+
+let compareRows: CompareRow[] = [];
+if (compareTerm) {
+  const candidates = [lender, ...compareLenders];
+  for (const l of candidates) {
+    const r = l.rates.find((x) => x.term === compareTerm);
+    if (!r) continue;
+    const eff = r.discounted ?? r.posted;
+    compareRows.push({
+      lender: l,
+      posted: r.posted,
+      discounted: r.discounted,
+      effective: eff,
+      isCurrent: l.slug === lender.slug,
+    });
+  }
+  compareRows.sort((a, b) => a.effective - b.effective);
+}
+const compareLabel = compareTerm ? formatTermLabel(compareTerm) : null;
 
 // Cross-link to the rate-term page for every term this lender offers.
 const TERM_TO_SLUG: Record<string, string> = {
@@ -56,7 +100,17 @@ const termLinks = lender.rates
     slug: TERM_TO_SLUG[r.term],
   }));
 
+// Pick which terms to plot on the rate-history chart. We use 5yr fixed and
+// variable as the universal benchmarks; fall back to whatever the lender
+// publishes if neither is offered.
+const HISTORY_TERMS_PRIORITY: Term[] = ["5yr_fixed", "variable", "3yr_fixed", "2yr_fixed"];
+const historyTerms = HISTORY_TERMS_PRIORITY
+  .filter((t) => lender.rates.some((r) => r.term === t))
+  .slice(0, 2);
+
 const isNationalBank = lender.slug === "national";
+
+const faqItems = buildLenderFaq(lender, facts);
 
 const pageUrl = `https://canadianrates.ca/lenders/${lender.slug}`;
 const breadcrumbTrail: BreadcrumbItem[] = [
@@ -64,7 +118,7 @@ const breadcrumbTrail: BreadcrumbItem[] = [
   { name: "Lenders", path: "/lenders" },
   { name: lender.name, path: `/lenders/${lender.slug}` },
 ];
-const pageSchemas = [
+const pageSchemas: Record<string, unknown>[] = [
   breadcrumbSchema(breadcrumbTrail),
   financialServiceSchema({
     name: lender.name,
@@ -72,6 +126,9 @@ const pageSchemas = [
     pageUrl,
   }),
 ];
+if (faqItems.length > 0) {
+  pageSchemas.push(faqPageSchema(faqItems));
+}
 ---
 
 <Base
@@ -111,7 +168,80 @@ const pageSchemas = [
     </tbody>
   </table>
 
+  <section class="lender-context">
+    <h2>Posted vs discounted rates: what to look at</h2>
+    <p>
+      The <strong>posted rate</strong> is the official sticker rate {lender.name} publishes.
+      It's used for the federal mortgage stress test{lender.type === "big6" ? " and — for Big 6 banks — to calculate the interest-rate-differential (IRD) penalty if you break a closed fixed mortgage early" : ""}.
+      The <strong>discounted rate</strong> is what {lender.name} will actually lend at to a typical qualified borrower; it's almost always the rate that matters for monthly payments.
+    </p>
+    {lender.type === "big6" && (
+      <p class="muted">
+        Because Big 6 IRD penalties are calculated against posted rates, a larger
+        posted-to-discounted gap can mean a larger penalty if you break the mortgage
+        before renewal — worth checking on the term you're considering.
+      </p>
+    )}
+  </section>
+
+  {historyTerms.length > 0 && (
+    <RateHistoryChart
+      terms={historyTerms}
+      heading="Market rate trend (lowest discounted)"
+      caption={`How the best discounted ${historyTerms.map((t) => formatTermLabel(t).toLowerCase()).join(" and ")} rate across tracked lenders has moved over time. ${lender.name}'s current rates are listed above.`}
+    />
+  )}
+
   {facts && <LenderFacts facts={facts} />}
+
+  {facts && (
+    <section class="lender-context">
+      <h2>{lender.name} prepayment privileges</h2>
+      <p>
+        {lender.name} allows up to <strong>{facts.prepayment.lump_sum_pct}% of the original principal</strong> as a lump-sum prepayment each year without penalty.
+        On a $500,000 mortgage, that's roughly <strong>${(500_000 * facts.prepayment.lump_sum_pct / 100).toLocaleString("en-CA")}</strong> per year.
+        {facts.prepayment.payment_increase_pct >= 100
+          ? " You can also double your regular payment without penalty."
+          : ` You can also increase your regular payment by up to ${facts.prepayment.payment_increase_pct}% per year.`}
+      </p>
+      <p class="muted">
+        Prepayment privileges and how they accumulate vary by product (open vs closed, fixed vs variable) — always confirm with your mortgage agreement.
+      </p>
+    </section>
+  )}
+
+  {compareTerm && compareRows.length > 1 && (
+    <section class="lender-context">
+      <h2>{lender.name} vs other lenders — {compareLabel}</h2>
+      <p class="muted">
+        Today's published {compareLabel?.toLowerCase()} rates from {lender.name} and similar lenders, sorted lowest first.
+      </p>
+      <table class="rate-table">
+        <thead>
+          <tr>
+            <th>Lender</th>
+            <th>Posted</th>
+            <th>Discounted</th>
+          </tr>
+        </thead>
+        <tbody>
+          {compareRows.map((row) => (
+            <tr class={`lender-row${row.isCurrent ? " lender-row--current" : ""}`}>
+              <td class="lender-row__name">
+                {row.isCurrent ? (
+                  <strong>{row.lender.name}</strong>
+                ) : (
+                  <a href={`/lenders/${row.lender.slug}`}>{row.lender.name}</a>
+                )}
+              </td>
+              <td><s class="lender-row__posted">{formatPercent(row.posted)}</s></td>
+              <td><strong class="lender-row__discounted">{formatPercent(row.discounted)}</strong></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  )}
 
   {lender.affiliate_url && (
     <p>
@@ -166,6 +296,8 @@ const pageSchemas = [
       </ul>
     </section>
   )}
+
+  <TermFaq items={faqItems} />
 
   <RelatedGuides slugs={["affordability"]} />
 </Base>
@@ -223,5 +355,8 @@ const pageSchemas = [
   }
   .lender-context__compare a:hover {
     border-color: var(--color-accent);
+  }
+  .lender-row--current {
+    background: var(--color-surface, #f7f9fb);
   }
 </style>

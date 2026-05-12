@@ -9,11 +9,19 @@ const { facts } = Astro.props;
 const channelList = facts.channels
   .map((c) => c.charAt(0).toUpperCase() + c.slice(1))
   .join(", ");
-const verifiedDate = new Date(facts.last_verified_at).toLocaleDateString("en-CA", {
-  year: "numeric",
-  month: "short",
-  timeZone: "UTC",
-});
+// Entries with an empty or unparseable `last_verified_at` are AI-drafted
+// (per the comment in lenders.yaml) and have not been fact-checked against
+// primary sources. Show a "pending" hint rather than "Invalid Date".
+const verifiedTime = facts.last_verified_at
+  ? new Date(facts.last_verified_at).getTime()
+  : NaN;
+const verifiedDate = Number.isNaN(verifiedTime)
+  ? null
+  : new Date(verifiedTime).toLocaleDateString("en-CA", {
+      year: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    });
 ---
 
 <section class="lender-facts">
@@ -40,7 +48,9 @@ const verifiedDate = new Date(facts.last_verified_at).toLocaleDateString("en-CA"
       </>
     )}
   </dl>
-  <p class="lender-facts__verified">Verified {verifiedDate}</p>
+  <p class="lender-facts__verified">
+    {verifiedDate ? `Verified ${verifiedDate}` : "Verification pending"}
+  </p>
 </section>
 
 <style>

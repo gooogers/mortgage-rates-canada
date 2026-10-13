@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-12T19:47:15Z",
+  "updated_at": "2026-10-13T17:32:23Z",
   "lenders": [
     {
       "slug": "rbc",
@@ -58,7 +58,7 @@
       "type": "big6",
       "source_url": "https://www.td.com/ca/en/personal-banking/products/mortgages/mortgage-rates",
       "affiliate_url": null,
-      "scraped_at": "2026-10-12T19:45:03Z",
+      "scraped_at": "2026-10-13T17:30:09Z",
       "rates": [
         {
           "term": "3yr_fixed",
@@ -262,7 +262,7 @@
       "type": "big6",
       "source_url": "https://www.nbc.ca/personal/mortgages.html",
       "affiliate_url": null,
-      "scraped_at": "2026-10-12T19:45:05Z",
+      "scraped_at": "2026-10-13T17:30:11Z",
       "rates": [
         {
           "term": "1yr_fixed",
@@ -364,7 +364,7 @@
       "type": "credit_union",
       "source_url": "https://www.alterna.ca/en/rates/mortgages",
       "affiliate_url": null,
-      "scraped_at": "2026-10-12T19:46:07Z",
+      "scraped_at": "2026-10-13T17:31:15Z",
       "rates": [
         {
           "term": "1yr_fixed",
@@ -407,7 +407,7 @@
       "type": "credit_union",
       "source_url": "https://www.coastcapitalsavings.com/rates/mortgages",
       "affiliate_url": null,
-      "scraped_at": "2026-10-12T19:47:11Z",
+      "scraped_at": "2026-10-13T17:32:18Z",
       "rates": [
         {
           "term": "1yr_fixed",
@@ -432,7 +432,7 @@
         {
           "term": "5yr_fixed",
           "posted": 6.1,
-          "discounted": 4.79
+          "discounted": 4.84
         },
         {
           "term": "7yr_fixed",
@@ -460,7 +460,7 @@
       "type": "credit_union",
       "source_url": "https://servus.ca/rates",
       "affiliate_url": null,
-      "scraped_at": "2026-10-12T19:47:13Z",
+      "scraped_at": "2026-10-13T17:32:19Z",
       "rates": [
         {
           "term": "1yr_fixed",
@@ -498,7 +498,7 @@
       "type": "credit_union",
       "source_url": "https://www.atb.com/resources/rates/mortgage-rates/",
       "affiliate_url": null,
-      "scraped_at": "2026-10-12T19:47:15Z",
+      "scraped_at": "2026-10-13T17:32:23Z",
       "rates": [
         {
           "term": "1yr_fixed",

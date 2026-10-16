@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T14:51:05Z",
+  "updated_at": "2026-10-16T14:45:23Z",
   "lenders": [
     {
       "slug": "rbc",
@@ -58,7 +58,7 @@
       "type": "big6",
       "source_url": "https://www.td.com/ca/en/personal-banking/products/mortgages/mortgage-rates",
       "affiliate_url": null,
-      "scraped_at": "2026-10-15T14:48:53Z",
+      "scraped_at": "2026-10-16T14:43:12Z",
       "rates": [
         {
           "term": "3yr_fixed",
@@ -262,7 +262,7 @@
       "type": "big6",
       "source_url": "https://www.nbc.ca/personal/mortgages.html",
       "affiliate_url": null,
-      "scraped_at": "2026-10-15T14:48:55Z",
+      "scraped_at": "2026-10-16T14:43:13Z",
       "rates": [
         {
           "term": "1yr_fixed",
@@ -277,17 +277,17 @@
         {
           "term": "3yr_fixed",
           "posted": 6.09,
-          "discounted": 4.94
+          "discounted": 5.04
         },
         {
           "term": "4yr_fixed",
           "posted": 6.05,
-          "discounted": 5.04
+          "discounted": 5.09
         },
         {
           "term": "5yr_fixed",
           "posted": 6.14,
-          "discounted": 5.04
+          "discounted": 5.14
         },
         {
           "term": "7yr_fixed",
@@ -364,7 +364,7 @@
       "type": "credit_union",
       "source_url": "https://www.alterna.ca/en/rates/mortgages",
       "affiliate_url": null,
-      "scraped_at": "2026-10-15T14:49:58Z",
+      "scraped_at": "2026-10-16T14:44:15Z",
       "rates": [
         {
           "term": "1yr_fixed",
@@ -407,7 +407,7 @@
       "type": "credit_union",
       "source_url": "https://www.coastcapitalsavings.com/rates/mortgages",
       "affiliate_url": null,
-      "scraped_at": "2026-10-15T14:51:01Z",
+      "scraped_at": "2026-10-16T14:45:19Z",
       "rates": [
         {
           "term": "1yr_fixed",
@@ -460,7 +460,7 @@
       "type": "credit_union",
       "source_url": "https://servus.ca/rates",
       "affiliate_url": null,
-      "scraped_at": "2026-10-15T14:51:03Z",
+      "scraped_at": "2026-10-16T14:45:20Z",
       "rates": [
         {
           "term": "1yr_fixed",
@@ -498,7 +498,7 @@
       "type": "credit_union",
       "source_url": "https://www.atb.com/resources/rates/mortgage-rates/",
       "affiliate_url": null,
-      "scraped_at": "2026-10-15T14:51:05Z",
+      "scraped_at": "2026-10-16T14:45:23Z",
       "rates": [
         {
           "term": "1yr_fixed",

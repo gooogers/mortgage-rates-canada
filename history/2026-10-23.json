@@ -1,0 +1,539 @@
+{
+  "updated_at": "2026-10-23T14:53:55Z",
+  "lenders": [
+    {
+      "slug": "rbc",
+      "name": "RBC Royal Bank",
+      "type": "big6",
+      "source_url": "https://www.rbcroyalbank.com/mortgages/mortgage-rates.html",
+      "affiliate_url": null,
+      "scraped_at": "2026-06-11T14:05:07Z",
+      "rates": [
+        {
+          "term": "1yr_fixed",
+          "posted": 5.49,
+          "discounted": 4.89
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 5.39,
+          "discounted": 4.79
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 6.05,
+          "discounted": 4.74
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 5.99,
+          "discounted": 4.84
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.09,
+          "discounted": 4.89
+        },
+        {
+          "term": "7yr_fixed",
+          "posted": 6.4,
+          "discounted": 5.0
+        },
+        {
+          "term": "10yr_fixed",
+          "posted": 6.8,
+          "discounted": null
+        },
+        {
+          "term": "variable",
+          "posted": 4.45,
+          "discounted": 3.95
+        }
+      ],
+      "provinces": null
+    },
+    {
+      "slug": "td",
+      "name": "TD Bank",
+      "type": "big6",
+      "source_url": "https://www.td.com/ca/en/personal-banking/products/mortgages/mortgage-rates",
+      "affiliate_url": null,
+      "scraped_at": "2026-10-23T14:51:44Z",
+      "rates": [
+        {
+          "term": "3yr_fixed",
+          "posted": 6.15,
+          "discounted": 5.24
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.14,
+          "discounted": 5.39
+        },
+        {
+          "term": "variable",
+          "posted": 4.6,
+          "discounted": 4.29
+        },
+        {
+          "term": "1yr_fixed",
+          "posted": 5.69,
+          "discounted": null
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 5.39,
+          "discounted": null
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 5.99,
+          "discounted": null
+        },
+        {
+          "term": "7yr_fixed",
+          "posted": 6.4,
+          "discounted": null
+        },
+        {
+          "term": "10yr_fixed",
+          "posted": 6.8,
+          "discounted": null
+        }
+      ],
+      "provinces": null
+    },
+    {
+      "slug": "bmo",
+      "name": "BMO Bank of Montreal",
+      "type": "big6",
+      "source_url": "https://www.bmo.com/main/personal/mortgages/mortgage-rates/",
+      "affiliate_url": null,
+      "scraped_at": "2026-04-27T20:28:54Z",
+      "rates": [
+        {
+          "term": "variable",
+          "posted": 4.1,
+          "discounted": 4.1
+        },
+        {
+          "term": "1yr_fixed",
+          "posted": 5.49,
+          "discounted": null
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 4.89,
+          "discounted": null
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 6.05,
+          "discounted": 4.64
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 5.99,
+          "discounted": null
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.09,
+          "discounted": 4.84
+        },
+        {
+          "term": "7yr_fixed",
+          "posted": 6.4,
+          "discounted": null
+        },
+        {
+          "term": "10yr_fixed",
+          "posted": 6.8,
+          "discounted": 6.7
+        }
+      ],
+      "provinces": null
+    },
+    {
+      "slug": "scotiabank",
+      "name": "Scotiabank",
+      "type": "big6",
+      "source_url": "https://www.scotiabank.com/ca/en/personal/mortgages.html",
+      "affiliate_url": null,
+      "scraped_at": "2026-04-27T20:28:54Z",
+      "rates": [
+        {
+          "term": "variable",
+          "posted": 5.95,
+          "discounted": 5.95
+        },
+        {
+          "term": "1yr_fixed",
+          "posted": 5.84,
+          "discounted": null
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 5.14,
+          "discounted": null
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 6.05,
+          "discounted": null
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 5.99,
+          "discounted": null
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.09,
+          "discounted": 4.9
+        },
+        {
+          "term": "7yr_fixed",
+          "posted": 6.4,
+          "discounted": null
+        },
+        {
+          "term": "10yr_fixed",
+          "posted": 6.8,
+          "discounted": null
+        }
+      ],
+      "provinces": null
+    },
+    {
+      "slug": "cibc",
+      "name": "CIBC",
+      "type": "big6",
+      "source_url": "https://www.cibc.com/en/personal-banking/mortgages/mortgage-rates.html",
+      "affiliate_url": null,
+      "scraped_at": "2026-04-27T20:28:55Z",
+      "rates": [
+        {
+          "term": "1yr_fixed",
+          "posted": 4.99,
+          "discounted": 4.74
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 5.24,
+          "discounted": 4.29
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 6.14,
+          "discounted": 4.64
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 6.19,
+          "discounted": 4.79
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.49,
+          "discounted": 4.84
+        },
+        {
+          "term": "7yr_fixed",
+          "posted": 6.3,
+          "discounted": 5.11
+        },
+        {
+          "term": "10yr_fixed",
+          "posted": 6.79,
+          "discounted": null
+        },
+        {
+          "term": "variable",
+          "posted": 4.45,
+          "discounted": 3.95
+        }
+      ],
+      "provinces": null
+    },
+    {
+      "slug": "national",
+      "name": "National Bank of Canada",
+      "type": "big6",
+      "source_url": "https://www.nbc.ca/personal/mortgages.html",
+      "affiliate_url": null,
+      "scraped_at": "2026-10-23T14:51:46Z",
+      "rates": [
+        {
+          "term": "1yr_fixed",
+          "posted": 5.49,
+          "discounted": null
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 5.24,
+          "discounted": null
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 6.09,
+          "discounted": 5.04
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 6.05,
+          "discounted": 5.09
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.14,
+          "discounted": 5.14
+        },
+        {
+          "term": "7yr_fixed",
+          "posted": 6.4,
+          "discounted": null
+        },
+        {
+          "term": "10yr_fixed",
+          "posted": 6.8,
+          "discounted": null
+        },
+        {
+          "term": "variable",
+          "posted": 4.45,
+          "discounted": null
+        }
+      ],
+      "provinces": null
+    },
+    {
+      "slug": "tangerine",
+      "name": "Tangerine",
+      "type": "other",
+      "source_url": "https://www.tangerine.ca/en/rates/mortgage-rates",
+      "affiliate_url": null,
+      "scraped_at": "2026-04-27T20:28:58Z",
+      "rates": [
+        {
+          "term": "variable",
+          "posted": 4.0,
+          "discounted": 4.0
+        },
+        {
+          "term": "1yr_fixed",
+          "posted": 5.99,
+          "discounted": 5.99
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 5.14,
+          "discounted": 5.14
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 4.44,
+          "discounted": 4.44
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 4.49,
+          "discounted": 4.49
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 4.49,
+          "discounted": 4.49
+        },
+        {
+          "term": "7yr_fixed",
+          "posted": 5.5,
+          "discounted": 5.5
+        },
+        {
+          "term": "10yr_fixed",
+          "posted": 5.9,
+          "discounted": 5.9
+        }
+      ],
+      "provinces": null
+    },
+    {
+      "slug": "alterna",
+      "name": "Alterna Savings",
+      "type": "credit_union",
+      "source_url": "https://www.alterna.ca/en/rates/mortgages",
+      "affiliate_url": null,
+      "scraped_at": "2026-10-23T14:52:48Z",
+      "rates": [
+        {
+          "term": "1yr_fixed",
+          "posted": 6.55,
+          "discounted": 5.69
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 6.25,
+          "discounted": 5.39
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 5.74,
+          "discounted": 4.94
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 6.44,
+          "discounted": 5.04
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.04,
+          "discounted": 5.04
+        },
+        {
+          "term": "variable",
+          "posted": 4.15,
+          "discounted": null
+        }
+      ],
+      "provinces": [
+        "ON"
+      ]
+    },
+    {
+      "slug": "coast-capital",
+      "name": "Coast Capital Savings",
+      "type": "credit_union",
+      "source_url": "https://www.coastcapitalsavings.com/rates/mortgages",
+      "affiliate_url": null,
+      "scraped_at": "2026-10-23T14:53:51Z",
+      "rates": [
+        {
+          "term": "1yr_fixed",
+          "posted": 5.5,
+          "discounted": 4.89
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 5.0,
+          "discounted": 4.49
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 6.05,
+          "discounted": 4.54
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 6.0,
+          "discounted": 4.69
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.1,
+          "discounted": 4.84
+        },
+        {
+          "term": "7yr_fixed",
+          "posted": 6.4,
+          "discounted": 4.99
+        },
+        {
+          "term": "10yr_fixed",
+          "posted": 6.8,
+          "discounted": 5.24
+        },
+        {
+          "term": "variable",
+          "posted": 4.45,
+          "discounted": 3.84
+        }
+      ],
+      "provinces": [
+        "BC"
+      ]
+    },
+    {
+      "slug": "servus",
+      "name": "Servus Credit Union",
+      "type": "credit_union",
+      "source_url": "https://servus.ca/rates",
+      "affiliate_url": null,
+      "scraped_at": "2026-10-23T14:53:53Z",
+      "rates": [
+        {
+          "term": "1yr_fixed",
+          "posted": 5.49,
+          "discounted": 4.94
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 5.49,
+          "discounted": 4.59
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 5.94,
+          "discounted": 4.59
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 5.99,
+          "discounted": 4.69
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.09,
+          "discounted": 4.79
+        }
+      ],
+      "provinces": [
+        "AB"
+      ]
+    },
+    {
+      "slug": "atb",
+      "name": "ATB Financial",
+      "type": "credit_union",
+      "source_url": "https://www.atb.com/resources/rates/mortgage-rates/",
+      "affiliate_url": null,
+      "scraped_at": "2026-10-23T14:53:55Z",
+      "rates": [
+        {
+          "term": "1yr_fixed",
+          "posted": 7.14,
+          "discounted": 6.09
+        },
+        {
+          "term": "2yr_fixed",
+          "posted": 6.64,
+          "discounted": 5.59
+        },
+        {
+          "term": "3yr_fixed",
+          "posted": 6.04,
+          "discounted": 4.59
+        },
+        {
+          "term": "4yr_fixed",
+          "posted": 6.04,
+          "discounted": 4.64
+        },
+        {
+          "term": "5yr_fixed",
+          "posted": 6.09,
+          "discounted": 4.69
+        },
+        {
+          "term": "variable",
+          "posted": 5.3,
+          "discounted": 3.8
+        }
+      ],
+      "provinces": [
+        "AB"
+      ]
+    }
+  ]
+}
